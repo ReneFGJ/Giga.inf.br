@@ -1,0 +1,119 @@
+@media screen {
+	#cab_print {
+		display: none;
+	}
+	.noscreen
+		{
+		display: none;	
+		}	
+}
+@media print {
+	#cab_screen {
+		display: none;
+	}
+	#foot {
+		display: none;
+	}
+	#main_menu {
+		display: none;
+	}
+	.nopr
+		{
+		display: none;	
+		}
+}
+/****************************************** BODY ****/
+body
+	{
+		background-image: url("../img/background/body.png");
+	}
+.painel
+	{
+		padding: 5px;
+		border: 1px solid #000000; 
+		margin-bottom: 5px; 
+		margin-right: 5px; 
+		border-radius: 10px;
+		min-height: 110px;
+	}
+/*********************************** TABELA ***********/
+th
+	{
+		background-color: #cccccc;
+		color: #000000;
+	}
+/******************** Font size ***********************/
+.small
+	{
+		color: #888888;
+		font-size: 11px;
+	}
+.middle
+	{
+		font-size: 13px;
+	}	
+.big
+	{
+		font-size: 18px;
+	}
+
+.superbig
+	{
+		font-size: 26px;
+	}	
+/************************ Font style **********************/
+.roboto
+	{
+		font-family: RobotoThin, Tahoma, Arial, Helvetica, sans-serif;
+	}
+
+.bg_item_0
+	{
+		background-color: #eeeeee;		
+	}
+.bg_item_1
+	{
+		background-color: #dddddd;		
+	}
+.bg_item_2
+	{
+		background-color: #cccccc;		
+	}
+.bg_item_3
+	{
+		background-color: #bbbbbb;		
+	}
+.red
+	{
+		color: red;
+	}
+.textoVertical {
+	writing-mode:tb-rl;
+	-webkit-transform:rotate(180deg); 
+	-moz-transform:rotate(180deg);
+	-o-transform: rotate(180deg);
+	white-space:nowrap;
+}
+.form_tabela2
+	{
+		font-size: 11px;
+	}
+/************************************* PADDING */ 
+ .pad5
+ 	{
+ 		padding: 10px;
+ 	}
+/*************** TOP MENU **********************/
+.navbar
+	{
+		background-color: #3367d6;
+		color: white;
+	}
+.navbar-default .navbar-nav > li > a
+	{
+		color: #d0d0d0;
+	}
+.navbar-default .navbar-nav > li > a:hover
+	{
+		color: white;
+	}
