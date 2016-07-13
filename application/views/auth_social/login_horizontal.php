@@ -2,7 +2,7 @@
 $erro = get("err");
 ?>
 <!--- LOGIN --->
-<div class="container-fluid" style="background-color: #1d4161; opacity: 0.7; position: absolute; top: 20%; z-index: 999999;">
+<div class="container-fluid" style="background-color: #1d4161; opacity: 0.7; position: absolute; top: 20%; z-index: 999999; width: 100%;">
 	<div id="loginbox" style="margin-top:15px;" class="col-md-3 col-sm-2 text-right">
 		<img src="<?php echo base_url('img/logo/logo_png_bw.png');?>">
 	</div>

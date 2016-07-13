@@ -90,7 +90,7 @@ $us_nome = $_SESSION['user'];
 						<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li>
-							<a href="#">Meus Dados</a>
+							<a href="<?php echo base_url('index.php/main/myaccount'); ?>">Meus Dados</a>
 						</li>
 						<li>
 							<a href="<?php echo base_url('index.php/social/logout'); ?>">Logout</a>

@@ -6,11 +6,10 @@ class users extends CI_model {
 		$cp = array();
 		array_push($cp, array('$H8', 'id_us', '', False, True));
 		array_push($cp, array('$S80', 'us_nome', 'Nome', True, True));
-		if ($id == 0)
-			{
-				array_push($cp, array('$S80', 'us_email', 'login/email', True, True));
-				array_push($cp, array('$P20', '', 'Senha', True, True));
-			}
+		if ($id == 0) {
+			array_push($cp, array('$S80', 'us_email', 'login/email', True, True));
+			array_push($cp, array('$P20', '', 'Senha', True, True));
+		}
 		array_push($cp, array('$HV', 'us_password', md5(get("dd3")), True, True));
 		array_push($cp, array('$O 1:SIM&0:NÃO', 'us_ativo', 'Ativo', True, True));
 		return ($cp);
@@ -24,14 +23,14 @@ class users extends CI_model {
 		$dt['us_autenticador'] = 'MD5';
 		$this -> insert_new_user($dt);
 	}
-	
-	function row($id='') {
+
+	function row($id = '') {
 		$form = new form;
 
-		$form -> fd = array('id_us', 'us_nome', 'us_badge');
-		$form -> lb = array('id', msg('us_name'), msg('us_cracha'));
-		$form -> mk = array('', 'L', 'L', 'L');		
-		
+		$form -> fd = array('id_us', 'us_nome', 'us_login');
+		$form -> lb = array('id', msg('us_name'), msg('us_login'));
+		$form -> mk = array('', 'L', 'L', 'L');
+
 		$form -> tabela = $this -> table;
 		$form -> see = true;
 		$form -> novo = true;
@@ -44,16 +43,15 @@ class users extends CI_model {
 		return (row($form, $id));
 	}
 
-	function editar($id,$chk)
-		{
-			$form = new form;
-			$form->id = $id;
-			$cp = $this->cp($id);
-			$data['title'] = '';
-			$data['content'] = $form->editar($cp,$this->table);
-			$this->load->view('content',$data);
-			return($form->saved);			
-		}	
+	function editar($id, $chk) {
+		$form = new form;
+		$form -> id = $id;
+		$cp = $this -> cp($id);
+		$data['title'] = '';
+		$data['content'] = $form -> editar($cp, $this -> table);
+		$this -> load -> view('content', $data);
+		return ($form -> saved);
+	}
 
 	function insert_new_user($data) {
 		$email = $data['us_email'];
@@ -98,11 +96,10 @@ class users extends CI_model {
 		} else {
 			return ($rlt[0]);
 		}
-
 	}
 
 	function updatex() {
-		$sql = "update " . $this -> table . " set us_badge = lpad(id_us,8,0) where us_badge = '' or us_badge is null ";
+		$sql = "update " . $this -> table . " set us_badge = lpad(id_us,5,0) where us_badge = '' or us_badge is null ";
 		$this -> db -> query($sql);
 	}
 
@@ -170,6 +167,17 @@ class users extends CI_model {
 				return (0);
 			}
 		}
+	}
+
+	function my_account($id) {
+		$this -> load -> model('user_drh');
+
+		$data1 = $this -> le($id);
+		$data2 = $this -> user_drh -> le($id);
+		$data = array_merge($data1, $data2);
+
+		$tela = $this -> load -> view('auth_social/myaccount', $data,true);
+		return($tela);
 	}
 
 }

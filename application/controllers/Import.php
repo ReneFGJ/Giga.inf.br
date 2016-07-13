@@ -44,6 +44,24 @@ class Import extends CI_Controller {
 		$this->imports->cpagar();
 		
 		$this -> footer();
-	}	
+	}
+	function usuarios() {
+		$this -> cab();
+		$this->load->model("imports");
+		
+		$this->imports->usuarios();
+		
+		$this -> footer();
+	}
+	function fornecedores() {
+		$this -> cab();
+		$this->load->model("imports");
+		
+		$data['content'] = $this->imports->fornecedores();
+		$data['title'] = '';
+		$this->load->view('content',$data);
+		
+		$this -> footer();
+	}			
 }
 ?>

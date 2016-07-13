@@ -1,6 +1,7 @@
 <?php
 class clientes extends CI_Model {
 	var $table = 'clientes';
+	var $table_contatos = 'clientes_contatos';
 	
 	function le($id)
 		{
@@ -43,12 +44,31 @@ class clientes extends CI_Model {
 		return ($cp);
 	}
 
+	function cp_contatos($id,$idc) {
+		$cp = array();
+		array_push($cp, array('$H8', 'id_cc', '', False, True));		
+		array_push($cp, array('$S80', 'cc_nome', 'Nome do contato', True, True));
+		array_push($cp, array('$S80', 'cc_telefone', 'Telefone', False, True));
+		array_push($cp, array('$S80', 'cc_email', 'e-mail', False, True));
+		
+		if ($id == 0)
+			{
+				array_push($cp, array('$HV', 'cc_cliente_id', $idc, True, True));
+				array_push($cp, array('$HV', 'cc_ativo', 1, True, True));
+			} else {
+				array_push($cp, array('$O 1:Ativo&0:Inativo', 'cc_ativo', 'Ativo', True, True));
+			}		
+		array_push($cp, array('$B', '', 'Gravar', False, True));
+		return ($cp);
+	}
+
 	function row($id='') {
 		$form = new form;
 
 		$form -> fd = array('id_f', 'f_nome_fantasia', 'f_razao_social', 'f_estado');
 		$form -> lb = array('id', msg('f_nome_fantasia'), msg('f_razao_social'), msg('f_estado'));
-		$form -> mk = array('', 'L', 'L', 'L');		
+		$form -> mk = array('', 'L', 'L', 'L');	
+		$form -> pre_where = ' f_ativo = 1 ';	
 		
 		$form -> tabela = $this -> table;
 		$form -> see = true;
@@ -72,5 +92,55 @@ class clientes extends CI_Model {
 			$this->load->view('content',$data);
 			return($form->saved);			
 		}
-
+		
+	function contatos($id)
+		{
+			$sql = "select * from ".$this->table_contatos." 
+					where cc_ativo = 1 and cc_cliente_id	= ".round($id);
+			$rlt = $this->db->query($sql);
+			$rlt = $rlt->result_array();
+			$sx = '<table class="table middle" width="100%">';
+			$sx .= '<tr>
+						<th>nome</th>
+						<th>telefone</th>
+						<th>e-mail</th>
+						<th>editar</th>
+					</tr>';
+			for ($r=0;$r < count($rlt);$r++)
+				{
+					$line = $rlt[$r];
+					$bx = '<button type="button" class="btn btn-primary" aria-label="Left Align" onclick="newwin(\''.base_url('index.php/main/cliente_contato_edit/'.$line['id_cc'].'/'.$id).'\');">';
+					$bx .= '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>';
+					$bx .= '</button>';					
+					
+					$sx .= '<tr>';
+					$sx .= '<td>'.$line['cc_nome'].'</td>';
+					$sx .= '<td>'.$line['cc_telefone'].'</td>';
+					$sx .= '<td>'.$line['cc_email'].'</td>';
+					$sx .= '<td>'.$bx.'</td>';
+				}
+			$sx .= '</table>';
+			return($sx);
+		}
+	function contatos_total($id)
+		{
+			$sql = "select count(*) as total from ".$this->table_contatos." 
+					where cc_ativo = 1 and cc_cliente_id	= ".round($id);
+			$rlt = $this->db->query($sql);
+			$rlt = $rlt->result_array();
+			if (count($rlt) > 0)
+				{
+					return($rlt[0]['total']);
+				} else {
+					return(0);
+				}
+			return($sx);
+		}
+	function novo_contato($id)
+		{
+			$sx = '<button type="button" class="btn btn-primary" aria-label="Left Align" onclick="newwin(\''.base_url('index.php/main/cliente_contato_edit/0/'.$id).'\');">';
+			$sx .= 'novo contato';
+			$sx .= '</button>';
+			return($sx);
+		}
 }

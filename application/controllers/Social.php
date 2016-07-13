@@ -220,5 +220,15 @@ class social extends CI_Controller {
 
 		}
 	}
+	function myaccount()
+		{
+			$id = $_SESSION['id'];
+			$this->load->model('users');
+			
+			$this -> cab();
+			$data['title'] = '';
+			$data['content'] = $this->users->my_account($id);
+			$this->load->view('content',$data);
+		}
 
 }

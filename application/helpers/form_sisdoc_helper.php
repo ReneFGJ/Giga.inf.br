@@ -2323,7 +2323,7 @@ if (!function_exists('form_edit')) {
 
 				$size = sonumero($type);
 
-				$dados = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'maxlenght' => $max, 'size' => $size, 'placeholder' => $label, 'class' => 'form_string');
+				$dados = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'maxlenght' => $max, 'size' => $size, 'placeholder' => $label, 'class' => 'form_string form_s'.$size);
 				if ($readonly == false) { $dados['readonly'] = 'readonly';
 				}
 				$tela .= $td . form_input($dados);

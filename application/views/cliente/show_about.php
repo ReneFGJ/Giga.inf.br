@@ -4,6 +4,12 @@ if ($mensagens_total == 0)
 	{
 		$msg_total = '<span>&nbsp;</span>';
 	}
+if ($contatos_total == 0)
+	{
+		$contatos_total = '<span>&nbsp;</span>';
+	} else {
+		$contatos_total = '<span class="badge">'.$contatos_total.'</span>';		
+	}
 /***************************** orcamento **********/
 $orcamento_total = '<span class="badge">'.$orcamentos_total.'</span>';
 if ($orcamentos_total == 0)
@@ -24,7 +30,7 @@ if ($orcamentos_total == 0)
 			<a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Mensagens <?php echo $msg_total;?></a>
 		</li>
 		<li role="presentation">
-			<a href="#contatos" aria-controls="contato" role="tab" data-toggle="tab">Contatos <span class="badge">42</span></a>
+			<a href="#contatos" aria-controls="contato" role="tab" data-toggle="tab">Contatos <?php echo $contatos_total;?></a>
 		</li>
 		<li role="presentation">
 			<a href="#pedidos" aria-controls="pedido" role="tab" data-toggle="tab">Pedidos <span class="badge">42</span></a>
@@ -43,10 +49,10 @@ if ($orcamentos_total == 0)
 			..2.
 		</div>
 		<div role="tabpanel" class="tab-pane fade" id="messages">
-			..3.
+			<?php echo $mensagens;?>
 		</div>
 		<div role="tabpanel" class="tab-pane" id="contatos">
-			..4.
+			<?php echo $contatos;?>
 		</div>
 		<div role="tabpanel" class="tab-pane" id="pedidos">
 			..5.

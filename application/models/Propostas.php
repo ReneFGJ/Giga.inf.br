@@ -302,10 +302,24 @@ class propostas extends CI_model {
 		$sx .= '<div class="row">';
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
+			$tipo = $line['pp_situacao'];
+			
+			switch ($tipo)
+				{
+				case '0':
+					$tipo = 'alert-danger';
+					break;
+				case '1':
+					$tipo = 'alert-success';
+					break;
+				}
+			
 			$validade = $line['pp_validade_proposta'];
 			$link = base_url('index.php/main/proposta/' . $line['id_pp'] . '/' . checkpost_link($line['id_pp']));
 			$sx .= '<a href="' . $link . '">';
-			$sx .= '<div class="col-md-3 painel alert alert-danger">';
+			//$sx .= '<div class="col-md-3 painel alert alert-danger">';
+			$sx .= '<div class="col-md-3">';
+			$sx .= '<button class="alert '.$tipo.' painel">';
 			$sx .= '<span class="small" >' . stodbr($line['pp_data']) . '</span>';
 			$sx .= '<br>';
 			$sx .= '<span class="small" >Proposta nº ' . round($line['pp_nr']) . '/' . $line['pp_ano'] . '</span>';
@@ -315,6 +329,7 @@ class propostas extends CI_model {
 
 			$sx .= '<br>';
 			$sx .= '<span class="small" >Vendedor: ' . $line['us_nome'] . '</span>';
+			$sx .= '</button>';
 			$sx .= '</div>';
 			$sx .= '</a>';
 			$sx .= cr();
@@ -323,6 +338,38 @@ class propostas extends CI_model {
 		$sx .= '</div>';
 		return ($sx);
 	}
+	function proposta_finalizar($id)
+		{
+			$sql = "update ".$this->table." set pp_situacao = 1 where id_pp = ".$id;
+			$this->db->query($sql);
+			return('');
+		}
+	function proposta_acoes($data)
+		{
+			$sit = $data['pp_situacao'];
+			$id = $data['id_pp'];
+			$ac = array();
+			$sx = '';
+			switch ($sit)
+				{
+				case '0':
+					$sx .= '<div class="row">
+								<div class="col-md-12">
+									<a href="'.base_url('index.php/main/proposta_finalizar/'.$id.'/'.checkpost_link($id)).'" class="btn btn-primary">Finalizar edição</a>
+									&nbsp;																	
+									<a href="'.base_url('index.php/main/proposta_editar/'.$id.'/'.checkpost_link($id)).'" class="btn btn-primary">Editar proposta</a>
+									&nbsp;
+									<a href="#" class="btn btn-default">Cancelar proposta</a>
+									&nbsp;
+
+								</div>
+							</div>';
+					break;
+				default:
+					break;		
+				}
+			return($sx);
+		}
 
 }
 ?>

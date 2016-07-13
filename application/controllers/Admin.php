@@ -99,6 +99,13 @@ class Admin extends CI_controller {
 		}
 	}
 
-
+	function user($id,$chk='')
+		{
+			$this->load->model('users');
+			$this -> cab();
+			$data['title'] = '';
+			$data['content'] = $this->users->my_account($id);
+			$this->load->view('content',$data);
+		}
 }
 ?>

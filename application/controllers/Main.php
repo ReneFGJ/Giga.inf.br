@@ -15,13 +15,16 @@ class Main extends CI_Controller {
 		array_push($js, 'form_sisdoc.js');
 		array_push($js, 'jquery-ui.min.js');
 
-		$data = array();
 		$data['js'] = $js;
 		$data['css'] = $css;
 
 		$data['title'] = ':: Giga Informática ::';
 		$this -> load -> view('header/header', $data);
-		$this -> load -> view('menus/menu_cab_top', $data);
+
+		if (!(isset($data['nocab'])))
+			{
+				$this -> load -> view('menus/menu_cab_top', $data);
+			}
 
 		$this -> load -> model('users');
 		$this -> users -> security();
@@ -79,7 +82,7 @@ class Main extends CI_Controller {
 					$form -> editar($cp, $this -> propostas -> table_item);
 					break;
 				case 'CONDICOES' :
-				print_r($_POST);
+					print_r($_POST);
 					$dd0 = get("dd0");
 					$cp = $this -> propostas -> cp_condicoes($dd0, $id);
 					$form = new form;
@@ -99,7 +102,7 @@ class Main extends CI_Controller {
 		$data['dados_proposta'] = $this -> load -> view('proposta/proposta_header', $data, true);
 		$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
 		$data['dados_condicoes'] = $this -> propostas -> proposta_condicoes($id, $editar);
-		;
+		$data['dados_acoes'] = $this -> propostas -> proposta_acoes($data);
 		$this -> load -> view('proposta/proposta', $data);
 	}
 
@@ -118,11 +121,19 @@ class Main extends CI_Controller {
 		$data['dados_proposta'] = $this -> load -> view('proposta/proposta_header', $data, true);
 		$data['id_pp'] = $id;
 		$data['dados_item'] = $this -> propostas -> proposta_items($id);
-		
+		$data['dados_acoes'] = $this -> propostas -> proposta_acoes($data);
+
 		//$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
 		$data['dados_condicoes'] = $this -> propostas -> proposta_condicoes($id, $editar);
 		$this -> load -> view('proposta/proposta', $data);
 	}
+
+	function proposta_finalizar($id,$chk='')
+		{
+			$this -> load -> model('propostas');
+			$this->propostas->proposta_finalizar($id);
+			redirect(base_url('index.php/main/menu_pedidos'));
+		}
 
 	/****************************************** CLIENTES *********************/
 	function clientes($id = '') {
@@ -146,11 +157,19 @@ class Main extends CI_Controller {
 		/* Controller */
 		$this -> cab();
 		$data = $this -> clientes -> le($id);
-		$data['mensagens_total'] = $this -> mensagens -> resumo($id);
+
 		/* orcamento / proposta */
 		$data['orcamentos_total'] = $this -> propostas -> resumo($id);
 		$data['orcamentos'] = $this -> propostas -> lista_por_cliente($id);
 		$data['orcamentos'] .= $this -> propostas -> botao_nova_proposta($id);
+
+		$data['contatos'] = $this -> clientes -> contatos($id);
+		$data['contatos'] .= $this -> clientes -> novo_contato($id);
+		$data['contatos_total'] = $this -> clientes -> contatos_total($id);
+		
+		$data['mensagens'] = $this -> mensagens -> mostra_mensagens($id);
+		$data['mensagens'] .= $this -> mensagens -> nova_mensagem($id);
+		$data['mensagens_total'] = $this -> mensagens -> mensagens_total($id);		
 
 		$this -> load -> view('cliente/show', $data);
 		$this -> load -> view('cliente/show_about', $data);
@@ -171,6 +190,29 @@ class Main extends CI_Controller {
 			redirect(base_url('index.php/main/clientes'));
 		}
 	}
+	
+	function cliente_contato_edit($id,$idc=0)
+		{
+			$this->load->model('clientes');
+			$param = array('nocab'=>True);
+			$this->cab($param);
+			
+			/* EDIT */
+			$form = new form;
+			$form->id = $id;
+			$cp = $this->clientes->cp_contatos($id,$idc);
+			$tela = $form->editar($cp,$this->clientes->table_contatos);
+			$tela = '<table width="100%"><tr><td>'.$tela.'</td></tr></table>';
+			$data['content'] = $tela;
+			$data['title'] = '';
+			$this->load->view('content',$data);
+			
+			if ($form->saved > 0)
+				{
+					$data['content'] = '<script> wclose(); </script>';
+					$this->load->view('content',$data);
+				}
+		}
 
 	/************************************************************************* PRODUTOS CATEGORIA *****************/
 	function estoque() {
@@ -296,6 +338,16 @@ class Main extends CI_Controller {
 		$this -> cab();
 		$data = $this -> $model -> le_marca($id);
 		$this -> load -> view('marca/show', $data);
+	}
+
+	function myaccount() {
+		$id = $_SESSION['id'];
+		$this -> load -> model('users');
+
+		$this -> cab();
+		$data['title'] = '';
+		$data['content'] = $this -> users -> my_account($id);
+		$this -> load -> view('content', $data);
 	}
 
 }
