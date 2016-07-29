@@ -1,4 +1,5 @@
 <?php
+if (isset($br) and ($br == true)) { echo '<br>'; }
 if (isset($fluid) == 1) {
 	echo '<div class="container-fluid">' . cr();
 } else {

@@ -4,7 +4,7 @@ class user_drh extends CI_Model {
 
 	function le($id, $fld = 'id') {
 		$sql = "select * from " . $this -> table;
-		$sql .= " left join _filiais ON usd_empresa = id_f "; 
+		$sql .= " left join _filiais ON usd_empresa = id_fi "; 
 		$sql .= ' where usd_id_us = ' . round($id);
 
 		$rlt = $this -> db -> query($sql);

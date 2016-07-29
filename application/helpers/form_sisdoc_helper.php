@@ -252,7 +252,16 @@ function brtosql($dt) {
 	$dt = substr($dt, 0, 4) . '-' . substr($dt, 4, 2) . '-' . substr($dt, 6, 2);
 	return ($dt);
 }
-
+function data_completa($data)
+	{
+		$dt = sonumero($data);
+		$ano = substr($dt,0,4);
+		$mes = round(substr($dt,4,2));
+		$dia = round(substr($dt,6,2));
+		if ($dia == '1') { $dia = '1º'; }
+		$txt = $dia.' de '.meses($mes).' de '.$ano.'.';
+		return($txt);
+	}
 function meses($id = 0) {
 	$mes = array('', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro');
 	$id = round($id);
@@ -1017,6 +1026,7 @@ function npag($obj, $blank = 1, $tot = 10, $offset = 20) {
 	$term = $obj -> term;
 	$npage = $obj -> npag;
 	$field = $obj -> field;
+	
 
 	/* Campos para busca */
 	$fd = $obj -> lb;
@@ -1026,20 +1036,20 @@ function npag($obj, $blank = 1, $tot = 10, $offset = 20) {
 	$link = $obj -> row;
 
 	$pagi = $npage;
-	$pagf = $npage + 10;
+	$pagf = $npage + 6;
 
 	if ($pagi > 5) {
-		$pagi = $pagi - 5;
-		$pagf = $pagf - 5;
+		$pagi = $pagi - 3;
+		$pagf = $pagf - 3;
 	} else {
 		$pagi = 1;
 	}
 
 	$sx = '<table class="table lt2" width="100%">';
-	$sx .= '<tr valign="middle"><td width="50%">';
+	$sx .= '<tr valign="middle"><td width="35%" class="visible-lg">';
 	$sx .= '<ul id="npag" class="npag">';
 	if ($pagi > 1) {
-		$linka = '<A HREF="' . $link . '/' . ($pagi - 1) . '">';
+		$linka = '<A HREF="' . $link . '/' . ($pagi - 1) . '" class="link lt1 small">';
 		$sx .= $linka . '<li><<</li></A> ';
 	}
 
@@ -1047,16 +1057,18 @@ function npag($obj, $blank = 1, $tot = 10, $offset = 20) {
 	if ($pagf > $tot) { $pagf = $tot;
 	}
 	for ($r = $pagi; $r < ($pagf + 1); $r++) {
-		$linka = '<A HREF="' . $link . '/' . $r . '" class="link lt1">';
+		$linka = '<A HREF="' . $link . '/' . $r . '" class="link lt1 small">';
 		$sx .= $linka . '<li class="lt1">' . $r . '</li></a>' . chr(10) . chr(13);
 	}
 	/* */
 	if ($pagf < $pagm) {
-		$linka = '<A HREF="' . $link . '/' . $r . '">';
+		$linka = '<A HREF="' . $link . '/' . $r . '" class="link lt1 small">';
 		$sx .= $linka . '<li>>></li></A>';
 	}
+	$sx .= '</ul>'.cr();
+	$sx .= '</td><td>';
+	
 	/* */
-	//$sx .= '</td><td>';
 	$sx .= ' Page:';
 	$linka = $link . '/';
 	$sx .= '<select onChange="location=\'' . $linka . '\'+this.options[this.selectedIndex].value;">';
@@ -1087,11 +1099,11 @@ function npag($obj, $blank = 1, $tot = 10, $offset = 20) {
 	$data = array('name' => 'dd1', 'id' => 'dd1', 'value' => $vlr, 'maxlength' => '100', 'size' => '100', 'style' => 'width:150px', );
 	$sx .= form_input($data);
 	//$sx .= form_submit('acao', msg('bt_search'));
-	$sx .= '<a href="' . ($link) . '"><input type="submit" name="acao" value="' . msg('bt_search') . '" class="btn">';
+	$sx .= '&nbsp;<a href="' . ($link) . '"><input type="submit" name="acao" value="' . msg('bt_search') . '" class="btn">';
 
 	if (strlen($term) > 0) {
 		//$sx .= form_submit('acao', msg('bt_clear'));
-		$sx .= '<a href="' . ($link) . '"><input type="submit" name="acao" value="' . msg('bt_clear') . '" class="btn">';
+		$sx .= '&nbsp;<a href="' . ($link) . '"><input type="submit" name="acao" value="' . msg('bt_clear') . '" class="btn">';
 	}
 	$sx .= '</nobr>';
 
@@ -1344,6 +1356,16 @@ if (!function_exists('form_edit')) {
 		$url_pre = substr($url_pre, 0, strpos($url_pre, '/')) . '/view';
 
 		$url_pre = $obj -> row_view;
+		
+			/* PRE */
+			$active = 0;
+			for ($r=0;$r < count($mk);$r++)
+				{
+				 if($mk[$r]=='A')
+				 	{
+				 		$active = $r;
+				 	}
+				}		
 
 		foreach ($query->result_array() as $row) {
 			/* recupera ID */
@@ -1351,6 +1373,15 @@ if (!function_exists('form_edit')) {
 			$id = $row[$flds];
 
 			/* mostra resultado da query */
+			$style = '';
+			if ($active > 0)
+				{
+					$flds = trim($fd[$active]);
+					if ($row[$flds] == 0)
+						{
+							$style = ' style="color: #ff0000;" ';
+						}
+				}
 			$data .= '<tr>';
 			for ($r = 1; $r < count($fd); $r++) {
 				/* mascara */
@@ -1369,8 +1400,18 @@ if (!function_exists('form_edit')) {
 						$mskm = ' align="left" ';
 						break;
 					case 'R' :
-						$mskm = ' align-"right" ';
+						$mskm = ' align="right" ';
 						break;
+					case 'A' :
+						$mskm = ' align="center" ';
+						if ($row[$flds] == '0')
+							{
+								$row[$flds] = '<font color="red">Inativo</font>';
+							} else {
+								$row[$flds] = '<font color="green">Ativo</font>';
+							}
+						
+						break;						
 				}
 
 				/* see */
@@ -1381,7 +1422,7 @@ if (!function_exists('form_edit')) {
 					$link = '';
 					$linkf = '';
 				}
-				$data .= chr(15) . '<td ' . $mskm . '>' . $link . trim($row[$flds]) . $linkf . '</td>';
+				$data .= chr(15) . '<td ' . $mskm . '>' . $link . '<font '.$style.'>'.trim($row[$flds]) . '</font>'. $linkf . '</td>';
 			}
 			if ($obj -> edit == True) {
 				$idr = trim($row[$fd[0]]);

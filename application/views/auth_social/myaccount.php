@@ -6,7 +6,7 @@ if (!file_exists($pict)) {
 	$picture = base_url($pict);
 }
 ?>
-<div class="container">
+
 	<div class="row">
 		<div class="col-md-4">
 			<img id="profile-picture" class="person-graphic win-color-bg-10" alt=""
@@ -32,8 +32,8 @@ if (!file_exists($pict)) {
 			<?php
 			if ($id_us == $_SESSION['id']) {
 				echo '<ul class="item_menu">' . cr();
-				echo '<li><a href="#" class="middle">Alterar senha</a></li>';
-				echo '<li><a href="#" class="middle">Alterar e-mail</a></li>';
+				echo '<li><a href="' . base_url('index.php/main/change_password') . '" class="middle">Alterar senha</a></li>';
+				echo '<li><a href="' . base_url('index.php/main/change_my_email') . '" class="middle">Alterar e-mail</a></li>';
 				echo '<li><a href="#" class="middle">Alterar dados pessoais</a></li>';
 				echo '</ul>' . cr();
 			}
@@ -61,9 +61,9 @@ if (!file_exists($pict)) {
 			<font class="middle"><?php echo $usd_pis; ?>&nbsp;</font><br>
 			<font class="small">Carteira de Trabalho</font><br>
 			<font class="middle"><?php
-				echo $usd_ct . ' ';
-				if (strlen($usd_ct_serie)) { echo ', Série: ' . $usd_ct_serie;
-				}
+			echo $usd_ct . ' ';
+			if (strlen($usd_ct_serie)) { echo ', Série: ' . $usd_ct_serie;
+			}
 			?>&nbsp;</font>
 		</div>
 		<div class="col-md-4">
@@ -75,13 +75,13 @@ if (!file_exists($pict)) {
 						
 			<hr>
 			<font class="small">Empresa</font><br>
-			<font class="middle"><?php echo $f_razao_social; ?>&nbsp;</font><br>
+			<font class="middle"><?php echo $fi_razao_social; ?>&nbsp;</font><br>
 			<font class="small">Cargo / departamento</font><br>
-			<font class="middle"><?php echo $usd_cargo . ' / '.$usd_departamento; ?>&nbsp;</font><br>
+			<font class="middle"><?php echo $usd_cargo . ' / ' . $usd_departamento; ?>&nbsp;</font><br>
 			<font class="small">Dt. adminssão</font><br>
 			<font class="middle"><?php echo stodbr($usd_dt_admissao); ?>&nbsp;</font><br>
 			<font class="small">Crachá</font><br>
-			<font class="middle"><?php echo ($us_badge); ?>&nbsp;</font><br>			
+			<font class="middle"><?php echo($us_badge); ?>&nbsp;</font><br>			
 		</div>
 	</div>
-</div>
+

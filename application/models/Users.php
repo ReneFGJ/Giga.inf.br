@@ -1,4 +1,21 @@
 <?php
+/****************** Security login ****************/
+function perfil($p, $trava = 0) {
+	$ac = 0;
+	if (isset($_SESSION['perfil'])) {
+		$perf = $_SESSION['perfil'];
+		for ($r = 0; $r < strlen($p); $r = $r + 4) {
+			$pc = substr($p, $r, 4);
+			//echo '<BR>'.$pc.'='.$perf.'=='.$ac;
+			if (strpos(' ' . $perf, $pc) > 0) { $ac = 1;
+			}
+		}
+	} else {
+		$ac = 0;
+	}
+	return ($ac);
+}
+
 class users extends CI_model {
 	var $table = 'users';
 
@@ -27,9 +44,9 @@ class users extends CI_model {
 	function row($id = '') {
 		$form = new form;
 
-		$form -> fd = array('id_us', 'us_nome', 'us_login');
-		$form -> lb = array('id', msg('us_name'), msg('us_login'));
-		$form -> mk = array('', 'L', 'L', 'L');
+		$form -> fd = array('id_us', 'us_nome', 'us_login','us_ativo');
+		$form -> lb = array('id', msg('us_name'), msg('us_login'),msg('us_ativo'));
+		$form -> mk = array('', 'L', 'L','A');
 
 		$form -> tabela = $this -> table;
 		$form -> see = true;
@@ -144,13 +161,14 @@ class users extends CI_model {
 	}
 
 	function security_login($login = '', $pass = '') {
-		$sql = "select * from " . $this -> table . " where us_email = '$login' ";
+		$sql = "select * from " . $this -> table . " where us_email = '$login' OR us_login = '$login' ";
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 
 		if (count($rlt) > 0) {
-			$dd2 = md5($pass);
 			$line = $rlt[0];
+
+			$dd2 = $this -> password_cripto($pass, $line['us_autenticador']);
 			$dd3 = $line['us_password'];
 
 			if ($dd2 == $dd3) {
@@ -176,8 +194,69 @@ class users extends CI_model {
 		$data2 = $this -> user_drh -> le($id);
 		$data = array_merge($data1, $data2);
 
-		$tela = $this -> load -> view('auth_social/myaccount', $data,true);
-		return($tela);
+		$tela = $this -> load -> view('auth_social/myaccount', $data, true);
+		return ($tela);
+	}
+
+	function password_cripto($pass, $tipo) {
+		switch ($tipo) {
+			case 'TXT' :
+				$dd2 = trim($pass);
+				break;
+			default :
+				$dd2 = md5($pass);
+				break;
+		}
+		return ($dd2);
+	}
+
+	function change_password($id) {
+		$this -> load -> model('user_drh');
+		
+		$data1 = $this -> le($id);
+		$data2 = $this -> user_drh -> le($id);
+		$data = array_merge($data1, $data2);	
+		
+		$tela = $this->load->view('auth_social/change_password',$data,true);	
+		
+		/* REGRAS DE VALIDACAO */
+		$data = $this -> le($id);
+		$pass = get("dd1");
+		$dd3 = $data['us_password'];
+		$p1 = get("dd2");
+		$p2 = get("dd3");
+
+		$dd2 = $this -> password_cripto($pass, $data['us_autenticador']);
+		if (strlen($p1) > 0) {
+			if ($dd2 == $dd3) {
+				if ($p1 == $p2) {
+					$sql = "update " . $this -> table . " set us_password = '" . md5($p1) . "', us_autenticador = 'MD5' where id_us = " . $id;
+					$this -> db -> query($sql);
+					$data['erro'] = '<div class="alert alert-success" role="alert">
+  										<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  										<span class="sr-only">Sucesso:</span>
+  										Senhas alterada com sucesso!
+									</div>';
+				} else {
+					$data['erro'] = '<div class="alert alert-danger" role="alert">
+  										<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  										<span class="sr-only">Error:</span>
+  										Senhas não conferem!
+									</div>';
+				}
+			} else {
+					$data['erro'] = '<div class="alert alert-danger" role="alert">
+  										<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  										<span class="sr-only">Error:</span>
+  										Senhas atual não confere!
+									</div>';
+			}
+		}
+		
+		$tela = $this->load->view('auth_social/change_password',$data,true);
+		$data['content'] = $tela;
+		$tela = $this -> load -> view('auth_social/account', $data, true);
+		return ($tela);
 	}
 
 }

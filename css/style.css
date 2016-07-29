@@ -5,7 +5,44 @@
 	.noscreen {
 		display: none;
 	}
+
+	/**************************************** BORDER ****/
+	.border_top {
+		border-top: 20px solid #ececec;
+		padding-top: 8px;
+	}
 }
+
+/**************************************** PICTURE ***/
+.person-graphic {
+	border-radius: 50%;
+	width: 100px;
+	height: 100px;
+}
+@media (min-width: 540px) {
+	.person-graphic {
+		border-radius: 50%;
+		width: 144px;
+		height: 144px;
+	}
+}
+@media (min-width: 860px) {
+	body {
+		/* background-image: url("../img/background/body.png"); */
+		/* background-image: url("../img/background/back_00.JPG"); */
+		background-image: url("../img/background/back_08.jpg");
+		background-attachment: fixed;
+		margin-top: 100px;
+		margin-bottom: 100px;
+	}
+}
+
+@media (min-width: 120px) {
+	body {
+		margin-top: 100px;
+	}
+}
+
 @media print {
 	#cab_screen {
 		display: none;
@@ -19,25 +56,30 @@
 	.nopr {
 		display: none;
 	}
-}
-/**************************************** PICTURE ***/
-.person-graphic {
-	border-radius: 50%;
-	width: 100px;
-	height: 100px;
-}
-@media (min-width: 540px) {
-	.person-graphic {
-		border-radius: 50%;
-		width: 144px;
-		height: 144px;
+	/**************************************** BORDER ****/
+	.border_top {
+		border-top: 0px solid #ffffff;
+		padding-top: 8px;
 	}
+	body
+		{
+			margin-top: 0px;
+		}
+}
 
-}
+
 /****************************************** BODY ****/
-body {
-	background-image: url("../img/background/body.png");
+.container {
+	background-color: #fcfcfc;
+	border: 0px solid #000000;
+	border-radius: 10px;
+	padding-top: 20px;
+	padding-bottom: 20px;
 }
+
+@media screen and (min-width: 600px) {
+}
+
 .painel {
 	margin-bottom: 5px;
 	margin-right: 5px;

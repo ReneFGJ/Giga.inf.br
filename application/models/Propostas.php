@@ -1,7 +1,7 @@
 <?php
 class propostas extends CI_model {
-	var $table = 'proposta';
-	var $table_item = 'proposta_itens';
+	var $table = 'pedido';
+	var $table_item = 'pedido_itens';
 
 	function cp_item($id, $id_pp) {
 		$id_us = $_SESSION['id'];
@@ -41,7 +41,7 @@ class propostas extends CI_model {
 		array_push($cp, array('$Q id_pz:pz_nome:'.$sql, 'pp_prazo_entrega', 'Prazo de entrega', False, True));
 		
 		/* VALIDADE DA PROPOSTA */		
-		$sql = "select * from proposta_validade where vd_ativo = 1 order by vd_seq ";
+		$sql = "select * from pedido_validade where vd_ativo = 1 order by vd_seq ";
 		array_push($cp, array('$Q id_vd:vd_nome:'.$sql, 'pp_validade_proposta', 'Validade da proposta', False, True));
 		
 		/* GARANTIA */
@@ -70,7 +70,7 @@ class propostas extends CI_model {
 					LEFT JOIN prazo_garantia ON id_pga = pp_garantia AND pga_visivel = 1
 					LEFT JOIN prazo_entrega ON id_pz = pp_prazo_entrega AND pz_visivel = 1
 					LEFT JOIN prazo_montagem ON id_pm = pp_montagem AND pm_visivel = 1
-					LEFT JOIN proposta_validade ON id_vd = pp_validade_proposta AND vd_visivel = 1
+					LEFT JOIN pedido_validade ON id_vd = pp_validade_proposta AND vd_visivel = 1
 					
 					WHERE id_pp = " . round($id);
 		$rlt = $this -> db -> query($sql);
@@ -295,6 +295,7 @@ class propostas extends CI_model {
 					INNER JOIN clientes on pp_cliente = id_f
 					WHERE pp_vendor = " . round($id_us) . "
 					AND ((pp_situacao = 0) OR (pp_situacao = 1))
+					AND (pp_tipo_pedido = 1)
 					ORDER BY pp_data desc ";
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -355,9 +356,9 @@ class propostas extends CI_model {
 				case '0':
 					$sx .= '<div class="row">
 								<div class="col-md-12">
-									<a href="'.base_url('index.php/main/proposta_finalizar/'.$id.'/'.checkpost_link($id)).'" class="btn btn-primary">Finalizar edição</a>
+									<a href="'.base_url('index.php/main/proposta_finalizar/'.$id.'/'.checkpost_link($id)).'" class="btn btn-primary nopr">Finalizar edição</a>
 									&nbsp;																	
-									<a href="'.base_url('index.php/main/proposta_editar/'.$id.'/'.checkpost_link($id)).'" class="btn btn-primary">Editar proposta</a>
+									<a href="'.base_url('index.php/main/proposta_editar/'.$id.'/'.checkpost_link($id)).'" class="btn btn-primary nopr">Editar proposta</a>
 									&nbsp;
 									<a href="#" class="btn btn-default">Cancelar proposta</a>
 									&nbsp;

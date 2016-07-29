@@ -5,7 +5,8 @@ class clientes extends CI_Model {
 	
 	function le($id)
 		{
-			$sql = "select * from ".$this->table." where id_f = ".round($id);
+			$sql = "select * from ".$this->table."					 
+						WHERE id_f = ".round($id);
 			$rlt = $this->db->query($sql);
 			$rlt = $rlt->result_array();
 			if (count($rlt) > 0)
@@ -19,6 +20,7 @@ class clientes extends CI_Model {
 	function cp() {
 		$cp = array();
 		array_push($cp, array('$H8', 'id_f', '', False, True));
+		array_push($cp, array('$A', '', 'Dados do cliente/fornecedor', False, True));
 		array_push($cp, array('$O 1:Pessoa Juridica&2:Pessoa Física', 'f_tipo', 'Tipo', True, True));
 		array_push($cp, array('$S12', 'f_cnpj', 'CNPJ/CPF', False, True));
 		array_push($cp, array('$S80', 'f_nome_fantasia', 'Nome Fantasia', True, True));
@@ -27,6 +29,7 @@ class clientes extends CI_Model {
 		array_push($cp, array('$S15', 'f_im', 'Inscrição Municipal', False, True));
 		array_push($cp, array('$O 1:SIM&0:NÃO', 'f_ativo', 'Ativo', True, True));
 
+		array_push($cp, array('$A', '', 'Endereço', False, True));
 		array_push($cp, array('$S15', 'f_cep', 'CEP', False, True));
 		array_push($cp, array('$S80', 'f_logradouro', 'Logradouro', False, True));
 		array_push($cp, array('$S15', 'f_numero', 'Número', False, True));
@@ -36,11 +39,20 @@ class clientes extends CI_Model {
 		array_push($cp, array('$S25', 'f_cidade', 'Cidade', False, True));
 		array_push($cp, array('$UF', 'f_estado', 'Estado', False, True));
 		
-		array_push($cp, array('$S15', 'f_fone_1', 'Telefone:', False, True));
-		array_push($cp, array('$S15', 'f_fone_2', 'Telefone:', False, True));
-		array_push($cp, array('$S80', 'f_email', 'e-mail:', False, True));		
+		//array_push($cp, array('$S15', 'f_fone_1', 'Telefone:', False, True));
+		//array_push($cp, array('$S15', 'f_fone_2', 'Telefone:', False, True));
+		//array_push($cp, array('$S80', 'f_email', 'e-mail:', False, True));		
 
 		array_push($cp, array('$T80:5', 'f_obs', 'Observações', False, True));
+		
+		
+		array_push($cp, array('$A', '', 'Fornecedor', False, True));
+		array_push($cp, array('$O 1:SIM&0:NÃO', 'f_fornecedor', 'Fornecedor', True, True));
+		
+		array_push($cp, array('$B', '', 'Gravar', False, True));
+		
+		
+		
 		return ($cp);
 	}
 
@@ -62,7 +74,7 @@ class clientes extends CI_Model {
 		return ($cp);
 	}
 
-	function row($id='') {
+	function row($id='',$param='array()') {
 		$form = new form;
 
 		$form -> fd = array('id_f', 'f_nome_fantasia', 'f_razao_social', 'f_estado');
@@ -87,7 +99,7 @@ class clientes extends CI_Model {
 			$form = new form;
 			$form->id = $id;
 			$cp = $this->cp();
-			$data['title'] = '';
+			$data['title'] = 'Dados dos Clientes';
 			$data['content'] = $form->editar($cp,$this->table);
 			$this->load->view('content',$data);
 			return($form->saved);			

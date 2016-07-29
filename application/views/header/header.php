@@ -22,6 +22,7 @@ if (!(isset($bootstrap))) { $bootstrap = 1;
 	array_push($css,'style.css');
 	array_push($css,'style_roboto.css');
 	array_push($css,'style_form_sisdoc.css');
+	array_push($css,'jquery-ui.css');
 	
 	for ($r = 0; $r < count($css); $r++) {
 		echo '	<link rel="stylesheet" href="' . base_url('css/' . $css[$r]) . '">' . cr();

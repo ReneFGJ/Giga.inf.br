@@ -45,6 +45,8 @@ $erro = get("err");
 	</div>
 	-->
 	</form>
-
+	<a href="http://10.1.1.123:8080"><img src="<?php echo base_url('img/img_old_system.png');?>" align="right" height="60" title="sistema antigo"></a>	
 </div>
+
+
 

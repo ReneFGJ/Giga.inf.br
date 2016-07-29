@@ -1,7 +1,7 @@
 <?php
 $us_nome = $_SESSION['user'];
 ?>
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-default navbar-fixed-top">
 	<div class="container-fluid">
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
@@ -20,26 +20,45 @@ $us_nome = $_SESSION['user'];
 				<li>
 					<a href="<?php echo base_url('index.php/main/clientes'); ?>">Clientes</a>
 				</li>
-				<li>
-					<a href="<?php echo base_url('index.php/main/menu_pedidos'); ?>">Propostas & Pedidos</a>
-				</li>
-				<li>
-					<a href="<?php echo base_url('index.php/main/estoque'); ?>">Estoque</a>
-				</li>				
 				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Financeiro <span class="caret"></span></a>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Propostas & Pedidos <span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li>
-							<a href="<?php echo base_url('index.php/cx/caixa'); ?>">Caixa</a>
+							<a href="<?php echo base_url('index.php/main/menu_pedidos/1'); ?>">Propostas</a>
 						</li>
 						<li>
-							<a href="<?php echo base_url('index.php/cx/cpagar'); ?>">Contas a Pagar</a>
+							<a href="<?php echo base_url('index.php/main/menu_pedidos/2'); ?>">Pedidos de venda</a>
 						</li>
 						<li>
-							<a href="<?php echo base_url('index.php/cx/creceber'); ?>">Contas a Receber</a>
+							<a href="<?php echo base_url('index.php/main/menu_pedidos/3'); ?>">Locações</a>
+						</li>
+						<li>
+							<a href="<?php echo base_url('index.php/main/menu_pedidos/4'); ?>">Atendimento laboratório</a>
+						</li>
+						<li>
+							<a href="<?php echo base_url('index.php/main/menu_pedidos/5'); ?>">Atendimento on-site</a>
 						</li>
 					</ul>
 				</li>
+				<li>
+				<a href="<?php echo base_url('index.php/main/locacao'); ?>">Locação</a>
+				</li>
+				<!--
+				<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Financeiro <span class="caret"></span></a>
+				<ul class="dropdown-menu">
+				<li>
+				<a href="<?php echo base_url('index.php/cx/caixa'); ?>">Caixa</a>
+				</li>
+				<li>
+				<a href="<?php echo base_url('index.php/cx/cpagar'); ?>">Contas a Pagar</a>
+				</li>
+				<li>
+				<a href="<?php echo base_url('index.php/cx/creceber'); ?>">Contas a Receber</a>
+				</li>
+				</ul>
+				</li>
+				-->
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Cadastro <span class="caret"></span></a>
 					<ul class="dropdown-menu">
@@ -57,20 +76,33 @@ $us_nome = $_SESSION['user'];
 						</li>
 				</li>
 				<li>
-					<a href="<?php echo base_url('index.php/admin/users'); ?>">Usuários do Sistema</a>
+				<a href="<?php echo base_url('index.php/admin/users'); ?>">Usuários do Sistema</a>
 				</li>
 				<li>
-					<a href="<?php echo base_url('index.php/admin/filiais'); ?>">Matriz e Filiais</a>
+				<a href="<?php echo base_url('index.php/admin/filiais'); ?>">Matriz e Filiais</a>
 				</li>
-				<li role="separator" class="divider"></li>
-				<li>
-					<a href="#">Separated link</a>
-				</li>
-				<li role="separator" class="divider"></li>
-				<li>
-					<a href="#">Usuários</a>
-				</li>
+				<?php
+					if (perfil("#ADM#GEG")) {
+						echo '<li role="separator" class="divider"></li>' . cr();
+						echo '<li><a href="' . base_url('index.php/admin/logins') . '">Atribuir Perfil a usuários</a></li>' . cr();
+					}
+				?>
 			</ul>
+			<?php
+				if (perfil("#ADM")) {
+					echo '<li class="dropdown">' . cr();
+					echo '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administrador <span class="caret"></span></a>' . cr();
+					echo '<ul class="dropdown-menu">' . cr();
+					echo '	<li>' . cr();
+					echo '		<li><a href="' . base_url('index.php/admin/perfil') . '">Cadastro de Perfis</a></li>' . cr();
+					echo '	</li>' . cr();
+					echo '	<li>' . cr();
+					echo '		<li><a href="' . base_url('index.php/admin/comunicacao_1') . '">Mensagens do Sistema</a></li>' . cr();
+					echo '	</li>' . cr();					
+					echo '</ul>' . cr();
+				}
+			?>
+
 			</li>
 			</ul>
 			<!--
@@ -85,9 +117,7 @@ $us_nome = $_SESSION['user'];
 			-->
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-						<?php echo $us_nome; ?>
-						<span class="caret"></span></a>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <?php echo $us_nome; ?> <span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li>
 							<a href="<?php echo base_url('index.php/main/myaccount'); ?>">Meus Dados</a>
