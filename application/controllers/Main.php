@@ -568,6 +568,16 @@ class Main extends CI_Controller {
 		$this -> load -> view('content', $data);
 	}
 
+	function change_my_sign()
+		{
+		$id = $_SESSION['id'];
+
+		$this -> cab();
+		$data['title'] = '';
+
+		$data['content'] = $this -> users -> change_sign($id);
+		$this -> load -> view('content', $data);			
+		}
 	function produto_item($id = '') {
 		$this -> load -> model('produtos');
 		$data['nocab'] = true;

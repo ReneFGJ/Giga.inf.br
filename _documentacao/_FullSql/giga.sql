@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 28, 2016 at 12:46 PM
+-- Generation Time: Aug 03, 2016 at 05:16 PM
 -- Server version: 5.6.20-log
 -- PHP Version: 5.4.31
 
@@ -75,7 +75,14 @@ CREATE TABLE IF NOT EXISTS `clientes` (
   `f_vendor` int(11) NOT NULL DEFAULT '0',
   `f_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `f_fornecedor` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `clientes`
+--
+
+INSERT INTO `clientes` (`id_f`, `f_tipo`, `f_razao_social`, `f_nome_fantasia`, `f_cnpj`, `f_ie`, `f_im`, `f_logradouro`, `f_numero`, `f_complemento`, `f_bairro`, `f_cidade`, `f_estado`, `f_cep`, `f_fone_1`, `f_fone_2`, `f_email`, `f_email_cobranca`, `f_ativo`, `f_obs`, `f_vendor`, `f_created`, `f_fornecedor`) VALUES
+(1, 2, 'Rene Faustino Gabriel Junior', 'Rene Faustino Gabriel Junior', '72952105987', '38253557', '', '', '', '', '', '', 'PR', '80710000', '', '', '', '', 1, '', 0, '2016-08-03 00:36:29', 1);
 
 -- --------------------------------------------------------
 
@@ -87,10 +94,18 @@ CREATE TABLE IF NOT EXISTS `clientes_contatos` (
 `id_cc` bigint(20) unsigned NOT NULL,
   `cc_cliente_id` int(11) NOT NULL,
   `cc_nome` char(80) NOT NULL,
+  `cc_funcao` int(11) NOT NULL,
   `cc_telefone` char(20) NOT NULL,
   `cc_email` char(80) NOT NULL,
   `cc_ativo` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `clientes_contatos`
+--
+
+INSERT INTO `clientes_contatos` (`id_cc`, `cc_cliente_id`, `cc_nome`, `cc_funcao`, `cc_telefone`, `cc_email`, `cc_ativo`) VALUES
+(1, 1, 'Rene Junior', 2, '4188119061', 'renefgj@gmail.com', 1);
 
 -- --------------------------------------------------------
 
@@ -119,7 +134,7 @@ CREATE TABLE IF NOT EXISTS `condicoes_pagamento` (
   `pg_ativo` int(11) NOT NULL DEFAULT '1',
   `pg_seq` int(11) NOT NULL,
   `pg_visivel` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `condicoes_pagamento`
@@ -129,6 +144,27 @@ INSERT INTO `condicoes_pagamento` (`id_pg`, `pg_nome`, `pg_ativo`, `pg_seq`, `pg
 (1, '-- não aplicável --', 1, 0, 0),
 (2, 'Contra apresentação', 1, 0, 1),
 (3, 'Boleto 28 dias', 1, 0, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contato_funcao`
+--
+
+CREATE TABLE IF NOT EXISTS `contato_funcao` (
+`id_ct` bigint(20) unsigned NOT NULL,
+  `ct_nome` char(40) NOT NULL,
+  `ct_ativo` int(11) NOT NULL
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `contato_funcao`
+--
+
+INSERT INTO `contato_funcao` (`id_ct`, `ct_nome`, `ct_ativo`) VALUES
+(1, 'Financeiro', 1),
+(2, 'Dono da empresa', 1),
+(3, 'Comercial', 1);
 
 -- --------------------------------------------------------
 
@@ -405,7 +441,14 @@ CREATE TABLE IF NOT EXISTS `pedido` (
   `pp_dt_fim_evento` date NOT NULL,
   `pp_valor` float NOT NULL DEFAULT '0',
   `pp_validade_proposta` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `pedido`
+--
+
+INSERT INTO `pedido` (`id_pp`, `pp_tipo_pedido`, `pp_nr`, `pp_ano`, `pp_situacao`, `pp_cliente`, `pp_cliente_faturamento`, `pp_data`, `pp_vendor`, `pp_condicoes`, `pp_prazo_entrega`, `pp_garantia`, `pp_validade_ppdido`, `pp_montagem`, `pp_periodo_locacao`, `pp_obs`, `pp_evento`, `pp_local_entrega`, `pp_dt_ini_evento`, `pp_dt_fim_evento`, `pp_valor`, `pp_validade_proposta`) VALUES
+(1, 1, '0000001', '16', 1, 1, 0, '2016-08-03 01:25:18', 8, 3, 1, 2, 1, 1, 0, '', '', '', '0000-00-00', '0000-00-00', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -422,8 +465,16 @@ CREATE TABLE IF NOT EXISTS `pedido_itens` (
   `pi_quant` float NOT NULL,
   `pi_valor_unit` int(11) NOT NULL,
   `pi_vendor` int(11) NOT NULL,
-  `pi_ativo` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  `pi_ativo` int(11) NOT NULL DEFAULT '1',
+  `pi_qt_diarias` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `pedido_itens`
+--
+
+INSERT INTO `pedido_itens` (`id_pi`, `pi_nr`, `pi_seq`, `pi_produto`, `pi_descricao`, `pi_quant`, `pi_valor_unit`, `pi_vendor`, `pi_ativo`, `pi_qt_diarias`) VALUES
+(1, 1, 0, 'Notebook I5', '', 5, 30, 8, 1, 10);
 
 -- --------------------------------------------------------
 
@@ -450,8 +501,8 @@ INSERT INTO `pedido_situacao` (`id_s`, `s_descricao`, `s_edicao`, `s_finalizado`
 (4, 'Emissão de nota fiscal', 0, 0, 'alert-primary'),
 (5, 'Mercadoria enviada para entrega', 0, 0, 'alert-primary'),
 (6, 'Pedido finalizado', 0, 0, ''),
-(999, 'Cancelado', 0, 0, ''),
-(900, 'Finalizado', 0, 0, '');
+(900, 'Finalizado', 0, 0, ''),
+(999, 'Cancelado', 0, 0, '');
 
 -- --------------------------------------------------------
 
@@ -514,7 +565,7 @@ CREATE TABLE IF NOT EXISTS `prazo_entrega` (
   `pz_ativo` int(1) NOT NULL DEFAULT '1',
   `pz_seq` int(11) NOT NULL,
   `pz_visivel` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `prazo_entrega`
@@ -593,7 +644,15 @@ CREATE TABLE IF NOT EXISTS `produtos` (
   `pr_doc` int(11) NOT NULL,
   `pr_ativo` int(11) NOT NULL DEFAULT '1',
   `pr_data_cadastro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+
+--
+-- Dumping data for table `produtos`
+--
+
+INSERT INTO `produtos` (`id_pr`, `pr_produto`, `pr_patrimonio`, `pr_serial`, `pr_tag`, `pr_fornecedor`, `pr_nf`, `pr_nf_data`, `pr_vlr_custo`, `pr_dt_baixa`, `pr_filial`, `pr_cliente`, `pr_cliente_dt`, `pr_doc`, `pr_ativo`, `pr_data_cadastro`) VALUES
+(1, 1, '001', 'HY3DY02', '001', 0, '', '0000-00-00', 0, '0000-00-00', 0, 0, '0000-00-00', 0, 1, '2016-08-03 00:30:30'),
+(2, 1, '002', 'HY3DY03', '002', 0, '', '0000-00-00', 0, '0000-00-00', 0, 0, '0000-00-00', 0, 1, '2016-08-03 00:31:02');
 
 -- --------------------------------------------------------
 
@@ -606,8 +665,20 @@ CREATE TABLE IF NOT EXISTS `produtos_categoria` (
   `pc_nome` char(100) NOT NULL,
   `pc_marca` int(11) NOT NULL,
   `pc_ativo` int(11) NOT NULL DEFAULT '1',
-  `pc_codigo` char(10) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  `pc_codigo` char(10) NOT NULL,
+  `pc_desc_basica` text NOT NULL
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+
+--
+-- Dumping data for table `produtos_categoria`
+--
+
+INSERT INTO `produtos_categoria` (`id_pc`, `pc_nome`, `pc_marca`, `pc_ativo`, `pc_codigo`, `pc_desc_basica`) VALUES
+(1, 'TV 40-42"', 0, 1, 'TV40', ''),
+(2, 'Notebook I5', 0, 1, 'NT-I5', ''),
+(3, 'Acessórios', 0, 1, 'AC', ''),
+(4, 'Notebook I3', 0, 1, 'NT-I3', 'Processador Intel I3'),
+(5, 'Notebook I7', 0, 1, 'NT-I7', '');
 
 -- --------------------------------------------------------
 
@@ -622,7 +693,14 @@ CREATE TABLE IF NOT EXISTS `produtos_historico` (
   `ph_historico` int(11) NOT NULL,
   `ph_log` int(11) NOT NULL,
   `ph_pedido` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `produtos_historico`
+--
+
+INSERT INTO `produtos_historico` (`id_ph`, `ph_data`, `ph_produto`, `ph_historico`, `ph_log`, `ph_pedido`) VALUES
+(1, '2016-08-03 00:19:44', 0, 1, 8, 0);
 
 -- --------------------------------------------------------
 
@@ -710,7 +788,32 @@ CREATE TABLE IF NOT EXISTS `produtos_tipo` (
   `prd_categoria` int(11) NOT NULL,
   `prd_ativo` int(11) NOT NULL,
   `prd_descricao` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `produtos_tipo`
+--
+
+INSERT INTO `produtos_tipo` (`id_prd`, `prd_nome`, `prd_marca`, `prd_categoria`, `prd_ativo`, `prd_descricao`) VALUES
+(1, 'Notebook Vostro 5470', 4, 2, 1, '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `produto_agenda`
+--
+
+CREATE TABLE IF NOT EXISTS `produto_agenda` (
+`id_ag` bigint(20) unsigned NOT NULL,
+  `ag_produto` int(11) NOT NULL,
+  `ag_data` date NOT NULL,
+  `ag_cliente` int(11) NOT NULL,
+  `ag_vendedor` int(11) NOT NULL,
+  `ag_data_reserva` date NOT NULL,
+  `ag_hora_reserva` char(8) NOT NULL,
+  `ag_reservado` int(11) NOT NULL,
+  `ag_situacao` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -782,75 +885,77 @@ CREATE TABLE IF NOT EXISTS `users` (
   `us_erros` int(11) NOT NULL,
   `us_last` timestamp NOT NULL,
   `us_perfil` text,
-  `us_perfil_check` char(50) DEFAULT NULL
+  `us_perfil_check` char(50) DEFAULT NULL,
+  `us_com_nome` char(50) NOT NULL,
+  `us_com_ass` char(50) NOT NULL
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=68 ;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id_us`, `us_nome`, `us_email`, `us_login`, `us_password`, `us_badge`, `us_link`, `us_ativo`, `us_genero`, `us_verificado`, `us_autenticador`, `us_cadastro`, `us_acessos`, `us_erros`, `us_last`, `us_perfil`, `us_perfil_check`) VALUES
-(7, 'Super User Admin', 'admin', 'ADMIN', '21232f297a57a5a743894a0e4a801fc3', '00007', '', 1, '', '', 'MD5', '2016-06-27 02:53:04', 0, 0, '2016-06-27 02:53:04', '', '8f14e45fceea167a5a36dedd4bea2543'),
-(8, 'Rene Faustino Gabriel Junior', 'renefgj@gmail.com', 'RENE', '2e3db7994011c8c5e315e42a0cb439c5', '00008', '', 1, 'M', '', 'MD5', '2016-06-29 12:28:18', 0, 0, '2016-06-29 12:28:18', '#ADM', NULL),
-(9, 'Tadeu Everton Zamoiski', '', 'TMK', '123456', '00009', '', 0, 'M', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(10, 'Moacyr Zambaldi Junior', '', 'JUNIOR', '123456', '00010', '', 0, 'C', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(11, 'Ana Cristina Zamoiski', '', 'ACZ', '123456', '00011', '', 0, 'F', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(12, 'Jacqueline Stein Jendick', '', 'JACKY', '123456', '00012', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(13, 'Douglas Antonio Durante Pegoraro', '', 'DOUGLAS', '123456', '00013', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(14, 'Gleisi Silvia Sima', '', 'GLEISI', '123456', '00014', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(15, 'Wagner Block', '', 'BLOCK', '123456', '00015', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(16, 'Fabricio Cola', '', 'FABRI', '123456', '00016', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(17, 'Joao Luiz Zamoiski', '', 'KIKO', '123456', '00017', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(18, 'Luis Fernando de Andrade', '', 'LUIS', '123456', '00018', '', 0, 'M', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(19, 'Olinda Maria Rigoni Ferreira', '', 'OLINDA', '123456', '00019', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(20, 'Elcio Douglas Ferreira', '', 'ELCIO', '123456', '00020', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(21, 'Eliara Prado Zambaldi', '', 'ELIARA', '123456', '00021', '', 1, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '#GEF', NULL),
-(22, 'Maite Elisa Kreusch', '', 'MAITE', '123456', '00022', '', 0, '3', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(23, 'Rodrigo Baptista', '', 'RODRIGO', '123456', '00023', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(24, 'Deisi Gomes Dos Santos', '', 'DGS', '123456', '00024', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(25, 'Welch MagalhÃes Brezina', '', 'WMB', '123456', '00025', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(26, 'Jose Domingos Favile Junior', '', 'JDFJ', '123456', '00026', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(27, 'Daniel Wojciechowski Martins', '', 'DANI', '123456', '00027', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(28, 'Natalia Henrique Zambaldi', '', 'NATALIA', '123456', '00028', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(29, 'Marcos Pontes Carvalho', '', 'MARCOS', '123456', '00029', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(30, 'Virgilio Paschoal Vintem', '', 'PASCHOAL', '123456', '00030', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(31, 'Samuel D. Sima de Azevedo', '', 'SAMUEL', '123456', '00031', '', 0, '2', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(32, 'Mariana Das Virgens', '', 'MARIANA', '123456', '00032', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(33, 'Barbara do Nascimento', '', 'BAR', '123456', '00033', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(34, 'Rodrigo Otavio França Miranda', '', 'ROM', '123456', '00034', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(35, 'Gabriel Pereira Das Virgens', '', 'GABRIEL', '123456', '00035', '', 0, 'M', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(36, 'Gregorio Luis Trentino', '', 'GREG', '123456', '00036', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(37, 'Giuliano Maciel Schiavinatto', '', 'GIULIANO', '123456', '00037', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(38, 'Jairo Vieira Sanguinete', '', 'JAIRO', '123456', '00038', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(39, 'Fabio Andre Tauffer de Sousa', '', 'FAA', '123456', '00039', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(40, 'Edyomar Souza de Jesus', '', 'EDY', '123456', '00040', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(41, 'Getulio da Silva Costa Neto', '', 'GETULIO', '123456', '00041', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(42, 'Marcos Francisco Dos Santos', '', 'FCO', '123456', '00042', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(43, 'Lucas Fernandes Garcia', '', 'LUCAS', '123456', '00043', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(44, 'Mauricio Luiz Medeiros de Andrade', '', 'MAURICIO', '123456', '00044', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(45, 'Debora Carneiro Morais', '', 'DEBORA', '123456', '00045', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(46, 'Maria Helena Pontes Carvalho', '', 'HELENA', '123456', '00046', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(47, 'Ozei Luiz da Silva', '', 'OZEI', '123456', '00047', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(48, 'Ana Carolina Pereira de Souza', '', 'ANACAROL', '123456', '00048', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(49, 'José Roberto Marques da Silva', '', 'ROBERTO', '123456', '00049', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(50, 'Thiago Gonçalves da Silva', '', 'THIAGO', '123456', '00050', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(51, 'Nelson da Silva Santos Junior', '', 'NELSON', '123456', '00051', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(52, 'Andrei Muller', '', 'ANDREI', '123456', '00052', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(53, 'Sabrina Alessandra Wolfgramm da Silva', '', 'SABRINA', '123456', '00053', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(54, 'Mariano Oliveira Porto', '', 'MARIANO', '123456', '00054', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(55, 'Joel da Silva Rodrigues', '', 'JOEL', '123456', '00055', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(56, 'Paulo Rafael Damas Albano', '', 'RAFAEL', '123456', '00056', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(57, 'Laiene Tamires da Silva', '', 'LAIENE', '123456', '00057', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(58, 'Jeferson Wasen Paulino', '', 'JEFERSON', '123456', '00058', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(59, 'Cristian Paulo Vieira', '', 'CRISTIAN', '123456', '00059', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(60, 'Ricardo Alexandre Vargas', '', 'RICARDO', '123456', '00060', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(61, 'Cristiane de Jesus Boas', '', 'CRISTIANE', '123456', '00061', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(62, 'Geovane Gonçalves', '', 'GEOVANE', '123456', '00062', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(63, 'Rafael de Paula Souza', '', 'RAFA', '123456', '00063', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(64, 'Gabriela Henrique Zambaldi', '', 'GABI', '123456', '00064', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(65, 'Alexandre Fernandes da Silva', '', 'ALEXANDRE', '123456', '00065', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(66, 'Alvaro Elias Gonçalves Filho', '', 'ALVARO', '123456', '00066', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL),
-(67, 'Joao Paulo Luciano', '', 'JOAO', '123456', '00067', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL);
+INSERT INTO `users` (`id_us`, `us_nome`, `us_email`, `us_login`, `us_password`, `us_badge`, `us_link`, `us_ativo`, `us_genero`, `us_verificado`, `us_autenticador`, `us_cadastro`, `us_acessos`, `us_erros`, `us_last`, `us_perfil`, `us_perfil_check`, `us_com_nome`, `us_com_ass`) VALUES
+(7, 'Super User Admin', 'admin', 'ADMIN', '21232f297a57a5a743894a0e4a801fc3', '00007', '', 1, '', '', 'MD5', '2016-06-27 02:53:04', 0, 0, '2016-06-27 02:53:04', '', '8f14e45fceea167a5a36dedd4bea2543', '', ''),
+(8, 'Rene Faustino Gabriel Junior', 'renefgj@gmail.com', 'RENE', '2e3db7994011c8c5e315e42a0cb439c5', '00008', '', 1, 'M', '', 'MD5', '2016-06-29 12:28:18', 0, 0, '2016-06-29 12:28:18', '#ADM', NULL, '', ''),
+(9, 'Tadeu Everton Zamoiski', '', 'TMK', '123456', '00009', '', 0, 'M', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(10, 'Moacyr Zambaldi Junior', '', 'JUNIOR', '123456', '00010', '', 0, 'C', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(11, 'Ana Cristina Zamoiski', '', 'ACZ', '123456', '00011', '', 0, 'F', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(12, 'Jacqueline Stein Jendick', '', 'JACKY', '123456', '00012', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(13, 'Douglas Antonio Durante Pegoraro', '', 'DOUGLAS', 'e10adc3949ba59abbe56e057f20f883e', '00013', '', 1, '0', '', 'MD5', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, 'Douglas Pegoraro', 'Representante Comercial'),
+(14, 'Gleisi Silvia Sima', '', 'GLEISI', '123456', '00014', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(15, 'Wagner Block', '', 'BLOCK', '123456', '00015', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(16, 'Fabricio Cola', '', 'FABRI', '123456', '00016', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(17, 'Joao Luiz Zamoiski', '', 'KIKO', '123456', '00017', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(18, 'Luis Fernando de Andrade', '', 'LUIS', '123456', '00018', '', 0, 'M', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(19, 'Olinda Maria Rigoni Ferreira', '', 'OLINDA', '123456', '00019', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(20, 'Elcio Douglas Ferreira', '', 'ELCIO', '123456', '00020', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(21, 'Eliara Prado Zambaldi', '', 'ELIARA', '123456', '00021', '', 1, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '#GEF', NULL, '', ''),
+(22, 'Maite Elisa Kreusch', '', 'MAITE', '123456', '00022', '', 0, '3', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(23, 'Rodrigo Baptista', '', 'RODRIGO', '123456', '00023', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(24, 'Deisi Gomes Dos Santos', '', 'DGS', '123456', '00024', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(25, 'Welch MagalhÃes Brezina', '', 'WMB', '123456', '00025', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(26, 'Jose Domingos Favile Junior', '', 'JDFJ', '123456', '00026', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(27, 'Daniel Wojciechowski Martins', '', 'DANI', '123456', '00027', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(28, 'Natalia Henrique Zambaldi', '', 'NATALIA', '123456', '00028', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(29, 'Marcos Pontes Carvalho', '', 'MARCOS', '123456', '00029', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(30, 'Virgilio Paschoal Vintem', '', 'PASCHOAL', '123456', '00030', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(31, 'Samuel D. Sima de Azevedo', '', 'SAMUEL', '123456', '00031', '', 0, '2', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(32, 'Mariana Das Virgens', '', 'MARIANA', '123456', '00032', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(33, 'Barbara do Nascimento', '', 'BAR', '123456', '00033', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(34, 'Rodrigo Otavio França Miranda', '', 'ROM', '123456', '00034', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(35, 'Gabriel Pereira Das Virgens', '', 'GABRIEL', '123456', '00035', '', 0, 'M', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(36, 'Gregorio Luis Trentino', '', 'GREG', '123456', '00036', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(37, 'Giuliano Maciel Schiavinatto', '', 'GIULIANO', '123456', '00037', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(38, 'Jairo Vieira Sanguinete', '', 'JAIRO', '123456', '00038', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(39, 'Fabio Andre Tauffer de Sousa', '', 'FAA', '123456', '00039', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(40, 'Edyomar Souza de Jesus', '', 'EDY', '123456', '00040', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(41, 'Getulio da Silva Costa Neto', '', 'GETULIO', '123456', '00041', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(42, 'Marcos Francisco Dos Santos', '', 'FCO', '123456', '00042', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(43, 'Lucas Fernandes Garcia', '', 'LUCAS', '123456', '00043', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(44, 'Mauricio Luiz Medeiros de Andrade', '', 'MAURICIO', '123456', '00044', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(45, 'Debora Carneiro Morais', '', 'DEBORA', '123456', '00045', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(46, 'Maria Helena Pontes Carvalho', '', 'HELENA', '123456', '00046', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(47, 'Ozei Luiz da Silva', '', 'OZEI', '123456', '00047', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(48, 'Ana Carolina Pereira de Souza', '', 'ANACAROL', '123456', '00048', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(49, 'José Roberto Marques da Silva', '', 'ROBERTO', '123456', '00049', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(50, 'Thiago Gonçalves da Silva', '', 'THIAGO', '123456', '00050', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(51, 'Nelson da Silva Santos Junior', '', 'NELSON', '123456', '00051', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(52, 'Andrei Muller', '', 'ANDREI', '123456', '00052', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(53, 'Sabrina Alessandra Wolfgramm da Silva', '', 'SABRINA', '123456', '00053', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(54, 'Mariano Oliveira Porto', '', 'MARIANO', '123456', '00054', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(55, 'Joel da Silva Rodrigues', '', 'JOEL', '123456', '00055', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(56, 'Paulo Rafael Damas Albano', '', 'RAFAEL', '123456', '00056', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(57, 'Laiene Tamires da Silva', '', 'LAIENE', '123456', '00057', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(58, 'Jeferson Wasen Paulino', '', 'JEFERSON', '123456', '00058', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(59, 'Cristian Paulo Vieira', '', 'CRISTIAN', '123456', '00059', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(60, 'Ricardo Alexandre Vargas', '', 'RICARDO', '123456', '00060', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(61, 'Cristiane de Jesus Boas', '', 'CRISTIANE', '123456', '00061', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(62, 'Geovane Gonçalves', '', 'GEOVANE', '123456', '00062', '', 0, '0', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(63, 'Rafael de Paula Souza', '', 'RAFA', '123456', '00063', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(64, 'Gabriela Henrique Zambaldi', '', 'GABI', '123456', '00064', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(65, 'Alexandre Fernandes da Silva', '', 'ALEXANDRE', '123456', '00065', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(66, 'Alvaro Elias Gonçalves Filho', '', 'ALVARO', '123456', '00066', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
+(67, 'Joao Paulo Luciano', '', 'JOAO', '123456', '00067', '', 0, 'A', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', '');
 
 -- --------------------------------------------------------
 
@@ -973,6 +1078,12 @@ ALTER TABLE `clientes_mensagem`
 --
 ALTER TABLE `condicoes_pagamento`
  ADD UNIQUE KEY `id_pg` (`id_pg`);
+
+--
+-- Indexes for table `contato_funcao`
+--
+ALTER TABLE `contato_funcao`
+ ADD UNIQUE KEY `id_ct` (`id_ct`);
 
 --
 -- Indexes for table `cx_caixa`
@@ -1113,6 +1224,12 @@ ALTER TABLE `produtos_tipo`
  ADD UNIQUE KEY `id_prd` (`id_prd`);
 
 --
+-- Indexes for table `produto_agenda`
+--
+ALTER TABLE `produto_agenda`
+ ADD UNIQUE KEY `id_ag` (`id_ag`);
+
+--
 -- Indexes for table `produto_doc_ged`
 --
 ALTER TABLE `produto_doc_ged`
@@ -1155,12 +1272,12 @@ MODIFY `id_cc` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
 -- AUTO_INCREMENT for table `clientes`
 --
 ALTER TABLE `clientes`
-MODIFY `id_f` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_f` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `clientes_contatos`
 --
 ALTER TABLE `clientes_contatos`
-MODIFY `id_cc` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_cc` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `clientes_mensagem`
 --
@@ -1170,7 +1287,12 @@ MODIFY `id_msg` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT for table `condicoes_pagamento`
 --
 ALTER TABLE `condicoes_pagamento`
-MODIFY `id_pg` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=13;
+MODIFY `id_pg` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+--
+-- AUTO_INCREMENT for table `contato_funcao`
+--
+ALTER TABLE `contato_funcao`
+MODIFY `id_ct` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `cx_caixa`
 --
@@ -1220,12 +1342,12 @@ MODIFY `id_m` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=11;
 -- AUTO_INCREMENT for table `pedido`
 --
 ALTER TABLE `pedido`
-MODIFY `id_pp` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_pp` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `pedido_itens`
 --
 ALTER TABLE `pedido_itens`
-MODIFY `id_pi` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_pi` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `pedido_situacao`
 --
@@ -1240,7 +1362,7 @@ MODIFY `id_t` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
 -- AUTO_INCREMENT for table `prazo_entrega`
 --
 ALTER TABLE `prazo_entrega`
-MODIFY `id_pz` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
+MODIFY `id_pz` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `prazo_garantia`
 --
@@ -1255,17 +1377,17 @@ MODIFY `id_pm` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 -- AUTO_INCREMENT for table `produtos`
 --
 ALTER TABLE `produtos`
-MODIFY `id_pr` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_pr` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `produtos_categoria`
 --
 ALTER TABLE `produtos_categoria`
-MODIFY `id_pc` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_pc` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT for table `produtos_historico`
 --
 ALTER TABLE `produtos_historico`
-MODIFY `id_ph` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_ph` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `produtos_historico_tipo`
 --
@@ -1285,7 +1407,12 @@ MODIFY `id_ps` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
 -- AUTO_INCREMENT for table `produtos_tipo`
 --
 ALTER TABLE `produtos_tipo`
-MODIFY `id_prd` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
+MODIFY `id_prd` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+--
+-- AUTO_INCREMENT for table `produto_agenda`
+--
+ALTER TABLE `produto_agenda`
+MODIFY `id_ag` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `produto_doc_ged`
 --

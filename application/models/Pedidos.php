@@ -9,9 +9,11 @@ class pedidos extends CI_model {
 		array_push($cp, array('$H8', 'id_pi', '', False, True));
 		array_push($cp, array('$HV', '', 'ITEM', True, True));
 		array_push($cp, array('$S80', 'pi_produto', 'Produto', True, True));
+		array_push($cp, array('$T80:3', 'pi_descricao', 'Descrição', False, True));
 		array_push($cp, array('$N8', 'pi_quant', 'Quantidade', False, True));
 		array_push($cp, array('$N8', 'pi_valor_unit', 'Vlr. Unitário', False, True));
-		array_push($cp, array('$T80:3', 'pi_descricao', 'Descrição', False, True));
+		array_push($cp, array('$[0-800]', 'pi_qt_diarias', 'Período de locação', False, True));
+		
 		if ($id == 0) {
 			array_push($cp, array('$HV', 'pi_vendor', $id_us, False, True));
 			array_push($cp, array('$HV', 'pi_ativo', '1', False, True));
@@ -55,7 +57,7 @@ class pedidos extends CI_model {
 		
 		
 		/* SOBRE O EVENTO */
-		array_push($cp, array('$[0-800]', 'pp_periodo_locacao', 'Período de locação (dias)', False, True));
+		//array_push($cp, array('$[0-800]', 'pp_periodo_locacao', 'Período de locação (dias)', False, True));
 		array_push($cp, array('$D8', 'pp_dt_ini_evento', 'Dt. início evento', False, True));
 		array_push($cp, array('$D8', 'pp_dt_fim_evento', 'Dt. final do evento', False, True));
 		
@@ -281,8 +283,9 @@ class pedidos extends CI_model {
 					<th width="2%">#</th>
 					<th width="70%">produto / serviço</th>
 					<th width="8%">quant.</th>
-					<th width="10%">vlr.unitário</th>
-					<th width="10%">vlr.total</th>
+					<th width="5%" class="locacao">diárias</th>
+					<th width="10%">vlr.unitário/diária</th>
+					<th width="10%">vlr.total</th>					
 					<th width="1%" class="nopr">&nbsp;</th>
 				</tr>' . cr();
 		$tot1 = 0;
@@ -294,8 +297,11 @@ class pedidos extends CI_model {
 			$sx .= '<td align="center">' . ($r + 1) . '</td>';
 			$sx .= '<td align="left" class="big">' . $line['pi_produto'] . '</td>';
 			$sx .= '<td align="right"><b>' . number_format($line['pi_quant'], 1, ',', '.') . '</b></td>';
+			$sx .= '<td align="right">' . number_format($line['pi_qt_diarias'], 0, ',', '.') . '</td>';
 			$sx .= '<td align="right">' . number_format($line['pi_valor_unit'], 2, ',', '.') . '</td>';
-			$sx .= '<td align="right" class="big"><b>' . number_format($line['pi_quant'] * $line['pi_valor_unit'], 2, ',', '.') . '</b></td>';
+			$vd = $line['pi_qt_diarias'];
+			if ($vd == 0) { $vd = 1; }
+			$sx .= '<td align="right" class="big"><b>' . number_format($vd * $line['pi_quant'] * $line['pi_valor_unit'], 2, ',', '.') . '</b></td>';
 			if (($id_us == $line['pi_vendor']) and ($edit == 1)) {
 				$link = '<button type="button" class="btn btn-primary" 
 							onclick="item_editar('.$line['id_pi'].','.$id.');"
@@ -307,7 +313,7 @@ class pedidos extends CI_model {
 			$sx .= '</tr>' . cr();
 			
 			$tot1 = $tot1 + $line['pi_quant'];
-			$tot2 = $tot2 + ($line['pi_quant'] * $line['pi_valor_unit']);
+			$tot2 = $tot2 + ($line['pi_quant'] * $line['pi_valor_unit'] * $vd);
 
 			if (strlen($line['pi_descricao']) > 0) {
 				$sx .= '<tr class="small"><td></td><td>' . mst($line['pi_descricao']) . '</td></tr>';

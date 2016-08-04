@@ -66,10 +66,10 @@ $us_nome = $_SESSION['user'];
 							<a href="<?php echo base_url('index.php/main/clientes'); ?>">Clientes</a>
 						</li>
 						<li>
-							<a href="<?php echo base_url('index.php/main/produtos'); ?>">Produtos</a>
+							<a href="<?php echo base_url('index.php/main/produtos_categoria'); ?>">Produto - Categoria</a>
 						</li>
 						<li>
-							<a href="<?php echo base_url('index.php/main/produtos_categoria'); ?>">Produtos - Categoria</a>
+							<a href="<?php echo base_url('index.php/main/produtos'); ?>">Produto - Equipamento</a>
 						</li>
 						<li>
 							<a href="<?php echo base_url('index.php/main/produtos_marca'); ?>">Produtos - Marcas</a>
@@ -95,6 +95,9 @@ $us_nome = $_SESSION['user'];
 					echo '<ul class="dropdown-menu">' . cr();
 					echo '	<li>' . cr();
 					echo '		<li><a href="' . base_url('index.php/admin/perfil') . '">Cadastro de Perfis</a></li>' . cr();
+					echo '	</li>' . cr();
+					echo '	<li>' . cr();
+					echo '		<li><a href="' . base_url('index.php/admin/contato_tipo') . '">Cadastro de Tipos de Contato</a></li>' . cr();
 					echo '	</li>' . cr();
 					echo '	<li>' . cr();
 					echo '		<li><a href="' . base_url('index.php/admin/comunicacao_1') . '">Mensagens do Sistema</a></li>' . cr();

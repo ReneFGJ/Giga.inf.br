@@ -30,14 +30,6 @@
 		<div class="col-md-2"><span class="small">Bairro</span><br><span class="big"><?php echo $f_bairro;?></span></div>
 		<div class="col-md-3"><span class="small">Cidade</span><br><span class="big"><?php echo $f_cidade;?> <?php echo $f_estado;?></span></div>
 	</div>
-
-	<!------------------------------------------ Endereco ------------->
-	<div class="row" style="margin-top: 20px; display: none;" id="clie03f">
-		<div class="col-md-3"><span class="small">Telefone</span><br><span class="big"><?php echo $f_fone_1;?></span></div>
-		<div class="col-md-3"><span class="small">Telefone</span><br><span class="big"><?php echo $f_fone_2;?></span></div>
-		<div class="col-md-3"><span class="small">e-mail</span><br><span class="big"><?php echo $f_email;?></span></div>
-		<div class="col-md-3"><span class="small">e-mail (alternativo)</span><br><span class="big"><?php echo $f_email_cobranca;?></span></div>
-	</div>
 </div>
 
 <script>

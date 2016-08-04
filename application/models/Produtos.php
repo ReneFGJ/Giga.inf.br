@@ -170,26 +170,12 @@ class produtos extends CI_model {
 		$data['title'] = '';
 		$data['content'] = $form -> editar($cp, $this -> table_tipo);
 		$this -> load -> view('content', $data);
-		if ($form->saved > 0)
-			{
-				if ($id == 0)
-					{
-						$data = array();
-						$sql = "select max(id_pr) as id_pr from ".$this->table;
-						$rlt = $this->db->query($sql);
-						$rlt = $rlt->result_array();
-						$data = $rlt[0];
-						$data['nr_pedido'] = 0;
-						$data['id_hs'] = 1; /* entrada de produto em estoque */
-						$this->inserir_historico($data);
-					}
-			}
 		return ($form -> saved);
 	}	
 	/****************************************************************************************** HISTORICO *********************/
 	function inserir_historico($dt)
 		{
-			$prod = $dt['id_pr'];
+			$prod = round($dt['id_pr']);
 			$user = $_SESSION['id'];
 			$hist = $dt['id_hs'];
 			$pedi = $dt['nr_pedido'];
@@ -217,6 +203,7 @@ class produtos extends CI_model {
 		array_push($cp, array('$H8', 'id_pc', '', False, True));
 		array_push($cp, array('$S80', 'pc_nome', 'Nome da categoria', True, True));
 		array_push($cp, array('$S80', 'pc_codigo', 'Código', True, True));		
+		array_push($cp, array('$T80:5', 'pc_desc_basica', 'Descrição Básica', True, True));
 		array_push($cp, array('$O 1:SIM&0:NÃO', 'pc_ativo', 'Ativo', True, True));
 
 		return ($cp);
@@ -227,7 +214,7 @@ class produtos extends CI_model {
 
 		$form -> fd = array('id_pc', 'pc_nome', 'pc_codigo', 'pc_ativo');
 		$form -> lb = array('id', msg('pc_nome'), msg('pc_codigo'), msg('pc_ativo'));
-		$form -> mk = array('', 'L', 'L', 'L');
+		$form -> mk = array('', 'L', 'L', 'A');
 
 		$form -> tabela = $this -> table_categoria;
 		$form -> see = true;

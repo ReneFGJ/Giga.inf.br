@@ -27,8 +27,16 @@ class users extends CI_model {
 			array_push($cp, array('$S80', 'us_email', 'login/email', True, True));
 			array_push($cp, array('$P20', '', 'Senha', True, True));
 		}
-		array_push($cp, array('$HV', 'us_password', md5(get("dd3")), True, True));
 		array_push($cp, array('$O 1:SIM&0:NÃO', 'us_ativo', 'Ativo', True, True));
+		return ($cp);
+	}
+
+	function cp_sign() {
+		$cp = array();
+		array_push($cp, array('$H8', 'id_us', '', False, True));
+		array_push($cp, array('$S80', 'us_com_nome', 'Nome comercial', True, True));
+		array_push($cp, array('$T80:6', 'us_com_ass', 'Assinatura', True, True));
+		array_push($cp, array('$B8', '', 'Atualizar', False, True));
 		return ($cp);
 	}
 
@@ -44,9 +52,9 @@ class users extends CI_model {
 	function row($id = '') {
 		$form = new form;
 
-		$form -> fd = array('id_us', 'us_nome', 'us_login','us_ativo');
-		$form -> lb = array('id', msg('us_name'), msg('us_login'),msg('us_ativo'));
-		$form -> mk = array('', 'L', 'L','A');
+		$form -> fd = array('id_us', 'us_nome', 'us_login', 'us_ativo');
+		$form -> lb = array('id', msg('us_name'), msg('us_login'), msg('us_ativo'));
+		$form -> mk = array('', 'L', 'L', 'A');
 
 		$form -> tabela = $this -> table;
 		$form -> see = true;
@@ -212,13 +220,13 @@ class users extends CI_model {
 
 	function change_password($id) {
 		$this -> load -> model('user_drh');
-		
+
 		$data1 = $this -> le($id);
 		$data2 = $this -> user_drh -> le($id);
-		$data = array_merge($data1, $data2);	
-		
-		$tela = $this->load->view('auth_social/change_password',$data,true);	
-		
+		$data = array_merge($data1, $data2);
+
+		$tela = $this -> load -> view('auth_social/change_password', $data, true);
+
 		/* REGRAS DE VALIDACAO */
 		$data = $this -> le($id);
 		$pass = get("dd1");
@@ -245,15 +253,76 @@ class users extends CI_model {
 									</div>';
 				}
 			} else {
-					$data['erro'] = '<div class="alert alert-danger" role="alert">
+				$data['erro'] = '<div class="alert alert-danger" role="alert">
   										<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
   										<span class="sr-only">Error:</span>
   										Senhas atual não confere!
 									</div>';
 			}
 		}
-		
-		$tela = $this->load->view('auth_social/change_password',$data,true);
+
+		$tela = $this -> load -> view('auth_social/change_password', $data, true);
+		$data['content'] = $tela;
+		$tela = $this -> load -> view('auth_social/account', $data, true);
+		return ($tela);
+	}
+
+	function change_sign($id) {
+		$this -> load -> model('user_drh');
+
+		$data1 = $this -> le($id);
+		$data2 = $this -> user_drh -> le($id);
+		$data = array_merge($data1, $data2);
+
+		$cp = $this -> cp_sign();
+		$form = new form;
+		$form -> id = $id;
+		$table = $this -> table;
+		$tela = $form -> editar($cp, $table);
+		if ($form -> saved > 0) {
+			$tela .= $this -> load -> view('success', null, true);
+		}
+		$data['content'] = $tela;
+		$tela = $this -> load -> view('auth_social/account', $data, true);
+		return ($tela);
+	}
+
+	function reset_password($id) {
+		$this -> load -> model('user_drh');
+
+		$data1 = $this -> le($id);
+		$data2 = $this -> user_drh -> le($id);
+		$data = array_merge($data1, $data2);
+
+		$tela = $this -> load -> view('auth_social/change_password', $data, true);
+
+		/* REGRAS DE VALIDACAO */
+		$data = $this -> le($id);
+		$pass = get("dd1");
+		$dd3 = $data['us_password'];
+		$p1 = get("dd2");
+		$p2 = get("dd3");
+
+		$dd2 = $this -> password_cripto($pass, $data['us_autenticador']);
+		if (strlen($p1) > 0) {
+			if ($p1 == $p2) {
+				$sql = "update " . $this -> table . " set us_password = '" . md5($p1) . "', us_autenticador = 'MD5' where id_us = " . $id;
+				$this -> db -> query($sql);
+				$data['erro'] = '<div class="alert alert-success" role="alert">
+  										<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  										<span class="sr-only">Sucesso:</span>
+  										Senhas alterada com sucesso!
+									</div>';
+			} else {
+				$data['erro'] = '<div class="alert alert-danger" role="alert">
+  										<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  										<span class="sr-only">Error:</span>
+  										Senhas não conferem!
+									</div>';
+			}
+		}
+
+		$tela = $this -> load -> view('auth_social/reset_password', $data, true);
 		$data['content'] = $tela;
 		$tela = $this -> load -> view('auth_social/account', $data, true);
 		return ($tela);

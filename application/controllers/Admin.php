@@ -66,6 +66,40 @@ class Admin extends CI_controller {
 		$this -> load -> view('form/form', $tela);
 	}
 
+	/********************************************************************** perfil *********************/
+	function contato_tipo($id = '', $chk = '') {
+		/* Load Models */
+		$this -> load -> model('clientes');
+
+		$this -> cab();
+		$data = array();
+
+		$tela['tela'] = $this -> clientes -> row_contatos_tipo($id);
+		$this -> load -> view('form/form', $tela);
+	}
+
+	function contato_tipo_edit($id = 0, $check = '') {
+		/* Load Models */
+		$this -> load -> model('clientes');
+		$cp = $this -> clientes -> cp_contatos_tipo();
+		$data = array();
+
+		$this -> cab();
+
+		$form = new form;
+		$form -> id = $id;
+
+		$tela = $form -> editar($cp, $this -> clientes -> table_contatos_tipo);
+		$data['title'] = msg('clientes');
+		$data['tela'] = $tela;
+		$this -> load -> view('form/form', $data);
+
+		/* Salva */
+		if ($form -> saved > 0) {
+			redirect(base_url('index.php/admin/contato_tipo'));
+		}
+	}
+
 	function perfil_edit($id = 0, $check = '') {
 		/* Load Models */
 		$this -> load -> model('logins');
@@ -213,6 +247,19 @@ class Admin extends CI_controller {
 		$data['title'] = '';
 		$data['content'] = $this -> users -> my_account($id);
 		$this -> load -> view('content', $data);
+	}
+
+	function user_reset_password($id = 0, $chk = '') {
+		if (perfil("#ADM#DRH")) {
+			$this -> cab();
+			$data['title'] = '';
+
+			$data['content'] = $this -> users -> reset_password($id);
+			$this -> load -> view('content', $data);
+		} else {
+			redirect(base_url('index.php/main'));
+		}
+
 	}
 
 	/***************************** comunicacao ***************************************/
