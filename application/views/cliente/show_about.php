@@ -16,31 +16,37 @@ if ($orcamentos_total == 0)
 	{
 		$orcamento_total = '<span>&nbsp;</span>';
 	}
+/***************************** mensagem **********/
+$msg_total = '<span class="badge">'.$mensagens_total.'</span>';
+if ($mensagens_total == 0)
+	{
+		$msg_total = '<span>&nbsp;</span>';
+	}
 /***************************** contato ***********/	
 $contatos_total = '<span class="badge">'.$contatos_total.'</span>';
 if ($contatos_total == 0)
 	{
 		$contatos_total = '<span>&nbsp;</span>';
 	}
-/***************************** contato ***********/	
+/***************************** laboratorio ***********/	
 $labo_total = '<span class="badge">'.$labos_total.'</span>';
 if ($labos_total == 0)
 	{
 		$labo_total = '<span>&nbsp;</span>';
 	}
-/***************************** contato ***********/	
+/***************************** onsit ***********/	
 $onsite_total = '<span class="badge">'.$onsites_total.'</span>';
 if ($onsites_total == 0)
 	{
 		$onsite_total = '<span>&nbsp;</span>';
 	}
-/***************************** contato ***********/	
+/***************************** locacao ***********/	
 $locacao_total = '<span class="badge">'.$locacoes_total.'</span>';
 if ($locacoes_total == 0)
 	{
 		$locacao_total = '<span>&nbsp;</span>';
 	}
-/***************************** contato ***********/	
+/***************************** financeiro ***********/	
 if (!isset($finan_total)) { $finan_total = 0; $financeiro = '<br><br><br><br><br><br><br><br><br><br><br><br><br><br>'; }
 $fin_total = '<span class="badge">'.$finan_total.'</span>';
 if ($finan_total == 0)

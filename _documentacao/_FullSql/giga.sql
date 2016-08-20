@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 03, 2016 at 05:16 PM
+-- Generation Time: Aug 08, 2016 at 01:21 PM
 -- Server version: 5.6.20-log
 -- PHP Version: 5.4.31
 
@@ -98,14 +98,15 @@ CREATE TABLE IF NOT EXISTS `clientes_contatos` (
   `cc_telefone` char(20) NOT NULL,
   `cc_email` char(80) NOT NULL,
   `cc_ativo` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `clientes_contatos`
 --
 
 INSERT INTO `clientes_contatos` (`id_cc`, `cc_cliente_id`, `cc_nome`, `cc_funcao`, `cc_telefone`, `cc_email`, `cc_ativo`) VALUES
-(1, 1, 'Rene Junior', 2, '4188119061', 'renefgj@gmail.com', 1);
+(1, 1, 'Rene Junior', 2, '4188119061', 'renefgj@gmail.com', 1),
+(2, 1, 'Viviane de Fátima Tulio', 1, '4188666389', 'vivianetulio@gmail.com', 1);
 
 -- --------------------------------------------------------
 
@@ -118,6 +119,7 @@ CREATE TABLE IF NOT EXISTS `clientes_mensagem` (
   `msg_cliente_id` int(11) NOT NULL,
   `msg_data` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `msg_user` int(11) NOT NULL,
+  `msg_subject` char(80) NOT NULL,
   `msg_text` longtext NOT NULL,
   `msg_tipo` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
@@ -134,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `condicoes_pagamento` (
   `pg_ativo` int(11) NOT NULL DEFAULT '1',
   `pg_seq` int(11) NOT NULL,
   `pg_visivel` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `condicoes_pagamento`
@@ -143,7 +145,8 @@ CREATE TABLE IF NOT EXISTS `condicoes_pagamento` (
 INSERT INTO `condicoes_pagamento` (`id_pg`, `pg_nome`, `pg_ativo`, `pg_seq`, `pg_visivel`) VALUES
 (1, '-- não aplicável --', 1, 0, 0),
 (2, 'Contra apresentação', 1, 0, 1),
-(3, 'Boleto 28 dias', 1, 0, 1);
+(3, 'Boleto 28 dias', 1, 0, 1),
+(4, 'Boleto 15 dias', 1, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -402,15 +405,21 @@ CREATE TABLE IF NOT EXISTS `mensagem_own` (
   `m_foot` char(150) NOT NULL,
   `m_ativo` tinyint(4) NOT NULL,
   `m_email` char(100) NOT NULL,
-  `m_own_cod` char(10) NOT NULL
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
+  `m_own_cod` char(10) NOT NULL,
+  `smtp_host` char(80) NOT NULL,
+  `smtp_user` char(80) NOT NULL,
+  `smtp_pass` char(80) NOT NULL,
+  `smtp_protocol` char(5) NOT NULL,
+  `smtp_port` char(3) NOT NULL,
+  `mailtype` char(5) NOT NULL
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 --
 -- Dumping data for table `mensagem_own`
 --
 
-INSERT INTO `mensagem_own` (`id_m`, `m_descricao`, `m_header`, `m_foot`, `m_ativo`, `m_email`, `m_own_cod`) VALUES
-(10, 'Giga', '', '', 1, '', '');
+INSERT INTO `mensagem_own` (`id_m`, `m_descricao`, `m_header`, `m_foot`, `m_ativo`, `m_email`, `m_own_cod`, `smtp_host`, `smtp_user`, `smtp_pass`, `smtp_protocol`, `smtp_port`, `mailtype`) VALUES
+(1, 'Giga Informática', '', '', 1, 'brapci@brapci.inf.br', '', 'brapci.inf.br', 'brapci@brapci.inf.br', '448545ct', 'smtp', '587', 'smtp');
 
 -- --------------------------------------------------------
 
@@ -441,14 +450,38 @@ CREATE TABLE IF NOT EXISTS `pedido` (
   `pp_dt_fim_evento` date NOT NULL,
   `pp_valor` float NOT NULL DEFAULT '0',
   `pp_validade_proposta` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `pedido`
 --
 
 INSERT INTO `pedido` (`id_pp`, `pp_tipo_pedido`, `pp_nr`, `pp_ano`, `pp_situacao`, `pp_cliente`, `pp_cliente_faturamento`, `pp_data`, `pp_vendor`, `pp_condicoes`, `pp_prazo_entrega`, `pp_garantia`, `pp_validade_ppdido`, `pp_montagem`, `pp_periodo_locacao`, `pp_obs`, `pp_evento`, `pp_local_entrega`, `pp_dt_ini_evento`, `pp_dt_fim_evento`, `pp_valor`, `pp_validade_proposta`) VALUES
-(1, 1, '0000001', '16', 1, 1, 0, '2016-08-03 01:25:18', 8, 3, 1, 2, 1, 1, 0, '', '', '', '0000-00-00', '0000-00-00', 0, 0);
+(1, 1, '0000001', '16', 2, 1, 0, '2016-08-03 01:25:18', 7, 3, 1, 2, 1, 1, 0, '', '', '', '0000-00-00', '0000-00-00', 0, 0),
+(2, 1, '0000002', '16', 1, 1, 0, '2016-08-08 12:30:27', 7, 3, 3, 3, 1, 1, 0, '', '', '', '0000-00-00', '0000-00-00', 0, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pedido_contato`
+--
+
+CREATE TABLE IF NOT EXISTS `pedido_contato` (
+`id_pct` bigint(20) unsigned NOT NULL,
+  `pct_id_pp` int(11) NOT NULL,
+  `pct_id_contato` int(11) NOT NULL,
+  `pct_ativo` int(11) NOT NULL DEFAULT '1'
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+
+--
+-- Dumping data for table `pedido_contato`
+--
+
+INSERT INTO `pedido_contato` (`id_pct`, `pct_id_pp`, `pct_id_contato`, `pct_ativo`) VALUES
+(1, 1, 1, 1),
+(2, 1, 2, 0),
+(3, 2, 2, 1),
+(4, 2, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -467,14 +500,15 @@ CREATE TABLE IF NOT EXISTS `pedido_itens` (
   `pi_vendor` int(11) NOT NULL,
   `pi_ativo` int(11) NOT NULL DEFAULT '1',
   `pi_qt_diarias` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `pedido_itens`
 --
 
 INSERT INTO `pedido_itens` (`id_pi`, `pi_nr`, `pi_seq`, `pi_produto`, `pi_descricao`, `pi_quant`, `pi_valor_unit`, `pi_vendor`, `pi_ativo`, `pi_qt_diarias`) VALUES
-(1, 1, 0, 'Notebook I5', '', 5, 30, 8, 1, 10);
+(1, 1, 0, 'Notebook I5', '', 5, 30, 8, 1, 10),
+(2, 2, 0, 'Notebook I5', 'teste', 10, 50, 7, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -538,20 +572,21 @@ INSERT INTO `pedido_tipo` (`id_t`, `t_descricao`, `t_locacao`, `t_venda`, `t_lab
 --
 
 CREATE TABLE IF NOT EXISTS `pedido_validade` (
-  `id_vd` bigint(20) unsigned NOT NULL,
+`id_vd` bigint(20) unsigned NOT NULL,
   `vd_nome` char(80) NOT NULL,
   `vd_ativo` int(1) NOT NULL DEFAULT '1',
   `vd_seq` int(11) NOT NULL,
   `vd_visivel` int(11) NOT NULL DEFAULT '1',
   `vd_dias` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `pedido_validade`
 --
 
 INSERT INTO `pedido_validade` (`id_vd`, `vd_nome`, `vd_ativo`, `vd_seq`, `vd_visivel`, `vd_dias`) VALUES
-(1, '--Não aplicável--', 1, 0, 1, 0);
+(1, '--Não aplicável--', 1, 0, 1, 0),
+(2, '7 dias', 1, 0, 1, 7);
 
 -- --------------------------------------------------------
 
@@ -588,7 +623,7 @@ CREATE TABLE IF NOT EXISTS `prazo_garantia` (
   `pga_ativo` int(1) NOT NULL DEFAULT '1',
   `pga_seq` int(11) NOT NULL,
   `pga_visivel` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `prazo_garantia`
@@ -597,7 +632,8 @@ CREATE TABLE IF NOT EXISTS `prazo_garantia` (
 INSERT INTO `prazo_garantia` (`id_pga`, `pga_nome`, `pga_ativo`, `pga_seq`, `pga_visivel`) VALUES
 (1, '-- não aplicável --', 1, 1, 0),
 (2, 'Durante o período de locação', 1, 2, 1),
-(3, '1 Ano de substituição de peças, serviço e atendimento Onsite', 1, 3, 1);
+(3, '1 Ano de substituição de peças, serviço e atendimento Onsite', 1, 3, 1),
+(4, '30 dias', 1, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -611,7 +647,7 @@ CREATE TABLE IF NOT EXISTS `prazo_montagem` (
   `pm_ativo` int(1) NOT NULL DEFAULT '1',
   `pm_seq` int(11) NOT NULL,
   `pm_visivel` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `prazo_montagem`
@@ -619,7 +655,8 @@ CREATE TABLE IF NOT EXISTS `prazo_montagem` (
 
 INSERT INTO `prazo_montagem` (`id_pm`, `pm_nome`, `pm_ativo`, `pm_seq`, `pm_visivel`) VALUES
 (1, '-- não aplicável --', 1, 1, 0),
-(2, '1 dia', 1, 2, 1);
+(2, '1 dia', 1, 2, 1),
+(3, '7 dias', 1, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -895,7 +932,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id_us`, `us_nome`, `us_email`, `us_login`, `us_password`, `us_badge`, `us_link`, `us_ativo`, `us_genero`, `us_verificado`, `us_autenticador`, `us_cadastro`, `us_acessos`, `us_erros`, `us_last`, `us_perfil`, `us_perfil_check`, `us_com_nome`, `us_com_ass`) VALUES
-(7, 'Super User Admin', 'admin', 'ADMIN', '21232f297a57a5a743894a0e4a801fc3', '00007', '', 1, '', '', 'MD5', '2016-06-27 02:53:04', 0, 0, '2016-06-27 02:53:04', '', '8f14e45fceea167a5a36dedd4bea2543', '', ''),
+(7, 'Super User Admin', 'rene@sisdoc.com.br', 'ADMIN', '21232f297a57a5a743894a0e4a801fc3', '00007', '', 1, '', '', 'MD5', '2016-06-27 02:53:04', 0, 0, '2016-06-27 02:53:04', '', '8f14e45fceea167a5a36dedd4bea2543', '', ''),
 (8, 'Rene Faustino Gabriel Junior', 'renefgj@gmail.com', 'RENE', '2e3db7994011c8c5e315e42a0cb439c5', '00008', '', 1, 'M', '', 'MD5', '2016-06-29 12:28:18', 0, 0, '2016-06-29 12:28:18', '#ADM', NULL, '', ''),
 (9, 'Tadeu Everton Zamoiski', '', 'TMK', '123456', '00009', '', 0, 'M', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
 (10, 'Moacyr Zambaldi Junior', '', 'JUNIOR', '123456', '00010', '', 0, 'C', '', 'TXT', '2016-07-03 18:07:46', 0, 0, '0000-00-00 00:00:00', '', NULL, '', ''),
@@ -1146,6 +1183,12 @@ ALTER TABLE `pedido`
  ADD UNIQUE KEY `id_po` (`id_pp`);
 
 --
+-- Indexes for table `pedido_contato`
+--
+ALTER TABLE `pedido_contato`
+ ADD UNIQUE KEY `id_pct` (`id_pct`);
+
+--
 -- Indexes for table `pedido_itens`
 --
 ALTER TABLE `pedido_itens`
@@ -1162,6 +1205,12 @@ ALTER TABLE `pedido_situacao`
 --
 ALTER TABLE `pedido_tipo`
  ADD UNIQUE KEY `id_t` (`id_t`);
+
+--
+-- Indexes for table `pedido_validade`
+--
+ALTER TABLE `pedido_validade`
+ ADD UNIQUE KEY `id_vda` (`id_vd`);
 
 --
 -- Indexes for table `prazo_entrega`
@@ -1277,7 +1326,7 @@ MODIFY `id_f` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 -- AUTO_INCREMENT for table `clientes_contatos`
 --
 ALTER TABLE `clientes_contatos`
-MODIFY `id_cc` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+MODIFY `id_cc` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `clientes_mensagem`
 --
@@ -1287,7 +1336,7 @@ MODIFY `id_msg` bigint(20) unsigned NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT for table `condicoes_pagamento`
 --
 ALTER TABLE `condicoes_pagamento`
-MODIFY `id_pg` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+MODIFY `id_pg` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `contato_funcao`
 --
@@ -1337,17 +1386,22 @@ MODIFY `id_nw` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=191;
 -- AUTO_INCREMENT for table `mensagem_own`
 --
 ALTER TABLE `mensagem_own`
-MODIFY `id_m` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=11;
+MODIFY `id_m` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `pedido`
 --
 ALTER TABLE `pedido`
-MODIFY `id_pp` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+MODIFY `id_pp` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT for table `pedido_contato`
+--
+ALTER TABLE `pedido_contato`
+MODIFY `id_pct` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `pedido_itens`
 --
 ALTER TABLE `pedido_itens`
-MODIFY `id_pi` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+MODIFY `id_pi` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `pedido_situacao`
 --
@@ -1359,6 +1413,11 @@ MODIFY `id_s` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1000;
 ALTER TABLE `pedido_tipo`
 MODIFY `id_t` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
 --
+-- AUTO_INCREMENT for table `pedido_validade`
+--
+ALTER TABLE `pedido_validade`
+MODIFY `id_vd` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+--
 -- AUTO_INCREMENT for table `prazo_entrega`
 --
 ALTER TABLE `prazo_entrega`
@@ -1367,12 +1426,12 @@ MODIFY `id_pz` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
 -- AUTO_INCREMENT for table `prazo_garantia`
 --
 ALTER TABLE `prazo_garantia`
-MODIFY `id_pga` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+MODIFY `id_pga` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `prazo_montagem`
 --
 ALTER TABLE `prazo_montagem`
-MODIFY `id_pm` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+MODIFY `id_pm` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `produtos`
 --

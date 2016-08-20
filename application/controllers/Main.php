@@ -5,6 +5,7 @@ class Main extends CI_Controller {
 		parent::__construct();
 		$this -> lang -> load("app", "portuguese");
 		$this -> load -> helper('form_sisdoc');
+		$this -> load -> helper('email');
 		$this -> load -> model('users');
 
 		date_default_timezone_set('America/Sao_Paulo');
@@ -45,6 +46,9 @@ class Main extends CI_Controller {
 	/****************************************** PEDIDOS *********************/
 	function menu_pedidos($tipo = '', $situacao = '') {
 		$id_us = $_SESSION['id'];
+		if (strlen($tipo) == 0) {
+			$tipo = '1';
+		}
 		$model = "pedidos";
 		$this -> load -> model($model);
 
@@ -52,7 +56,27 @@ class Main extends CI_Controller {
 
 		/* Pedidos */
 		$tela = $this -> $model -> pedidos_abertas_resumo($id_us, $tipo);
-		$data['title'] = 'Resumo dos Pedidos';
+		switch($tipo) {
+			case '1' :
+				$data['title'] = 'Resumo dos Orçamentos';
+				break;
+			case '2' :
+				$data['title'] = 'Resumo dos Pedidos';
+				break;
+			case '3' :
+				$data['title'] = 'Resumo dos Pedidos de locação';
+				break;
+			case '4' :
+				$data['title'] = 'Resumo das ordem de serviço - Laboratório';
+				break;
+			case '5' :
+				$data['title'] = 'Resumo das ordem de atendimento - onsite';
+				break;
+			default :
+				$data['title'] = 'Resumo';
+				break;
+		}
+
 		$data['content'] = $tela;
 		$this -> load -> view('content', $data);
 
@@ -86,6 +110,38 @@ class Main extends CI_Controller {
 	}
 
 	/****************************************** PEDIDO *********************/
+	function pedido_set_contato($ped) {
+		$dd1 = round(get("pedido"));
+		$dd2 = round(get("contato"));
+		$dd3 = get("value");
+		echo '===>' . $dd3;
+		if (($dd3 == 'True') or ($dd3 == 'true')) { $dd3 = 1;
+		} else { $dd3 = 0;
+		}
+
+		$sql = "select * from pedido_contato 
+						WHERE pct_id_pp = $dd1
+						AND pct_id_contato = $dd2 ";
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		if (count($rlt) == 0) {
+			$sql = "insert into pedido_contato
+							(
+								pct_id_pp, 	pct_id_contato, pct_ativo
+							) values (
+								$dd1,$dd2,$dd3
+							)";
+			$rlt = $this -> db -> query($sql);
+		} else {
+			$line = $rlt[0];
+			$sql = "update pedido_contato 
+						set pct_ativo = $dd3
+						where id_pct = " . $line['id_pct'];
+			$rlt = $this -> db -> query($sql);
+			echo $sql;
+		}
+	}
+
 	function pedido_novo_inserir($id = 0, $chk = '', $tipo = 2) {
 		$this -> load -> model('pedidos');
 		$idp = $this -> pedidos -> pedido_novo($id, $tipo);
@@ -143,6 +199,8 @@ class Main extends CI_Controller {
 		$data['dados_proposta'] = $this -> load -> view('pedido/pedido_header', $data, true);
 		$data['dados_item'] .= $this -> load -> view('pedido/pedido_item', $data, true);
 		$data['dados_condicoes'] = $this -> pedidos -> pedido_condicoes($id, $editar);
+
+		$data['contatos'] = $this -> pedidos -> contatos_do_pedido($id, $id_cliente, $editar);
 		/* habilita cancelamento */
 		$data['pp_situacao'] = 0;
 
@@ -185,12 +243,12 @@ class Main extends CI_Controller {
 
 		$client = $this -> clientes -> le($id_cliente);
 		$this -> cab();
-		
+
 		$client['data'] = data_completa($data['pp_data']);
-		
-		$txt = $this->ics->busca('PED_'.$data['pp_tipo_pedido'],$client);
-		$data['cab'] = $txt['nw_texto']; 
-		
+
+		$txt = $this -> ics -> busca('PED_' . $data['pp_tipo_pedido'], $client);
+		$data['cab'] = $txt['nw_texto'];
+
 		$data['dados_cliente'] = $this -> load -> view('cliente/show', $client, true);
 		if ($data['pp_cliente_faturamento'] > 0) {
 			$client_f = $this -> clientes -> le($id_cliente_f);
@@ -211,33 +269,34 @@ class Main extends CI_Controller {
 		$data['dados_condicoes'] = $this -> pedidos -> pedido_condicoes($id, $editar);
 		$this -> load -> view('pedido/pedido', $data);
 	}
+
 	function cliente_faturamento($id, $chk = '') {
-		$data=array();
+		$data = array();
 		$data['clie_sel'] = $id;
 		$data['clie_chk'] = $chk;
-		$this->session->set_userdata($data);
+		$this -> session -> set_userdata($data);
 		redirect(base_url('index.php/main/cliente_faturamento_sel'));
 	}
-	function cliente_faturamento_confirma($id='',$chk='')
-		{
-			$data['nocab'] = true;
-			$this -> cab($data);
-			$idc = $_SESSION['clie_sel'];
-			$sql = "update pedido set pp_cliente_faturamento = ".round($id)." where id_pp = ".round($idc);
-			$this->db->query($sql);
-			
-			$data['content'] = '<script> wclose(); </script>';
-			$data['title'] = 'Sucesso';
-			$this->load->view('content',$data);
-		}
-	function cliente_faturamento_sel($npag='') {
+
+	function cliente_faturamento_confirma($id = '', $chk = '') {
+		$data['nocab'] = true;
+		$this -> cab($data);
+		$idc = $_SESSION['clie_sel'];
+		$sql = "update pedido set pp_cliente_faturamento = " . round($id) . " where id_pp = " . round($idc);
+		$this -> db -> query($sql);
+
+		$data['content'] = '<script> wclose(); </script>';
+		$data['title'] = 'Sucesso';
+		$this -> load -> view('content', $data);
+	}
+
+	function cliente_faturamento_sel($npag = '') {
 		/* Load Model */
 		$this -> load -> model("clientes");
-		if (!isset($_SESSION['clie_sel']))
-			{
-				echo 'Erro de sessão';
-				return('');
-			}
+		if (!isset($_SESSION['clie_sel'])) {
+			echo 'Erro de sessão';
+			return ('');
+		}
 		$idc = $_SESSION['clie_sel'];
 		$data['nocab'] = true;
 		$this -> cab($data);
@@ -246,10 +305,10 @@ class Main extends CI_Controller {
 
 		$form -> fd = array('id_f', 'f_nome_fantasia', 'f_razao_social', 'f_estado');
 		$form -> lb = array('id', msg('f_nome_fantasia'), msg('f_razao_social'), msg('f_estado'));
-		$form -> mk = array('', 'L', 'L', 'L');	
-		$form -> pre_where = ' f_ativo = 1 ';	
-		
-		$form -> tabela = $this -> clientes-> table;
+		$form -> mk = array('', 'L', 'L', 'L');
+		$form -> pre_where = ' f_ativo = 1 ';
+
+		$form -> tabela = $this -> clientes -> table;
 		$form -> see = True;
 		$form -> novo = false;
 		$form -> edit = false;
@@ -260,7 +319,7 @@ class Main extends CI_Controller {
 
 		$data = array();
 		$data['title'] = 'Clientes para faturamento';
-		$data['content'] = row($form,$npag);
+		$data['content'] = row($form, $npag);
 		$this -> load -> view('content', $data);
 
 	}
@@ -568,16 +627,16 @@ class Main extends CI_Controller {
 		$this -> load -> view('content', $data);
 	}
 
-	function change_my_sign()
-		{
+	function change_my_sign() {
 		$id = $_SESSION['id'];
 
 		$this -> cab();
 		$data['title'] = '';
 
 		$data['content'] = $this -> users -> change_sign($id);
-		$this -> load -> view('content', $data);			
-		}
+		$this -> load -> view('content', $data);
+	}
+
 	function produto_item($id = '') {
 		$this -> load -> model('produtos');
 		$data['nocab'] = true;
@@ -624,5 +683,274 @@ class Main extends CI_Controller {
 		$this -> footer();
 	}
 
+	/********************************* mensagem *********************/
+	function cliente_mensagem_edit($id, $cliente) {
+		$this -> load -> model('mensagens');
+		$this -> load -> model('clientes');
+
+		$data['nocab'] = true;
+		$this -> cab($data);
+
+		$cp = $this -> mensagens -> cp($cliente);
+		$form = new form;
+		$form -> id = $id;
+		$data['content'] = $form -> editar($cp, $this -> mensagens -> table);
+		$data['title'] = msg('mensagens');
+		$this -> load -> view('content', $data);
+
+		if ($form -> saved > 0) {
+			if (get("dd5") == '1') {
+				$assunto = utf8_decode(get("dd3"));
+				$text = utf8_decode(get("dd4"));
+				$de = 1;
+				$anexos = array();
+				$this -> clientes -> enviaremail_cliente($cliente, $assunto, $text, $de, $anexos);
+			}
+			$data['content'] .= '<script> wclose(); </script>';
+			$this -> load -> view('content', $data);
+		}
+	}
+/************** prazo de entrega ************************/
+	function prazo_entrega($npag = '') {
+		$model = 'prazos_entrega';
+		$this -> load -> model($model);
+		/* Load Model */
+		$this -> cab();
+		
+		$form = new form;
+		$form = $this->$model->row($form);
+
+		$form -> tabela = $this -> $model -> table;
+		$form -> see = False;
+		$form -> novo = true;
+		$form -> edit = true;
+		$form -> npag = $npag;
+
+		$form -> row = base_url('index.php/main/'.$model.'/');
+		$form -> row_edit = base_url('index.php/main/'.$model.'_edit/');
+
+		$data = array();
+		$data['title'] = msg('tit_'.$model);
+		$data['content'] = row($form, $npag);
+		$this -> load -> view('content', $data);
+	}
+	
+	function prazos_entrega_edit($id = '', $chk = '') {
+		$model = 'prazos_entrega';
+		$this -> load -> model($model);
+		/* Load Model */
+		$this -> cab();
+		
+		$form = new form;
+		$cp = $this->$model->cp($id);
+		$form->cp = $cp;
+		
+		$form -> tabela = $this -> $model -> table;
+		$form->id = $id;
+		
+		$data['content'] = $form->editar($cp,$form -> tabela);
+
+		$data['title'] = msg('tit_'.$model);
+		$this -> load -> view('content', $data);
+		
+		if ($form->saved > 0)
+			{
+				redirect(base_url('index.php/main/prazo_entrega'));
+			}
+	}
+	
+/************** prazo de garantia ************************/
+	function prazo_garantia($npag = '') {
+		$model = 'prazos_garantia';
+		$this -> load -> model($model);
+		/* Load Model */
+		$this -> cab();
+		
+		$form = new form;
+		$form = $this->$model->row($form);
+
+		$form -> tabela = $this -> $model -> table;
+		$form -> see = False;
+		$form -> novo = true;
+		$form -> edit = true;
+		$form -> npag = $npag;
+
+		$form -> row = base_url('index.php/main/'.$model.'/');
+		$form -> row_edit = base_url('index.php/main/'.$model.'_edit/');
+
+		$data = array();
+		$data['title'] = msg('tit_'.$model);
+		$data['content'] = row($form, $npag);
+		$this -> load -> view('content', $data);
+	}
+	
+	function prazos_garantia_edit($id = '', $chk = '') {
+		$model = 'prazos_garantia';
+		$this -> load -> model($model);
+		/* Load Model */
+		$this -> cab();
+		
+		$form = new form;
+		$cp = $this->$model->cp($id);
+		$form->cp = $cp;
+		$form->id = $id;
+		
+		$form -> tabela = $this -> $model -> table;
+		
+		$data['content'] = $form->editar($cp,$form -> tabela);
+
+		$data['title'] = msg('tit_'.$model);
+		$this -> load -> view('content', $data);
+		
+		if ($form->saved > 0)
+			{
+				redirect(base_url('index.php/main/prazo_garantia'));
+			}
+	}
+/************** prazo_montagem ************************/
+	function prazo_montagem($npag = '') {
+		$model = 'prazos_montagem';
+		$this -> load -> model($model);
+		/* Load Model */
+		$this -> cab();
+		
+		$form = new form;
+		$form = $this->$model->row($form);
+
+		$form -> tabela = $this -> $model -> table;
+		$form -> see = False;
+		$form -> novo = true;
+		$form -> edit = true;
+		$form -> npag = $npag;
+
+		$form -> row = base_url('index.php/main/'.$model.'/');
+		$form -> row_edit = base_url('index.php/main/'.$model.'_edit/');
+
+		$data = array();
+		$data['title'] = msg('tit_'.$model);
+		$data['content'] = row($form, $npag);
+		$this -> load -> view('content', $data);
+	}
+	
+	function prazos_montagem_edit($id = '', $chk = '') {
+		$model = 'prazos_montagem';
+		$this -> load -> model($model);
+		/* Load Model */
+		$this -> cab();
+		
+		$form = new form;
+		$cp = $this->$model->cp($id);
+		$form->cp = $cp;
+		
+		$form -> tabela = $this -> $model -> table;
+		$form->id = $id;
+		
+		$data['content'] = $form->editar($cp,$form -> tabela);
+
+		$data['title'] = msg('tit_'.$model);
+		$this -> load -> view('content', $data);
+		
+		if ($form->saved > 0)
+			{
+				redirect(base_url('index.php/main/prazo_montagem'));
+			}
+	}
+	
+/************** pedido_validade ************************/
+	function pedido_validade($npag = '') {
+		$model = 'pedidos_validade';
+		$this -> load -> model($model);
+		/* Load Model */
+		$this -> cab();
+		
+		$form = new form;
+		$form = $this->$model->row($form);
+
+		$form -> tabela = $this -> $model -> table;
+		$form -> see = False;
+		$form -> novo = true;
+		$form -> edit = true;
+		$form -> npag = $npag;
+
+		$form -> row = base_url('index.php/main/'.$model.'/');
+		$form -> row_edit = base_url('index.php/main/'.$model.'_edit/');
+
+		$data = array();
+		$data['title'] = msg('tit_'.$model);
+		$data['content'] = row($form, $npag);
+		$this -> load -> view('content', $data);
+	}
+	
+	function pedidos_validade_edit($id = '', $chk = '') {
+		$model = 'pedidos_validade';
+		$this -> load -> model($model);
+		/* Load Model */
+		$this -> cab();
+		
+		$form = new form;
+		$cp = $this->$model->cp($id);
+		$form->cp = $cp;
+		
+		$form -> tabela = $this -> $model -> table;
+		$form->id = $id;
+		
+		$data['content'] = $form->editar($cp,$form -> tabela);
+
+		$data['title'] = msg('tit_'.$model);
+		$this -> load -> view('content', $data);
+		
+		if ($form->saved > 0)
+			{
+				redirect(base_url('index.php/main/pedido_validade'));
+			}
+	}	
+/************** condicoes_pagamento ************************/
+	function condicoes_pagamento($npag = '') {
+		$model = 'condicoes_pagamento';
+		$this -> load -> model($model);
+		/* Load Model */
+		$this -> cab();
+		
+		$form = new form;
+		$form = $this->$model->row($form);
+
+		$form -> tabela = $this -> $model -> table;
+		$form -> see = False;
+		$form -> novo = true;
+		$form -> edit = true;
+		$form -> npag = $npag;
+
+		$form -> row = base_url('index.php/main/'.$model.'/');
+		$form -> row_edit = base_url('index.php/main/'.$model.'_edit/');
+
+		$data = array();
+		$data['title'] = msg('tit_'.$model);
+		$data['content'] = row($form, $npag);
+		$this -> load -> view('content', $data);
+	}
+	
+	function condicoes_pagamento_edit($id = '', $chk = '') {
+		$model = 'condicoes_pagamento';
+		$this -> load -> model($model);
+		/* Load Model */
+		$this -> cab();
+		
+		$form = new form;
+		$cp = $this->$model->cp($id);
+		$form->cp = $cp;
+		
+		$form -> tabela = $this -> $model -> table;
+		$form->id = $id;
+		
+		$data['content'] = $form->editar($cp,$form -> tabela);
+
+		$data['title'] = msg('tit_'.$model);
+		$this -> load -> view('content', $data);
+		
+		if ($form->saved > 0)
+			{
+				redirect(base_url('index.php/main/condicoes_pagamento'));
+			}
+	}	
 }
 ?>

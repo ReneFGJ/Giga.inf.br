@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 28, 2016 at 11:42 AM
+-- Generation Time: Aug 08, 2016 at 09:35 AM
 -- Server version: 5.6.20-log
 -- PHP Version: 5.4.31
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `cip`
+-- Database: `brapci_base`
 --
 
 -- --------------------------------------------------------
@@ -33,8 +33,21 @@ CREATE TABLE IF NOT EXISTS `mensagem_own` (
   `m_foot` char(150) NOT NULL,
   `m_ativo` tinyint(4) NOT NULL,
   `m_email` char(100) NOT NULL,
-  `m_own_cod` char(10) NOT NULL
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
+  `m_own_cod` char(10) NOT NULL,
+  `smtp_host` char(80) NOT NULL,
+  `smtp_user` char(80) NOT NULL,
+  `smtp_pass` char(80) NOT NULL,
+  `smtp_protocol` char(5) NOT NULL,
+  `smtp_port` char(3) NOT NULL,
+  `mailtype` char(5) NOT NULL
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `mensagem_own`
+--
+
+INSERT INTO `mensagem_own` (`id_m`, `m_descricao`, `m_header`, `m_foot`, `m_ativo`, `m_email`, `m_own_cod`, `smtp_host`, `smtp_user`, `smtp_pass`, `smtp_protocol`, `smtp_port`, `mailtype`) VALUES
+(1, 'Brapci', '', '', 1, 'brapci@brapci.inf.br', '', 'mil.brapci.inf.br', 'brapci@brapci.inf.br', '448545ct', 'smtp', '587', '');
 
 --
 -- Indexes for dumped tables
@@ -54,7 +67,7 @@ ALTER TABLE `mensagem_own`
 -- AUTO_INCREMENT for table `mensagem_own`
 --
 ALTER TABLE `mensagem_own`
-MODIFY `id_m` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=10;
+MODIFY `id_m` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

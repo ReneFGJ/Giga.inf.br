@@ -17,93 +17,112 @@ $us_nome = $_SESSION['user'];
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li>
-					<a href="<?php echo base_url('index.php/main/clientes'); ?>">Clientes</a>
-				</li>
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Propostas & Pedidos <span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li>
-							<a href="<?php echo base_url('index.php/main/menu_pedidos/1'); ?>">Propostas</a>
-						</li>
-						<li>
-							<a href="<?php echo base_url('index.php/main/menu_pedidos/2'); ?>">Pedidos de venda</a>
-						</li>
-						<li>
-							<a href="<?php echo base_url('index.php/main/menu_pedidos/3'); ?>">Locações</a>
-						</li>
-						<li>
-							<a href="<?php echo base_url('index.php/main/menu_pedidos/4'); ?>">Atendimento laboratório</a>
-						</li>
-						<li>
-							<a href="<?php echo base_url('index.php/main/menu_pedidos/5'); ?>">Atendimento on-site</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-				<a href="<?php echo base_url('index.php/main/locacao'); ?>">Locação</a>
-				</li>
-				<!--
-				<li class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Financeiro <span class="caret"></span></a>
-				<ul class="dropdown-menu">
-				<li>
-				<a href="<?php echo base_url('index.php/cx/caixa'); ?>">Caixa</a>
-				</li>
-				<li>
-				<a href="<?php echo base_url('index.php/cx/cpagar'); ?>">Contas a Pagar</a>
-				</li>
-				<li>
-				<a href="<?php echo base_url('index.php/cx/creceber'); ?>">Contas a Receber</a>
-				</li>
-				</ul>
-				</li>
-				-->
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Cadastro <span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li>
-							<a href="<?php echo base_url('index.php/main/clientes'); ?>">Clientes</a>
-						</li>
-						<li>
-							<a href="<?php echo base_url('index.php/main/produtos_categoria'); ?>">Produto - Categoria</a>
-						</li>
-						<li>
-							<a href="<?php echo base_url('index.php/main/produtos'); ?>">Produto - Equipamento</a>
-						</li>
-						<li>
-							<a href="<?php echo base_url('index.php/main/produtos_marca'); ?>">Produtos - Marcas</a>
-						</li>
-				</li>
-				<li>
-				<a href="<?php echo base_url('index.php/admin/users'); ?>">Usuários do Sistema</a>
-				</li>
-				<li>
-				<a href="<?php echo base_url('index.php/admin/filiais'); ?>">Matriz e Filiais</a>
-				</li>
-				<?php
-					if (perfil("#ADM#GEG")) {
-						echo '<li role="separator" class="divider"></li>' . cr();
-						echo '<li><a href="' . base_url('index.php/admin/logins') . '">Atribuir Perfil a usuários</a></li>' . cr();
-					}
-				?>
+			<li>
+			<a href="<?php echo base_url('index.php/main/clientes'); ?>">Clientes</a>
+			</li>
+			<li class="dropdown">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Propostas & Pedidos <span class="caret"></span></a>
+			<ul class="dropdown-menu">
+			<li>
+			<a href="<?php echo base_url('index.php/main/menu_pedidos/1'); ?>">Propostas</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/menu_pedidos/2'); ?>">Pedidos de venda</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/menu_pedidos/3'); ?>">Locações</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/menu_pedidos/4'); ?>">Atendimento laboratório</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/menu_pedidos/5'); ?>">Atendimento on-site</a>
+			</li>
+			</ul>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/locacao'); ?>">Locação</a>
+			</li>
+			<!--
+			<li class="dropdown">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Financeiro <span class="caret"></span></a>
+			<ul class="dropdown-menu">
+			<li>
+			<a href="<?php echo base_url('index.php/cx/caixa'); ?>">Caixa</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/cx/cpagar'); ?>">Contas a Pagar</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/cx/creceber'); ?>">Contas a Receber</a>
+			</li>
+			</ul>
+			</li>
+			-->
+			<li class="dropdown">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Cadastro <span class="caret"></span></a>
+			<ul class="dropdown-menu">
+			<li>
+			<a href="<?php echo base_url('index.php/main/clientes'); ?>">Clientes</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/produtos_categoria'); ?>">Produto - Categoria</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/produtos'); ?>">Produto - Equipamento</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/produtos_marca'); ?>">Produtos - Marcas</a>
+			</li>
+
+			<li role="separator" class="divider"></li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/prazo_entrega'); ?>">Condições - Prazo de entrega</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/prazo_garantia'); ?>">Condições - Prazo de garantia</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/prazo_montagem'); ?>">Condições - Prazo de montagem</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/pedido_validade'); ?>">Condições - Validade da proposta</a>
+			</li>			
+			<li>
+			<a href="<?php echo base_url('index.php/main/condicoes_pagamento'); ?>">Condições - Condições de pagamento</a>
+			</li>			
+
+
+			<li role="separator" class="divider"></li>
+			<li>
+			<a href="<?php echo base_url('index.php/admin/users'); ?>">Usuários do Sistema</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/admin/filiais'); ?>">Matriz e Filiais</a>
+			</li>
+			<?php
+			if (perfil("#ADM#GEG")) {
+				echo '<li role="separator" class="divider"></li>' . cr();
+				echo '<li><a href="' . base_url('index.php/admin/logins') . '">Atribuir Perfil a usuários</a></li>' . cr();
+			}
+			?>
 			</ul>
 			<?php
-				if (perfil("#ADM")) {
-					echo '<li class="dropdown">' . cr();
-					echo '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administrador <span class="caret"></span></a>' . cr();
-					echo '<ul class="dropdown-menu">' . cr();
-					echo '	<li>' . cr();
-					echo '		<li><a href="' . base_url('index.php/admin/perfil') . '">Cadastro de Perfis</a></li>' . cr();
-					echo '	</li>' . cr();
-					echo '	<li>' . cr();
-					echo '		<li><a href="' . base_url('index.php/admin/contato_tipo') . '">Cadastro de Tipos de Contato</a></li>' . cr();
-					echo '	</li>' . cr();
-					echo '	<li>' . cr();
-					echo '		<li><a href="' . base_url('index.php/admin/comunicacao_1') . '">Mensagens do Sistema</a></li>' . cr();
-					echo '	</li>' . cr();					
-					echo '</ul>' . cr();
-				}
+			if (perfil("#ADM")) {
+				echo '<li class="dropdown">' . cr();
+				echo '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administrador <span class="caret"></span></a>' . cr();
+				echo '<ul class="dropdown-menu">' . cr();
+				echo '	<li>' . cr();
+				echo '		<li><a href="' . base_url('index.php/admin/perfil') . '">Cadastro de Perfis</a></li>' . cr();
+				echo '	</li>' . cr();
+				echo '	<li>' . cr();
+				echo '		<li><a href="' . base_url('index.php/admin/contato_tipo') . '">Cadastro de Tipos de Contato</a></li>' . cr();
+				echo '	</li>' . cr();
+				echo '	<li>' . cr();
+				echo '		<li><a href="' . base_url('index.php/admin/comunicacao_1') . '">Mensagens do Sistema</a></li>' . cr();
+				echo '	</li>' . cr();
+				echo '</ul>' . cr();
+			}
 			?>
 
 			</li>
@@ -120,7 +139,8 @@ $us_nome = $_SESSION['user'];
 			-->
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <?php echo $us_nome; ?> <span class="caret"></span></a>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <?php echo $us_nome; ?>
+					<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li>
 							<a href="<?php echo base_url('index.php/main/myaccount'); ?>">Meus Dados</a>

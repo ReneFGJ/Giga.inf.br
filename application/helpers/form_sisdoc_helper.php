@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category	Helpers
  * @author		Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link		http://www.sisdoc.com.br/CodIgniter
- * @version		v0.16.18
+ * @version		v0.16.31
  */
 $dd = array();
 
@@ -2480,6 +2480,23 @@ if (!function_exists('form_edit')) {
 			return false;
 		}
 	}
-
+function mask_fone($fone)
+	{
+		$fone = sonumero($fone);
+		$fone_m = $fone;
+		if (strlen($fone) <= 8)
+			{
+				$fone_m = substr($fone,0,4).'.'.substr($fone,4,4); 
+			}
+		if (strlen($fone) == 9)
+			{
+				$fone_m = substr($fone,0,5).'.'.substr($fone,5,4); 
+			}
+		if ((strlen($fone) > 9) and (strlen($fone) < 13))
+			{
+				$fone_m = '('.substr($fone,0,2).')'.substr($fone,2,4).'.'.substr($fone,6,5); 
+			}
+		return($fone_m);
+	}
 }
 ?>

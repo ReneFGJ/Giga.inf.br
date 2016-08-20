@@ -14,10 +14,10 @@ class clientes extends CI_Model {
 			/* contato */
 			$sql = "select * from clientes_contatos 
 						INNER JOIN contato_funcao ON cc_funcao = id_ct
-						WHERE cc_cliente_id = ".$id;
-			$rlc = $this->db->query($sql);
-			$rlc = $rlc->result_array();
-			$line['contacts'] = $rlc;			
+						WHERE cc_cliente_id = " . $id;
+			$rlc = $this -> db -> query($sql);
+			$rlc = $rlc -> result_array();
+			$line['contacts'] = $rlc;
 			return ($line);
 		} else {
 			return ( array());
@@ -79,7 +79,7 @@ class clientes extends CI_Model {
 		return ($cp);
 	}
 
-	function cp_contatos_tipo($id=0, $idc='') {
+	function cp_contatos_tipo($id = 0, $idc = '') {
 		$cp = array();
 		array_push($cp, array('$H8', 'id_ct', '', False, True));
 		array_push($cp, array('$S80', 'ct_nome', 'Função', True, True));
@@ -144,6 +144,7 @@ class clientes extends CI_Model {
 
 	function contatos($id) {
 		$sql = "select * from " . $this -> table_contatos . " 
+					left join contato_funcao ON id_ct = cc_funcao
 					where cc_ativo = 1 and cc_cliente_id	= " . round($id);
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -162,7 +163,8 @@ class clientes extends CI_Model {
 
 			$sx .= '<tr>';
 			$sx .= '<td>' . $line['cc_nome'] . '</td>';
-			$sx .= '<td>' . $line['cc_telefone'] . '</td>';
+			$sx .= '<td>' . $line['ct_nome'] . '</td>';
+			$sx .= '<td>' . mask_fone($line['cc_telefone']) . '</td>';
 			$sx .= '<td>' . $line['cc_email'] . '</td>';
 			$sx .= '<td>' . $bx . '</td>';
 		}
@@ -188,6 +190,32 @@ class clientes extends CI_Model {
 		$sx .= 'novo contato';
 		$sx .= '</button>';
 		return ($sx);
+	}
+
+	function enviaremail_cliente($cliente = 0, $assunto = '', $texto = '', $de = 1, $anexos = array()) {
+		$id_us = round($_SESSION['id']);
+		$us = $this -> users -> le($id_us);
+		$email = trim($us['us_email']);
+		$para = array();
+		if (strlen($email) > 5) {
+			array_push($para, $email);
+		}
+
+		$sql = "select * from clientes_contatos 
+						WHERE cc_cliente_id = $cliente
+							AND cc_ativo = 1 ";
+
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$email = trim($rlt[$r]['cc_email']);
+			if (strlen($email) > 5) {
+				array_push($para, $email);
+			}
+		}
+		enviaremail($para, $assunto, $texto, $de );
 	}
 
 }

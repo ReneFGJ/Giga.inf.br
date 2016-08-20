@@ -54,6 +54,17 @@
 	</div>
 
 </div>
+
+<?php if ((isset($contatos)) and (strlen($contatos) > 0)) { ?>
+<div class="npr nopr"><br></div>
+<div class="container">
+	<div class="row" >
+		<h3>Contatos</h3>
+		<?php echo $contatos; ?>
+	</div>
+</div>
+<?php } ?>
+
 <div class="npr nopr"><br></div>
 <div class="container">
 	<div class="row" >
