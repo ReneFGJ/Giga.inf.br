@@ -11,6 +11,10 @@
 		font-size: 18px;
 		font-family: Arial, Helvetica, sans-serif;
 	}
+	.superbig {
+		font-size: 22px;
+		font-family: Arial, Helvetica, sans-serif;
+	}	
 </style>
 <table width="800" align="center">
 	<tr valign="top">
@@ -60,6 +64,7 @@
 				1º VIA - DESTINATÁRIO
 				</font>
 			<hr>
+			<font class="superbig">Nº <?php echo strzero($id_iv,6);?></font>
 		</td>
 	</tr>
 	<tr><td colspan=3><hr></td></tr>
