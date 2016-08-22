@@ -40,6 +40,45 @@ $us_nome = $_SESSION['user'];
 			</li>
 			</ul>
 			</li>
+			
+			<!---- Financiero --->
+			<?php
+			if (perfil("#ADM#FIN")) {
+				echo '<li class="dropdown">' . cr();
+				echo '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Financeiro <span class="caret"></span></a>' . cr();
+				echo '<ul class="dropdown-menu">' . cr();
+				echo '	<li>' . cr();
+				echo '		<li><a href="' . base_url('index.php/financeiro/cpagar') . '">Contas a Pagar</a></li>' . cr();
+				echo '	</li>' . cr();
+				echo '	<li>' . cr();
+				echo '		<li><a href="' . base_url('index.php/financeiro/creceber') . '">Contas a Receber</a></li>' . cr();
+				echo '	</li>' . cr();
+				echo '	<li>' . cr();
+				echo '		<li><a href="' . base_url('index.php/financeiro/faturar') . '">Faturar</a></li>' . cr();
+				echo '	</li>' . cr();
+				echo '</ul>' . cr();
+			}
+			?>		
+				
+			<!---- Fiscal --->
+			<?php
+			if (perfil("#FIS")) {
+				echo '<li class="dropdown">' . cr();
+				echo '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Fiscal <span class="caret"></span></a>' . cr();
+				echo '<ul class="dropdown-menu">' . cr();
+				echo '	<li>' . cr();
+				echo '		<li><a href="' . base_url('index.php/financeiro/fiscal') . '">Faturas</a></li>' . cr();
+				echo '	</li>' . cr();
+				//echo '	<li>' . cr();
+				//echo '		<li><a href="' . base_url('index.php/financeiro/creceber') . '">Contas a Receber</a></li>' . cr();
+				//echo '	</li>' . cr();
+				//echo '	<li>' . cr();
+				//echo '		<li><a href="' . base_url('index.php/financeiro/faturar') . '">Faturar</a></li>' . cr();
+				//echo '	</li>' . cr();
+				echo '</ul>' . cr();
+			}
+			?>	
+			
 			<li>
 			<a href="<?php echo base_url('index.php/main/locacao'); ?>">Locação</a>
 			</li>

@@ -11,13 +11,13 @@ function fullwin(url) {
 }
 
 function newxy(url, xx, yy) {
-	NewWindow = window.open(url, 'newwin', 'scrollbars=no,resizable=no,width=' + xx + ',height=' + yy + ',top=10,left=10');
+	NewWindow = window.open(url, 'newwin', 'scrollbars=yes,resizable=no,width=' + xx + ',height=' + yy + ',top=10,left=10');
 	NewWindow.focus();
 	void (0);
 }
 
 function newwin(url) {
-	NewWindow = window.open(url, 'newwin', 'scrollbars=no,resizable=yes, width=800,height=450,top=10,left=10');
+	NewWindow = window.open(url, 'newwin', 'scrollbars=yes,resizable=yes, width=800,height=450,top=10,left=10');
 	NewWindow.focus();
 	void (0);
 }

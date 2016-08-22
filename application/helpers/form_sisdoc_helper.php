@@ -2498,5 +2498,19 @@ function mask_fone($fone)
 			}
 		return($fone_m);
 	}
+function mask_cep($cep)
+	{
+		$cep = strzero(sonumero($cep),8);
+		$cep = substr($cep,0,2).'.'.substr($cep,2,3).'-'.substr($cep,5,3);
+		return($cep);
+	}
+
+function name_weekday($day)
+	{
+		$wk = array('Domingo','Segunda-Feira','Terça-Feira','Quarta-Feira','Quinta-Feira','Sexta-Feira','Sábado');
+		$day = round($day);
+		if ($day > 6) { $day = 0; }
+		return($wk[$day]);
+	}
 }
 ?>

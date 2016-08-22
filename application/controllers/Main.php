@@ -348,12 +348,20 @@ class Main extends CI_Controller {
 		$this -> load -> model('clientes');
 		$this -> load -> model('mensagens');
 		$this -> load -> model('pedidos');
+		$this -> load -> model('financeiros');
 
 		/* Controller */
 		$this -> cab();
 		$data = $this -> clientes -> le($id);
 
 		$data['model'] = $this -> pedidos -> botao_novo_pedido($id);
+		
+		/* financeiro */
+		$fin = $this -> financeiros -> resumo($id, 1);
+		$data['finan_total'] = $fin['titulos'];
+		$data['finan_valor'] = number_format($fin['total'],2,',','.');
+		$data['financeiro'] = $this -> financeiros -> lista_por_cliente($id, 1);
+		//$data['financeiro_resumo'] = $this -> financeiros -> resumo_cliente($id, 1);	
 
 		/* orcamento / proposta */
 		$data['orcamentos_total'] = $this -> pedidos -> resumo($id, 1);
