@@ -10,6 +10,7 @@ $lk_next7 = base_url('index.php/financeiro/cpagar/'.date("Ymd",$data+$day*7));
 $lk_next30 = base_url('index.php/financeiro/cpagar/'.date("Ymd",$data+$day*30));
 $lk_new = '#" onclick="newxy(\''.base_url('index.php/financeiro/cpagar_edit/0/0').'\',800,800);';
 $lk_refresh = base_url('index.php/financeiro/cpagar/'.$date);
+$lk_search = base_url('index.php/financeiro/cpagar_search');
 
 $week_day = name_weekday(date("w",$data));
 
@@ -41,7 +42,7 @@ $week_day = name_weekday(date("w",$data));
 			<table align="center">
 				<tr>
 					<td style="padding: 10px;"><a href="<?php echo $lk_new;?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></a></td>
-					<td style="padding: 10px;"><a href="#"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a></td>
+					<td style="padding: 10px;"><a href="<?php echo $lk_search;?>"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a></td>
 					<td style="padding: 10px;"><a href="<?php echo $lk_refresh;?>"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></a></td>
 					<td style="padding: 10px;"><a href="#"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></a></td>
 					<td style="padding: 10px;"><a href="#"><span class="glyphicon glyphicon-sort-by-alphabet" aria-hidden="true"></span></a></td>

@@ -56,6 +56,9 @@ $us_nome = $_SESSION['user'];
 				echo '	<li>' . cr();
 				echo '		<li><a href="' . base_url('index.php/financeiro/faturar') . '">Faturar</a></li>' . cr();
 				echo '	</li>' . cr();
+				echo '	<li>' . cr();
+				echo '		<li><a href="' . base_url('index.php/financeiro/relatorio') . '">Relatório</a></li>' . cr();
+				echo '	</li>' . cr();
 				echo '</ul>' . cr();
 			}
 			?>		

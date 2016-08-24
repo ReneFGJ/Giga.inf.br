@@ -36,7 +36,7 @@ class financeiros extends CI_model {
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
 			/* Situacao */
-			
+
 			/* previsao */
 			if ($line['cp_previsao'] == '1') {
 				$trc = ' class="warning" ';
@@ -92,7 +92,7 @@ class financeiros extends CI_model {
 
 			$saldo = $saldo + $line['cp_valor'];
 
-			$sx .= '<td class="middle '.$line['cpa_classe'].'" align="right">';
+			$sx .= '<td class="middle ' . $line['cpa_classe'] . '" align="right">';
 			$sx .= '<b>';
 			$sx .= $line['cpa_descricao'];
 			$sx .= '</b>';
@@ -179,7 +179,7 @@ class financeiros extends CI_model {
 		array_push($cp, array('$N8', 'cp_valor', 'Valor', True, True));
 		array_push($cp, array('$HV', 'cp_valor_pago', get("dd10"), True, true));
 
-		array_push($cp, array('$S80', 'cp_nossonumero', 'Cod.Barras', False, True));
+		array_push($cp, array('$S80', 'cp_nossonumero', 'Cod.Barras / Nosso Nº', False, True));
 		array_push($cp, array('$O 1:SIM&0:NÃO', 'cp_previsao', 'Previsão', True, true));
 
 		array_push($cp, array('$B8', '', 'Salvar >>>', false, true));
@@ -202,7 +202,7 @@ class financeiros extends CI_model {
 		array_push($cp, array('$N8', 'cp_valor', 'Valor', True, True));
 		array_push($cp, array('$HV', 'cp_valor_pago', get("dd10"), True, true));
 
-		array_push($cp, array('$S80', 'cp_nossonumero', 'Cod.Barras', False, True));
+		array_push($cp, array('$S80', 'cp_nossonumero', 'Cod.Barras / Nosso Nº', False, True));
 		array_push($cp, array('$O 1:SIM&0:NÃO', 'cp_previsao', 'Previsão', True, true));
 
 		array_push($cp, array('$B8', '', 'Salvar >>>', false, true));
@@ -309,6 +309,7 @@ class financeiros extends CI_model {
 		$dt = substr($dt, 0, 4) . '-' . substr($dt, 4, 2) . '-' . substr($dt, 6, 2);
 		$cp = '*';
 		$sql = "select $cp, 1 as tipo from cx_pagar 
+							left join clientes ON id_f = cp_fornecedor
 							where cp_vencimento = '$dt'
 						order by cp_vencimento, cp_valor desc 
 						";
@@ -322,7 +323,6 @@ class financeiros extends CI_model {
 					<th width="5%">pedido</th>
 					<th width="5%">parc.</th>
 					<th width="10%">valor</th>
-					<th width="10%">saldo</th>
 					<th width="3%">#</th>
 				</tr>' . cr();
 		$saldo = 0;
@@ -354,7 +354,14 @@ class financeiros extends CI_model {
 			$sx .= '</td>';
 
 			$sx .= '<td class="middle">';
-			$sx .= $link_edit . UpperCase($line['cp_historico']) . '</a>';
+			$dados = UpperCase($line['cp_historico']);
+			if (strlen($line['f_nome_fantasia']) > 0) {
+				$dados = $line['f_nome_fantasia'] . '  - ' . $dados . ' ';
+			}
+			if (strlen(trim($line['cp_nossonumero'])) > 0) {
+				$dados .= ' - Boleto ' . $line['cp_nossonumero'];
+			}
+			$sx .= $link_edit . $dados . '</a>';
 			$sx .= '</td>';
 
 			$sx .= '<td class="small">';
@@ -372,12 +379,6 @@ class financeiros extends CI_model {
 			$sx .= '</td>';
 
 			$saldo = $saldo - $line['cp_valor'];
-
-			$sx .= '<td class="middle alert-danger" align="right">';
-			$sx .= '<b>';
-			$sx .= number_format($saldo, 2, ',', '.');
-			$sx .= '</b>';
-			$sx .= '</td>';
 
 			$sx .= '<td align="center">';
 			$sx .= '<b>';
@@ -446,6 +447,106 @@ class financeiros extends CI_model {
 		}
 		$data['dados'] = $sx;
 		$sx = $this -> load -> view('financeiro/caixa', $data, true);
+		return ($sx);
+	}
+
+	function busca($tipo) {
+		$table = $this -> table_pagar;
+		$dt1 = date("Y-m-d");
+		$dt2 = "2099-01-01";
+		if ($tipo == 2) {
+			$table = $this -> table_receber;
+		}
+		/* busca */
+		$t1 = trim(get("dd1"));
+		$wh = '';
+		if (strlen($t1) > 0) {
+			$wh .= " AND 
+						(
+							(cp_historico like '%" . $t1 . "%') 
+							OR
+							(f_razao_social like '%" . $t1 . "%') 
+							OR
+							(f_nome_fantasia like '%" . $t1 . "%') 
+						)
+						";
+		}
+
+		/* Boleto */
+		$t5 = trim(get("dd5"));
+		if (strlen($t5) > 0) {
+			$wh .= " AND 
+						(
+							(cp_nossonumero like '%" . $t5 . "%') 
+						)
+						";
+		}
+
+		/* Data */
+		$t3 = trim(get("dd3"));
+		if (strlen($t3) > 0) {
+			$t3 = brtos($t3);
+			$t3 = sonumero($t3);
+			$t3 = substr($t3, 0, 4) . '-' . substr($t3, 4, 2) . '-' . substr($t3, 6, 2);
+			$wh .= " AND 
+						(
+							(cp_vencimento >='" . $t3 . "') 
+						)
+						";
+		} else {
+			$t3 = date("Y-m-d");
+			$wh .= " AND 
+						(
+							(cp_vencimento >='" . $t3 . "') 
+						)
+						";
+			$wh .= " AND 
+						(
+							(cp_vencimento >='" . $t3 . "') 
+						)
+						";
+		}
+		$t4 = trim(get("dd4"));
+		if (strlen($t4) > 0) {
+			$t4 = brtos($t4);
+			$t4 = sonumero($t4);
+			$t4 = substr($t4, 0, 4) . '-' . substr($t4, 4, 2) . '-' . substr($t4, 6, 2);
+			$wh .= " AND 
+						(
+							(cp_vencimento <='" . $t4 . "') 
+						)
+						";
+		}
+
+		$sql = "select * from $table 
+							left join clientes ON id_f = cp_fornecedor
+							where 1=1
+							$wh
+						order by cp_vencimento, cp_valor desc 
+						limit 50
+						";
+
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$sx = '<br><table width="100%" class="table" border=1>';
+		$sx .= '<tr><th width="5%">venc.</th>
+					<th width="62%">histórico</th>
+					<th width="5%">pedido</th>
+					<th width="5%">parc.</th>
+					<th width="10%">valor</th>
+					<th width="3%">#</th>
+				</tr>' . cr();
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$data['line'] = $line;
+			if ($tipo == 1) {
+				$sx .= $this -> load -> view('financeiro/row_pagar', $data, true);
+			}
+			if ($tipo == 2) {
+				$sx .= $this -> load -> view('financeiro/row_receber', $data, true);
+			}
+		}
+		$sx .= '</table>';
 		return ($sx);
 	}
 
