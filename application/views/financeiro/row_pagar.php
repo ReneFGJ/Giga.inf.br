@@ -23,6 +23,8 @@
 			$sx .= substr(sonumero($line['cp_vencimento']), 6, 2);
 			$sx .= '/';
 			$sx .= substr(sonumero($line['cp_vencimento']), 4, 2);
+			$sx .= '/';
+			$sx .= substr(sonumero($line['cp_vencimento']), 2, 2);			
 			$sx .= '</td>';
 
 			$sx .= '<td class="middle">';

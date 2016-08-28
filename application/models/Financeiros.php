@@ -213,7 +213,9 @@ class financeiros extends CI_model {
 		$dt = sonumero($dt);
 		$dt = substr($dt, 0, 4) . '-' . substr($dt, 4, 2) . '-' . substr($dt, 6, 2);
 		$cp = '*';
+
 		$sql = "select $cp, 1 as tipo from cx_receber 
+							left join clientes ON id_f = cp_fornecedor
 							where cp_vencimento = '$dt'
 						order by cp_vencimento, cp_valor desc 
 						";
@@ -227,7 +229,6 @@ class financeiros extends CI_model {
 					<th width="5%">pedido</th>
 					<th width="10%">fatura</th>
 					<th width="10%">valor</th>
-					<th width="10%">saldo</th>
 					<th width="3%">#</th>
 				</tr>' . cr();
 		$saldo = 0;
@@ -259,7 +260,14 @@ class financeiros extends CI_model {
 			$sx .= '</td>';
 
 			$sx .= '<td class="middle">';
-			$sx .= $link_edit . UpperCase($line['cp_historico']) . '</a>';
+			$dados = UpperCase($line['cp_historico']);
+			if (strlen($line['f_nome_fantasia']) > 0) {
+				$dados = $line['f_nome_fantasia'] . '  - ' . $dados . ' ';
+			}
+			if (strlen(trim($line['cp_nossonumero'])) > 0) {
+				$dados .= ' - Boleto ' . $line['cp_nossonumero'];
+			}
+			$sx .= $link_edit . $dados . '</a>';
 			$sx .= '</td>';
 
 			/******** PEDIDO **********/
@@ -284,12 +292,6 @@ class financeiros extends CI_model {
 			$sx .= '</td>';
 
 			$saldo = $saldo + $line['cp_valor'];
-
-			$sx .= '<td class="middle alert-success" align="right">';
-			$sx .= '<b>';
-			$sx .= number_format($saldo, 2, ',', '.');
-			$sx .= '</b>';
-			$sx .= '</td>';
 
 			$sx .= '<td align="center">';
 			$sx .= '<b>';
@@ -450,10 +452,146 @@ class financeiros extends CI_model {
 		return ($sx);
 	}
 
-	function busca($tipo) {
+	function financeiro_relatorio($tipo) {
+		$table = $this -> table_pagar;
+		if ($tipo == 2) {
+			$table = $this -> table_receber;
+		}
+		$wh = '';
+		$sx = '';
+		$ano1 = get("dd1");
+		$ano2 = get("dd2");
+		$wh .= " AND (cp_vencimento >= '" . $ano1 . "-01-01') ";
+		$wh .= " AND (cp_vencimento <= '" . $ano2 . "-12-31') ";
+
+		$sqlx = "select count(*) as itens, sum(cp_valor) as valor, substring(cp_vencimento,1,7) as ano from $table 
+							left join clientes ON id_f = cp_fornecedor
+							where (1=1) $wh AND cp_situacao = 2
+							GROUP BY ano
+							ORDER BY ano ";
+		$rlt = $this -> db -> query($sqlx);
+		$rlt = $rlt -> result_array();
+		$ser = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		$series = array();
+		if (count($rlt) > 0) {
+			for ($r = 0; $r < count($rlt); $r++) {
+				$line = $rlt[$r];
+				$ano = substr($line['ano'], 0, 4);
+				if (!isset($series[$ano])) { $series[$ano] = $ser;
+				}
+				$mes = round(substr($line['ano'], 5, 2));
+				$series[$ano][$mes] = $line['valor'];
+
+				//$tot = round($line['itens']);
+			}
+
+			$data['series'] = $series;
+			$sx .= $this -> load -> view('highcharts/bars.php', $data, true);
+		}
+		return ($sx);
+	}
+
+	function financeiro_abertos($tipo) {
 		$table = $this -> table_pagar;
 		$dt1 = date("Y-m-d");
 		$dt2 = "2099-01-01";
+		$wh = '';
+
+		if ($tipo == 2) {
+			$table = $this -> table_receber;
+		}
+
+		/* Data */
+		$t3 = trim(get("dd1"));
+		if (strlen($t3) > 0) {
+			$t3 = brtos($t3);
+			$t3 = sonumero($t3);
+			$t3 = substr($t3, 0, 4) . '-' . substr($t3, 4, 2) . '-' . substr($t3, 6, 2);
+			$wh .= " AND (cp_vencimento >='" . $t3 . "') 
+						";
+		} else {
+			$t3 = date("Y-m-d");
+			$wh .= " AND (cp_vencimento >='" . $t3 . "') ";
+		}
+		$t4 = trim(get("dd2"));
+		if (strlen($t4) > 0) {
+			$t4 = brtos($t4);
+			$t4 = sonumero($t4);
+			$t4 = substr($t4, 0, 4) . '-' . substr($t4, 4, 2) . '-' . substr($t4, 6, 2);
+			$wh .= " AND (cp_vencimento <='" . $t4 . "') ";
+		}
+
+		/* Situacao */
+		$t5 = get("dd3");
+		if (strlen($t5) > 0) {
+			switch($t5) {
+				case 'A' :
+					$wh .= ' AND (cp_situacao = 1) ';
+					break;
+				case 'P' :
+					$wh .= ' AND (cp_situacao = 2) ';
+					break;
+			}
+		}
+
+		$sql = "select * from $table 
+							left join clientes ON id_f = cp_fornecedor
+							where 1=1
+							$wh
+						order by cp_vencimento, cp_valor desc 
+						limit 200
+						";
+
+		/* SALDO */
+		$sx = '';
+		$sqlx = "select count(*) as itens, sum(cp_valor) as valor from $table 
+							left join clientes ON id_f = cp_fornecedor
+							where (1=1) $wh ";
+		$rlt = $this -> db -> query($sqlx);
+		$rlt = $rlt -> result_array();
+		if (count($rlt) > 0) {
+			$line = $rlt[0];
+			$vlr = number_format($line['valor'], 2, ',', '.');
+			$tot = round($line['itens']);
+			$sx .= '<table width="100%" class="table" border=1>';
+			$sx .= '<tr><td>Valor ' . $vlr . ' (' . $tot . ')' . '</td></tr>';
+			$sx .= '</table>';
+		}
+
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$sx .= '<br><table width="100%" class="table" border=1>';
+		$sx .= '<tr><th width="5%">venc.</th>
+					<th width="62%">histórico</th>
+					<th width="5%">pedido</th>
+					<th width="5%">parc.</th>
+					<th width="10%">valor</th>
+					<th width="3%">#</th>
+				</tr>' . cr();
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$data['line'] = $line;
+			if ($tipo == 1) {
+				$sx .= $this -> load -> view('financeiro/row_pagar', $data, true);
+			}
+			if ($tipo == 2) {
+				$sx .= $this -> load -> view('financeiro/row_receber', $data, true);
+			}
+		}
+		$sx .= '</table>';
+		return ($sx);
+	}
+
+	function busca($tipo) {
+
+		$dt1 = date("Y-m-d");
+		$dt2 = "2099-01-01";
+		$t7 = troca(get("dd7"), '.', '');
+		$t7 = round(troca($t7, ',', '.'));
+		$t8 = troca(get("dd8"), '.', '');
+		$t8 = round(troca($t8, ',', '.'));
+
+		$table = $this -> table_pagar;
 		if ($tipo == 2) {
 			$table = $this -> table_receber;
 		}
@@ -470,6 +608,13 @@ class financeiros extends CI_model {
 							(f_nome_fantasia like '%" . $t1 . "%') 
 						)
 						";
+		}
+		/* Valores */
+		if ($t7 > 0) {
+			$wh .= " AND (cp_valor >= $t7) ";
+		}
+		if ($t8 > 0) {
+			$wh .= " AND (cp_valor <= $t8) ";
 		}
 
 		/* Boleto */
@@ -488,34 +633,18 @@ class financeiros extends CI_model {
 			$t3 = brtos($t3);
 			$t3 = sonumero($t3);
 			$t3 = substr($t3, 0, 4) . '-' . substr($t3, 4, 2) . '-' . substr($t3, 6, 2);
-			$wh .= " AND 
-						(
-							(cp_vencimento >='" . $t3 . "') 
-						)
+			$wh .= " AND (cp_vencimento >='" . $t3 . "') 
 						";
 		} else {
 			$t3 = date("Y-m-d");
-			$wh .= " AND 
-						(
-							(cp_vencimento >='" . $t3 . "') 
-						)
-						";
-			$wh .= " AND 
-						(
-							(cp_vencimento >='" . $t3 . "') 
-						)
-						";
+			$wh .= " AND (cp_vencimento >='" . $t3 . "') ";
 		}
 		$t4 = trim(get("dd4"));
 		if (strlen($t4) > 0) {
 			$t4 = brtos($t4);
 			$t4 = sonumero($t4);
 			$t4 = substr($t4, 0, 4) . '-' . substr($t4, 4, 2) . '-' . substr($t4, 6, 2);
-			$wh .= " AND 
-						(
-							(cp_vencimento <='" . $t4 . "') 
-						)
-						";
+			$wh .= " AND (cp_vencimento <='" . $t4 . "') ";
 		}
 
 		$sql = "select * from $table 
@@ -547,6 +676,66 @@ class financeiros extends CI_model {
 			}
 		}
 		$sx .= '</table>';
+		return ($sx);
+	}
+
+	function financeiro_comparacao() {
+		$table = $this -> table_pagar;
+		$wh = '';
+		$sx = '';
+		$ano1 = get("dd1");
+		$wh .= " AND (cp_vencimento >= '" . $ano1 . "-01-01') ";
+		$wh .= " AND (cp_vencimento <= '" . $ano1 . "-12-31') ";
+
+		$sqlx = "select count(*) as itens, sum(cp_valor) as valor, substring(cp_vencimento,1,7) as ano from $table 
+							left join clientes ON id_f = cp_fornecedor
+							where (1=1) $wh AND cp_situacao = 2
+							GROUP BY ano
+							ORDER BY ano ";
+		$rlt = $this -> db -> query($sqlx);
+		$rlt = $rlt -> result_array();
+		$ser = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		$series = array();
+		if (count($rlt) > 0) {
+			for ($r = 0; $r < count($rlt); $r++) {
+				$line = $rlt[$r];
+				$ano = substr($line['ano'], 0, 4);
+				if (!isset($series['pago'])) { $series['pago'] = $ser;
+				}
+				$mes = round(substr($line['ano'], 5, 2));
+				$series['pago'][$mes] = $line['valor'];
+
+				//$tot = round($line['itens']);
+			}
+		}
+		
+		$table = $this -> table_receber;
+		$sx = '';
+
+		$sqlx = "select count(*) as itens, sum(cp_valor) as valor, substring(cp_vencimento,1,7) as ano from $table 
+							left join clientes ON id_f = cp_fornecedor
+							where (1=1) $wh AND cp_situacao = 2
+							GROUP BY ano
+							ORDER BY ano ";
+		$rlt = $this -> db -> query($sqlx);
+		$rlt = $rlt -> result_array();
+
+		if (count($rlt) > 0) {
+			for ($r = 0; $r < count($rlt); $r++) {
+				$line = $rlt[$r];
+				$ano = substr($line['ano'], 0, 4);
+				if (!isset($series['receber'])) { $series['receber'] = $ser;
+				}
+				$mes = round(substr($line['ano'], 5, 2));
+				$series['receber'][$mes] = $line['valor'];
+
+				//$tot = round($line['itens']);
+			}
+		}		
+
+		$data['series'] = $series;
+		$sx .= $this -> load -> view('highcharts/bars.php', $data, true);
+		
 		return ($sx);
 	}
 

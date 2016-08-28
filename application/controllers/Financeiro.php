@@ -212,6 +212,9 @@ class Financeiro extends CI_Controller {
 		array_push($cp, array('$D8', '', 'Vencimento inicial', false, true));
 		array_push($cp, array('$D8', '', 'Vencimento final', false, true));
 		array_push($cp, array('$S20', '', 'Nº boleto', false, true));
+		array_push($cp, array('$A', '', 'Valor', false, true));
+		array_push($cp, array('$N20', '', 'Valor entre', false, true));
+		array_push($cp, array('$N20', '', 'Valor até', false, true));
 		$data['content'] = $form -> editar($cp, '');
 		$this -> load -> view('financeiro/search', $data);
 
@@ -236,6 +239,9 @@ class Financeiro extends CI_Controller {
 		array_push($cp, array('$D8', '', 'Vencimento inicial', false, true));
 		array_push($cp, array('$D8', '', 'Vencimento final', false, true));
 		array_push($cp, array('$S20', '', 'Nº boleto', false, true));
+		array_push($cp, array('$A', '', 'Valor', false, true));
+		array_push($cp, array('$N20', '', 'Valor entre', false, true));
+		array_push($cp, array('$N20', '', 'Valor até', false, true));
 		$data['content'] = $form -> editar($cp, '');
 		$this -> load -> view('financeiro/search', $data);
 
@@ -255,6 +261,13 @@ class Financeiro extends CI_Controller {
 		$menu = array();
 		$data['title_menu'] = 'Relatórios';
 		array_push($menu, array('Contas a Receber', '__Clientes em aberto', 'ITE', '/financeiro/creceber_abertos'));
+		array_push($menu, array('Contas a Receber', '__Resumo do contas a receber', 'ITE', '/financeiro/resumos_creceber'));
+
+		array_push($menu, array('Contas a Pagar', '__Contas em aberto', 'ITE', '/financeiro/cpagar_abertos'));
+		array_push($menu, array('Contas a Pagar', '__Resumo do contas a pagar', 'ITE', '/financeiro/resumos_cpagar'));
+
+		array_push($menu, array('Relação', '__Recebido / Despesas', 'ITE', '/financeiro/relatorio_cpcr'));
+
 		$data['menu'] = $menu;
 		$data['content'] = $this -> load -> view('header/main_menu', $data, true);
 
@@ -267,8 +280,108 @@ class Financeiro extends CI_Controller {
 		$this -> load -> model('financeiros');
 
 		$this -> cab();
+		$data['title'] = msg('contas_receber_relatorio');
+		$form = new form;
+		$cp = array();
+		array_push($cp, array('$H8', '', '', false, true));
+		array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
+		array_push($cp, array('$D8', '', 'Vencimento final', True, true));
+		array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', True, true));
+		$data['content'] = $form -> editar($cp, '');
+		$this -> load -> view('content', $data);
 
+		if ($form -> saved > 0) {
+			$sx = $this -> financeiros -> financeiro_abertos(2);
+			$data['content'] = $sx;
+			$this -> load -> view('content', $data);
+		}
+		$this -> footer();
+	}
 
+	function cpagar_abertos() {
+		$this -> load -> model('financeiros');
+
+		$this -> cab();
+		$data['title'] = msg('contas_pagar_relatorio');
+		$form = new form;
+		$cp = array();
+		array_push($cp, array('$H8', '', '', false, true));
+		array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
+		array_push($cp, array('$D8', '', 'Vencimento final', True, true));
+		array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', True, true));
+		$data['content'] = $form -> editar($cp, '');
+		$this -> load -> view('content', $data);
+
+		if ($form -> saved > 0) {
+			$sx = $this -> financeiros -> financeiro_abertos(1);
+			$data['content'] = $sx;
+			$this -> load -> view('content', $data);
+		}
+		$this -> footer();
+	}
+
+	function resumos_cpagar() {
+
+		$this -> load -> model('financeiros');
+
+		$this -> cab();
+		$data['title'] = msg('contas_pagar_relatorio');
+		$form = new form;
+		$cp = array();
+		array_push($cp, array('$H8', '', '', false, true));
+		array_push($cp, array('$[2000-' . date("Y") . ']', '', 'Ano Inicial', true, true));
+		array_push($cp, array('$[2000-' . date("Y") . ']', '', 'Ano Final', true, true));
+		$data['content'] = $form -> editar($cp, '');
+		$this -> load -> view('content', $data);
+
+		if ($form -> saved > 0) {
+			$sx = $this -> financeiros -> financeiro_relatorio(1);
+			$data['content'] = $sx;
+			$this -> load -> view('content', $data);
+		}
+		$this -> footer();
+	}
+
+	function resumos_creceber() {
+
+		$this -> load -> model('financeiros');
+
+		$this -> cab();
+		$data['title'] = msg('contas_receber_relatorio');
+		$form = new form;
+		$cp = array();
+		array_push($cp, array('$H8', '', '', false, true));
+		array_push($cp, array('$[2000-' . date("Y") . ']', '', 'Ano Inicial', true, true));
+		array_push($cp, array('$[2000-' . date("Y") . ']', '', 'Ano Final', true, true));
+		$data['content'] = $form -> editar($cp, '');
+		$this -> load -> view('content', $data);
+
+		if ($form -> saved > 0) {
+			$sx = $this -> financeiros -> financeiro_relatorio(2);
+			$data['content'] = $sx;
+			$this -> load -> view('content', $data);
+		}
+		$this -> footer();
+	}
+
+	function relatorio_cpcr() {
+		$this -> load -> model('financeiros');
+
+		$this -> cab();
+		$data['title'] = msg('relacao_cp_cr');
+		$form = new form;
+		$cp = array();
+		array_push($cp, array('$H8', '', '', false, true));
+		array_push($cp, array('$[2000-' . date("Y") . ']', '', 'Ano de referência', true, true));
+		$data['content'] = $form -> editar($cp, '');
+		$this -> load -> view('content', $data);
+
+		if ($form -> saved > 0) {
+			$ano = get("dd1");
+			$sx = $this -> financeiros -> financeiro_comparacao($ano);
+			$data['content'] = $sx;
+			$this -> load -> view('content', $data);
+		}
 		$this -> footer();
 	}
 
