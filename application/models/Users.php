@@ -267,6 +267,25 @@ class users extends CI_model {
 		return ($tela);
 	}
 
+	function change_email($id) {
+		$this -> load -> model('user_drh');
+
+		$data1 = $this -> le($id);
+		$data2 = $this -> user_drh -> le($id);
+		$data = array_merge($data1, $data2);
+
+		$cp = array();
+		array_push($cp,array('$H8','id_us','',False,False));
+		array_push($cp,array('$A1','','Atualizar e-mail',False,True));
+		array_push($cp,array('$S80','us_email','e-mail',True,True));
+		array_push($cp,array('$B8','','Atualizar',False,False));
+		$form = new form;
+		$form->id = $id;
+		$tela = $form->editar($cp,'users');
+		$data['content'] = $tela;
+		return ($tela);
+	}
+
 	function change_sign($id) {
 		$this -> load -> model('user_drh');
 

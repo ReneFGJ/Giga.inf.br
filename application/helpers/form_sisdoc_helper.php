@@ -252,16 +252,18 @@ function brtosql($dt) {
 	$dt = substr($dt, 0, 4) . '-' . substr($dt, 4, 2) . '-' . substr($dt, 6, 2);
 	return ($dt);
 }
-function data_completa($data)
-	{
-		$dt = sonumero($data);
-		$ano = substr($dt,0,4);
-		$mes = round(substr($dt,4,2));
-		$dia = round(substr($dt,6,2));
-		if ($dia == '1') { $dia = '1º'; }
-		$txt = $dia.' de '.meses($mes).' de '.$ano.'.';
-		return($txt);
+
+function data_completa($data) {
+	$dt = sonumero($data);
+	$ano = substr($dt, 0, 4);
+	$mes = round(substr($dt, 4, 2));
+	$dia = round(substr($dt, 6, 2));
+	if ($dia == '1') { $dia = '1º';
 	}
+	$txt = $dia . ' de ' . meses($mes) . ' de ' . $ano . '.';
+	return ($txt);
+}
+
 function meses($id = 0) {
 	$mes = array('', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro');
 	$id = round($id);
@@ -500,8 +502,14 @@ function validaCPF($cpf = null) {
 
 function mask_cpf($cpf) {
 	$cpf = sonumero($cpf);
-	strzero($cpf, 12);
-	$cpf = substr($cpf, 0, 3) . '.' . substr($cpf, 3, 3) . '.' . substr($cpf, 6, 3) . '-' . substr($cpf, 9, 2);
+	if (strlen($cpf) > 12) {
+		strzero($cpf, 12);
+		$cpf = substr($cpf, 0, 2) . '.' . substr($cpf, 2, 3) . '.' . substr($cpf, 5, 3) . '/' . substr($cpf, 8, 4).'-'.substr($cpf,12,2);
+	} else {
+		strzero($cpf, 12);
+		$cpf = substr($cpf, 0, 3) . '.' . substr($cpf, 3, 3) . '.' . substr($cpf, 6, 3) . '-' . substr($cpf, 9, 2);
+	}
+
 	return ($cpf);
 }
 
@@ -1026,7 +1034,6 @@ function npag($obj, $blank = 1, $tot = 10, $offset = 20) {
 	$term = $obj -> term;
 	$npage = $obj -> npag;
 	$field = $obj -> field;
-	
 
 	/* Campos para busca */
 	$fd = $obj -> lb;
@@ -1065,9 +1072,9 @@ function npag($obj, $blank = 1, $tot = 10, $offset = 20) {
 		$linka = '<A HREF="' . $link . '/' . $r . '" class="link lt1 small">';
 		$sx .= $linka . '<li>>></li></A>';
 	}
-	$sx .= '</ul>'.cr();
+	$sx .= '</ul>' . cr();
 	$sx .= '</td><td>';
-	
+
 	/* */
 	$sx .= ' Page:';
 	$linka = $link . '/';
@@ -1356,16 +1363,14 @@ if (!function_exists('form_edit')) {
 		$url_pre = substr($url_pre, 0, strpos($url_pre, '/')) . '/view';
 
 		$url_pre = $obj -> row_view;
-		
-			/* PRE */
-			$active = 0;
-			for ($r=0;$r < count($mk);$r++)
-				{
-				 if($mk[$r]=='A')
-				 	{
-				 		$active = $r;
-				 	}
-				}		
+
+		/* PRE */
+		$active = 0;
+		for ($r = 0; $r < count($mk); $r++) {
+			if ($mk[$r] == 'A') {
+				$active = $r;
+			}
+		}
 
 		foreach ($query->result_array() as $row) {
 			/* recupera ID */
@@ -1374,14 +1379,12 @@ if (!function_exists('form_edit')) {
 
 			/* mostra resultado da query */
 			$style = '';
-			if ($active > 0)
-				{
-					$flds = trim($fd[$active]);
-					if ($row[$flds] == 0)
-						{
-							$style = ' style="color: #ff0000;" ';
-						}
+			if ($active > 0) {
+				$flds = trim($fd[$active]);
+				if ($row[$flds] == 0) {
+					$style = ' style="color: #ff0000;" ';
 				}
+			}
 			$data .= '<tr>';
 			for ($r = 1; $r < count($fd); $r++) {
 				/* mascara */
@@ -1404,14 +1407,13 @@ if (!function_exists('form_edit')) {
 						break;
 					case 'A' :
 						$mskm = ' align="center" ';
-						if ($row[$flds] == '0')
-							{
-								$row[$flds] = '<font color="red">Inativo</font>';
-							} else {
-								$row[$flds] = '<font color="green">Ativo</font>';
-							}
-						
-						break;						
+						if ($row[$flds] == '0') {
+							$row[$flds] = '<font color="red">Inativo</font>';
+						} else {
+							$row[$flds] = '<font color="green">Ativo</font>';
+						}
+
+						break;
 				}
 
 				/* see */
@@ -1422,7 +1424,7 @@ if (!function_exists('form_edit')) {
 					$link = '';
 					$linkf = '';
 				}
-				$data .= chr(15) . '<td ' . $mskm . '>' . $link . '<font '.$style.'>'.trim($row[$flds]) . '</font>'. $linkf . '</td>';
+				$data .= chr(15) . '<td ' . $mskm . '>' . $link . '<font ' . $style . '>' . trim($row[$flds]) . '</font>' . $linkf . '</td>';
 			}
 			if ($obj -> edit == True) {
 				$idr = trim($row[$fd[0]]);
@@ -1702,7 +1704,7 @@ if (!function_exists('form_edit')) {
 
 		if (strlen($acao) == 0) { $recupera = 1;
 		}
-		
+
 		/* Save in table */
 		if ($recupera == 0) {
 			/* Valida */
@@ -1720,9 +1722,9 @@ if (!function_exists('form_edit')) {
 				<td>' . form_open() . '</td>
 			</tr>
 			';
-		
+
 		if ($recupera == 1) {
-			
+
 			/* recupera dados do banco */
 			if (strlen($obj -> tabela) > 0) {
 				$data = le_dados($obj);
@@ -1901,7 +1903,7 @@ if (!function_exists('form_edit')) {
 					/* TR da tabela */
 					$tela .= $tr;
 					$nr = round(sonumero($type));
-					if ($nr < 1) { $nr = '1';
+					if ($nr < 1) { $nr = '3';
 					}
 
 					if (substr($tdl, 0, 3) == '<td') {
@@ -1982,7 +1984,8 @@ if (!function_exists('form_edit')) {
 				$dados = array('name' => $dn, 'id' => $dn, 'value' => '1', 'class' => 'form_checkbox ');
 				if ($readonly == false) { $dados['readonly'] = 'readonly';
 				}
-				$tela .= '<td align="right">' . form_checkbox($dados, 'accept', $vlr); ;
+				$tela .= '<td align="right">' . form_checkbox($dados, 'accept', $vlr);
+				;
 
 				/* label */
 				if (strlen($label) > 0) {
@@ -2364,7 +2367,7 @@ if (!function_exists('form_edit')) {
 
 				$size = sonumero($type);
 
-				$dados = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'maxlenght' => $max, 'size' => $size, 'placeholder' => $label, 'class' => 'form_string form_s'.$size);
+				$dados = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'maxlenght' => $max, 'size' => $size, 'placeholder' => $label, 'class' => 'form_string form_s' . $size);
 				if ($readonly == false) { $dados['readonly'] = 'readonly';
 				}
 				$tela .= $td . form_input($dados);
@@ -2480,37 +2483,35 @@ if (!function_exists('form_edit')) {
 			return false;
 		}
 	}
-function mask_fone($fone)
-	{
+
+	function mask_fone($fone) {
 		$fone = sonumero($fone);
 		$fone_m = $fone;
-		if (strlen($fone) <= 8)
-			{
-				$fone_m = substr($fone,0,4).'.'.substr($fone,4,4); 
-			}
-		if (strlen($fone) == 9)
-			{
-				$fone_m = substr($fone,0,5).'.'.substr($fone,5,4); 
-			}
-		if ((strlen($fone) > 9) and (strlen($fone) < 13))
-			{
-				$fone_m = '('.substr($fone,0,2).')'.substr($fone,2,4).'.'.substr($fone,6,5); 
-			}
-		return($fone_m);
-	}
-function mask_cep($cep)
-	{
-		$cep = strzero(sonumero($cep),8);
-		$cep = substr($cep,0,2).'.'.substr($cep,2,3).'-'.substr($cep,5,3);
-		return($cep);
+		if (strlen($fone) <= 8) {
+			$fone_m = substr($fone, 0, 4) . '.' . substr($fone, 4, 4);
+		}
+		if (strlen($fone) == 9) {
+			$fone_m = substr($fone, 0, 5) . '.' . substr($fone, 5, 4);
+		}
+		if ((strlen($fone) > 9) and (strlen($fone) < 13)) {
+			$fone_m = '(' . substr($fone, 0, 2) . ')' . substr($fone, 2, 4) . '.' . substr($fone, 6, 5);
+		}
+		return ($fone_m);
 	}
 
-function name_weekday($day)
-	{
-		$wk = array('Domingo','Segunda-Feira','Terça-Feira','Quarta-Feira','Quinta-Feira','Sexta-Feira','Sábado');
-		$day = round($day);
-		if ($day > 6) { $day = 0; }
-		return($wk[$day]);
+	function mask_cep($cep) {
+		$cep = strzero(sonumero($cep), 8);
+		$cep = substr($cep, 0, 2) . '.' . substr($cep, 2, 3) . '-' . substr($cep, 5, 3);
+		return ($cep);
 	}
+
+	function name_weekday($day) {
+		$wk = array('Domingo', 'Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira', 'Sábado');
+		$day = round($day);
+		if ($day > 6) { $day = 0;
+		}
+		return ($wk[$day]);
+	}
+
 }
 ?>

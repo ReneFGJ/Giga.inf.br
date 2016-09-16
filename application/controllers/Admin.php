@@ -5,6 +5,7 @@ class Admin extends CI_controller {
 		parent::__construct();
 		$this -> lang -> load("app", "portuguese");
 		$this -> load -> helper('form_sisdoc');
+		$this -> load -> helper('email');
 		$this -> load -> model('users');
 
 		date_default_timezone_set('America/Sao_Paulo');
@@ -167,7 +168,7 @@ class Admin extends CI_controller {
 	}
 
 	/*********************************************************************** USERS *********************/
-	function users() {
+	function users($id=0) {
 		/* Load Model */
 		$model = 'users';
 		$this -> load -> model($model);
@@ -176,7 +177,7 @@ class Admin extends CI_controller {
 		$this -> cab();
 		$data = array();
 		$data['title'] = 'Usuários do sistema';
-		$data['content'] = $this -> $model -> row();
+		$data['content'] = $this -> $model -> row($id);
 		$this -> load -> view('content', $data);
 	}
 
@@ -284,6 +285,38 @@ class Admin extends CI_controller {
 			redirect(base_url('index.php/admin/comunicacao_1'));
 		}
 	}
+	
+	function email()
+		{
+		$this -> cab();
+		$data['title'] = 'Teste de e-mail';
+		
+		$cp = array();
+		array_push($cp,array('$H8','id_m','',false,true));
+		array_push($cp,array('$S80','smtp_host','STMP Host',true,true));
+		array_push($cp,array('$S80','smtp_user','User name',true,true));
+		array_push($cp,array('$S80','smtp_pass','User Pass',true,true));
+		$op = 'smtp:smtp';
+		array_push($cp,array('$O '.$op,'smtp_protocol','Protocolos',true,true));
+		$op = '25:25&465:465&587:587';
+		array_push($cp,array('$O '.$op,'smtp_port','Port',true,true));
+		$op = 'smtp:smtp';
+		array_push($cp,array('$O '.$op,'mailtype','Tipo',true,true));
+		$form = new form;
+		$form->id = 1;
+		$tela = $form->editar($cp,'mensagem_own');
+		
+		/***********************/
+		if ($form->saved > 0)
+			{
+				$para = array('renefgj@gmail.com');
+				enviaremail($para,'Teste','Teste de e-mail',1);
+			}
+		
+		$data['content'] = $tela;
+		$this->load->view('content',$data);
+		$this->footer();			
+		}
 
 	function comunicacao_1($id = 0, $gr = 0, $tp = 0) {
 		/* Load Models */

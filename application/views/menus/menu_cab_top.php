@@ -40,7 +40,7 @@ $us_nome = $_SESSION['user'];
 			</li>
 			</ul>
 			</li>
-			
+
 			<!---- Financiero --->
 			<?php
 			if (perfil("#ADM#FIN")) {
@@ -61,16 +61,16 @@ $us_nome = $_SESSION['user'];
 				echo '	</li>' . cr();
 				echo '</ul>' . cr();
 			}
-			?>		
-				
+			?>
+
 			<!---- Fiscal --->
 			<?php
-			if (perfil("#FIS")) {
+			if (perfil("#FIS#ADM")) {
 				echo '<li class="dropdown">' . cr();
 				echo '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Fiscal <span class="caret"></span></a>' . cr();
 				echo '<ul class="dropdown-menu">' . cr();
 				echo '	<li>' . cr();
-				echo '		<li><a href="' . base_url('index.php/financeiro/fiscal') . '">Faturas</a></li>' . cr();
+				echo '		<li><a href="' . base_url('index.php/financeiro/fiscal') . '">Recibos</a></li>' . cr();
 				echo '	</li>' . cr();
 				//echo '	<li>' . cr();
 				//echo '		<li><a href="' . base_url('index.php/financeiro/creceber') . '">Contas a Receber</a></li>' . cr();
@@ -80,27 +80,20 @@ $us_nome = $_SESSION['user'];
 				//echo '	</li>' . cr();
 				echo '</ul>' . cr();
 			}
-			?>	
-			
-			<li>
-			<a href="<?php echo base_url('index.php/main/locacao'); ?>">Locação</a>
-			</li>
-			<!--
+			?>
+
 			<li class="dropdown">
-			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Financeiro <span class="caret"></span></a>
-			<ul class="dropdown-menu">
-			<li>
-			<a href="<?php echo base_url('index.php/cx/caixa'); ?>">Caixa</a>
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Locação <span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li>
+						<a href="<?php echo base_url('index.php/main/locacao'); ?>">Locação</a>
+					</li>
+					<li>
+						<a href="<?php echo base_url('index.php/main/contrato_pdf'); ?>">Contrato PDF</a>
+					</li>
+				</ul>
 			</li>
-			<li>
-			<a href="<?php echo base_url('index.php/cx/cpagar'); ?>">Contas a Pagar</a>
-			</li>
-			<li>
-			<a href="<?php echo base_url('index.php/cx/creceber'); ?>">Contas a Receber</a>
-			</li>
-			</ul>
-			</li>
-			-->
+
 			<li class="dropdown">
 			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Cadastro <span class="caret"></span></a>
 			<ul class="dropdown-menu">
@@ -129,11 +122,10 @@ $us_nome = $_SESSION['user'];
 			</li>
 			<li>
 			<a href="<?php echo base_url('index.php/main/pedido_validade'); ?>">Condições - Validade da proposta</a>
-			</li>			
+			</li>
 			<li>
 			<a href="<?php echo base_url('index.php/main/condicoes_pagamento'); ?>">Condições - Condições de pagamento</a>
-			</li>			
-
+			</li>
 
 			<li role="separator" class="divider"></li>
 			<li>
@@ -163,6 +155,9 @@ $us_nome = $_SESSION['user'];
 				echo '	<li>' . cr();
 				echo '		<li><a href="' . base_url('index.php/admin/comunicacao_1') . '">Mensagens do Sistema</a></li>' . cr();
 				echo '	</li>' . cr();
+				echo '	<li>' . cr();
+				echo '		<li><a href="' . base_url('index.php/admin/email') . '">E-mail</a></li>' . cr();
+				echo '	</li>' . cr();
 				echo '</ul>' . cr();
 			}
 			?>
@@ -181,8 +176,7 @@ $us_nome = $_SESSION['user'];
 			-->
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <?php echo $us_nome; ?>
-					<span class="caret"></span></a>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <?php echo $us_nome; ?> <span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li>
 							<a href="<?php echo base_url('index.php/main/myaccount'); ?>">Meus Dados</a>

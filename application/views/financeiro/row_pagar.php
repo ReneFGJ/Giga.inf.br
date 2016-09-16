@@ -15,6 +15,11 @@
 			} else {
 				$link_edit = '';
 				$trc = ' class="info" ';
+				
+				if (perfil('#ADM'))
+					{
+						$link_edit = '<span onclick="newxy(\'' . base_url('index.php/financeiro/cpagar_contabil_edit/' . $line['id_cp'] . '/' . checkpost_link($line['id_cp'])) . '\',800,600);" style="cursor: pointer; color: blue;">';				
+					}
 			}
 
 			$sx .= '<tr ' . $trc . '>';

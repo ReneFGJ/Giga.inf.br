@@ -43,4 +43,7 @@ $lang['bt_clear'] = 'limpa filtro';
 $lang['proposta_nova'] = 'nova proposta';
 $lang['not_register'] = 'nenhum registro';
 
+$lang['contas_pagar'] = 'Contas a Pagar';
+$lang['contas_receber'] = 'Contas a Receber';
+
 ?>

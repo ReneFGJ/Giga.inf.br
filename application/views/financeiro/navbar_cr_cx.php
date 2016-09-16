@@ -55,7 +55,7 @@ $week_day = name_weekday(date("w",$data));
 			
 		</div>
 		<div class="col-md-2" >
-			Calendario
+			<?php echo $calendario;?>
 		</div>
 	</div>
 </div>
