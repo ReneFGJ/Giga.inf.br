@@ -105,6 +105,7 @@ class clientes extends CI_Model {
 		$form -> see = true;
 		$form -> novo = true;
 		$form -> edit = true;
+		$form -> pre_where = 'f_ativo = 1';
 
 		$form -> row_edit = base_url('index.php/main/clientes_edit');
 		$form -> row_view = base_url('index.php/main/cliente');

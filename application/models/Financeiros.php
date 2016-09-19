@@ -55,6 +55,7 @@ class financeiros extends CI_model {
 		$i = 0;
 		while (date("m", $do) == date("m", $di)) {
 			$day = round(date("d", $do));
+			
 			if (isset($cal[$day])) {
 				$valor = $cal[$day];
 				$vlr = $cal[$day];
@@ -86,7 +87,7 @@ class financeiros extends CI_model {
 			}
 			if ($i > 40) { exit ;
 			}
-			$do = $do + 25 * 60 * 60;
+			$do = $do + 25 * 60 * 59;
 		}
 		$sx .= '</table>';
 
@@ -117,7 +118,7 @@ class financeiros extends CI_model {
 		$sx .= '<tr><th width="5%">venc.</th>
 					<th width="57%">histórico</th>
 					<th width="5%">pedido</th>
-					<th width="10%">fatura</th>
+					<th width="10%">parcela</th>
 					<th width="10%">valor</th>
 					<th width="10%">situacao</th>
 					<th width="3%">#</th>
@@ -294,7 +295,7 @@ class financeiros extends CI_model {
 		array_push($cp, array('$S80', 'cp_parcela', 'Parcela', True, true));
 		array_push($cp, array('$S80', 'cp_doc', 'Documento', False, true));
 		array_push($cp, array('$Q id_cd:cd_descricao:select * from cx_conta_codigo where cd_cpage = 1', 'cp_conta', 'Conta', False, true));
-		array_push($cp, array('$Q id_f:f_nome_fantasia:select * from clientes where f_fornecedor = 1', 'cp_fornecedor', 'Fornecedor', False, true));
+		array_push($cp, array('$Q id_f:f_nome_fantasia:select * from clientes where f_fornecedor = 1 and f_ativo = 1', 'cp_fornecedor', 'Fornecedor', False, true));
 
 		array_push($cp, array('$Q id_cpa:cpa_descricao:select * from cx_pagar_situacao where cpa_ativo = 1', 'cp_situacao', 'Situação', true, true));
 
@@ -339,7 +340,7 @@ class financeiros extends CI_model {
 
 		$sql = "select $cp, 1 as tipo from cx_receber 
 							left join clientes ON id_f = cp_fornecedor
-							where cp_vencimento = '$dt'
+							where cp_vencimento = '$dt' and cp_situacao <> 9
 						order by cp_vencimento, cp_valor desc 
 						";
 		$rlt = $this -> db -> query($sql);
@@ -350,7 +351,7 @@ class financeiros extends CI_model {
 		$sx .= '<tr><th width="5%">venc.</th>
 					<th width="57%">histórico</th>
 					<th width="5%">pedido</th>
-					<th width="10%">fatura</th>
+					<th width="10%">parcela</th>
 					<th width="10%">valor</th>
 					<th width="3%">#</th>
 				</tr>' . cr();
@@ -376,7 +377,7 @@ class financeiros extends CI_model {
 
 			$sx .= '<tr ' . $trc . '>';
 			//$sx .= '<td>'.$line['cp_situacao'].'</td>';
-			$sx .= '<td align="center" class="small">';
+			$sx .= '<td align="center" class="small">'.$line['cp_situacao'];
 			$sx .= substr(sonumero($line['cp_vencimento']), 6, 2);
 			$sx .= '/';
 			$sx .= substr(sonumero($line['cp_vencimento']), 4, 2);
@@ -435,7 +436,7 @@ class financeiros extends CI_model {
 		$cp = '*';
 		$sql = "select $cp, 1 as tipo from cx_pagar 
 							left join clientes ON id_f = cp_fornecedor
-							where cp_vencimento = '$dt'
+							where cp_vencimento = '$dt' and cp_situacao <> 9
 						order by cp_vencimento, cp_valor desc 
 						";
 		$rlt = $this -> db -> query($sql);
