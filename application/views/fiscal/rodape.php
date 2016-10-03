@@ -13,7 +13,7 @@
 	</td>
 	<td width="20%"></td>
 	<td width="40%" align="center">
-		<img src="<?php echo base_url('img/logo/carimbo-logo.jpg');?>" width="300">
+		<img src="<?php echo base_url('img/logo/'.strzero($id_fi,3).'_carimbo-logo.jpg');?>" width="300">
 	</td>
 	</tr>
 </table>

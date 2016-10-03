@@ -173,21 +173,27 @@ class invoices extends CI_model {
 	}	
 
 	function fechar_edicao($id, $cliente) {
-		$this -> updatex();
 
 		$sql = "select * from " . $this -> table_nr . " where nrs_id = " . $id;
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
+		
 		if (count($rlt) == 0) {
+			
+			$data = $this->le($id);
+			$recibo = strzero($data['fi_nr_recibo'],6);
+			
+			
 			$sql = "insert into " . $this -> table_nr . " 
 				(
-					nrs_id, nrs_cliente
+					nrs_id, nrs_cliente, nrs_nr
 				) values (
-					$id,$cliente
+					$id,$cliente,'$recibo'
 				)";
 			$rlt = $this -> db -> query($sql);
-
-			$this -> updatex();
+			
+			$sql = "update _filiais set fi_nr_recibo = fi_nr_recibo + 1 where id_fi = ".round($data['id_fi']);
+			$rlt2 = $this -> db -> query($sql);
 
 			$sql = "select * from " . $this -> table_nr . " where nrs_id = " . $id;
 			$rlt = $this -> db -> query($sql);

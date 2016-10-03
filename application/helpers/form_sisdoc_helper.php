@@ -594,7 +594,7 @@ function DateAdd($ddf, $ddi, $ddt) {
 		$ddt = mktime(0, 0, 0, $ddmes, $dddia + $ddi, $ddano);
 	}
 	if ($ddf == 'w') {
-		$ddt = mktime(0, 0, 0, $ddmes, $dddia + 7, $ddano);
+		$ddt = mktime(0, 0, 0, $ddmes, $dddia + $ddi*7, $ddano);
 	}
 	if ($ddf == 'm') {
 		$ddt = mktime(0, 0, 0, $ddmes + $ddi, $dddia, $ddano);
@@ -1883,7 +1883,7 @@ if (!function_exists('form_edit')) {
 				}
 
 				/* recupera dados */
-				$dados = array('name' => $dn, 'id' => $dn, 'size' => 1, 'class' => 'form_select ');
+				$dados = array('name' => $dn, 'id' => $dn, 'size' => 1, 'class' => 'form-control ');
 
 				$tela .= $tr;
 
@@ -2120,7 +2120,7 @@ if (!function_exists('form_edit')) {
 				}
 
 				/* recupera dados */
-				$dados = array('name' => $dn, 'id' => $dn, 'size' => 1, 'class' => 'form_select  ');
+				$dados = array('name' => $dn, 'id' => $dn, 'size' => 1, 'class' => 'form-control  ');
 
 				$tela .= $tr;
 
@@ -2154,7 +2154,7 @@ if (!function_exists('form_edit')) {
 					$options[$flds] = $vlrs;
 				}
 
-				$dados = array('name' => $dn, 'id' => $dn, 'size' => 1, 'class' => 'form_select  ');
+				$dados = array('name' => $dn, 'id' => $dn, 'size' => 1, 'class' => 'form-control  ');
 
 				$tela .= $tr;
 
@@ -2190,7 +2190,7 @@ if (!function_exists('form_edit')) {
 					$vlrs = $row[$vlrs];
 					$options[$flds] = $vlrs;
 					$checked = '';
-					$dados = array('name' => $dn, 'id' => $dn, 'value' => $flds, 'class' => 'form_select  ', 'checked' => $checked);
+					$dados = array('name' => $dn, 'id' => $dn, 'value' => $flds, 'class' => 'form-control  ', 'checked' => $checked);
 					$form .= form_radio($dados) . ' ' . $vlrs . '<br>';
 				}
 
@@ -2209,7 +2209,7 @@ if (!function_exists('form_edit')) {
 			/* String */
 			case 'R' :
 				$ntype = trim(substr($type, 2, strlen($type)));
-				$ntype = troca($ntype, '&', ';') . ';';
+				$ntype = troca($ntype, '&', ';') . ';';	
 				$param = splitx(';', $ntype);
 				$form = '<table width="100%" border=0>';
 

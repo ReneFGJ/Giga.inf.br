@@ -27,8 +27,9 @@ class empresas extends CI_model {
 		
 		array_push($cp, array('$O 1:SIM&0:NÃO', 'fi_ativo', 'Ativo', True, True));
 		
-		array_push($cp, array('$A3', '', 'Aliquota ISSN', False, True));
+		array_push($cp, array('$A3', '', 'Aliquota ISSN/Recibo', False, True));
 		array_push($cp, array('$N8', 'fi_aliquota', 'Aliquota ISSN', True, True));
+		array_push($cp, array('$I8', 'fi_nr_recibo', 'Número do Recibo', True, True));
 		return ($cp);
 	}
 

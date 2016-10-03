@@ -147,18 +147,60 @@ class Financeiro extends CI_Controller {
 
 	function cpagar_edit($id = '', $chk = '') {
 		$this -> load -> model('financeiros');
+		$tabela = $this -> financeiros -> table_pagar;
+		$parcelas = round(get("dd5"));
+		
 		$data = array();
 		$data['nocab'] = true;
 		$this -> cab($data);
-		$cp = $this -> financeiros -> cp_cpagar_editar();
+		$cp = $this -> financeiros -> cp_cpagar_editar($id);
 		$form = new form;
 		$form -> id = $id;
-		$_POST['dd10'] = get("dd9");
-		$data['content'] = $form -> editar($cp, $this -> financeiros -> table_pagar);
+		$_POST['dd12'] = get("dd11");
+
+		if ($id==0)
+			{
+				$data['content'] = $form -> editar($cp, '');
+			} else {
+				$data['content'] = $form -> editar($cp, $tabela);		
+			}
+		
+
 		$data['title'] = '';
 		$this -> load -> view('content', $data);
-
+		
 		if ($form -> saved > 0) {
+			$perio = get("dd6");
+			$venc = brtos(get("dd1"));
+			$cp[5][3] = False;
+			
+			if ($parcelas > 1)
+				{
+					$_POST['dd5'] = strzero(1, 2) . '/' . strzero($parcelas, 2);	
+				} else {
+					$_POST['dd5'] = 'ÚNICA';					
+				}
+			$form -> editar($cp, $tabela);
+			
+			if ($form->saved <> 1)
+				{
+					echo 'OPS';
+					exit;
+				}				
+
+			for ($r = 2; $r <= $parcelas; $r++) {
+				$_POST['dd5'] = strzero($r, 2) . '/' . strzero($parcelas, 2);
+				$prox_venc = stod(dateadd($perio, ($r - 1), $venc));
+				$wk = date("N", $prox_venc);
+				while ($wk > 5) {
+					$prox_venc = stod(dateadd('d', -1, date("Ymd", $prox_venc)));
+					$wk = date("N", $prox_venc);
+				}
+				$prox_venc = date("Ymd", $prox_venc);
+				$_POST['dd1'] = stodbr($prox_venc);
+				$data['content'] = $form -> editar($cp, $tabela);
+			}
+
 			echo '
 					<script> 
 						window.opener.location.reload();
@@ -193,18 +235,60 @@ class Financeiro extends CI_Controller {
 
 	function creceber_edit($id = '', $chk = '') {
 		$this -> load -> model('financeiros');
+		$tabela = $this -> financeiros -> table_receber;
+		$parcelas = round(get("dd5"));
+		
 		$data = array();
 		$data['nocab'] = true;
 		$this -> cab($data);
-		$cp = $this -> financeiros -> cp_creceber_editar();
+		$cp = $this -> financeiros -> cp_creceber_editar($id);
 		$form = new form;
 		$form -> id = $id;
-		$_POST['dd10'] = get("dd9");
-		$data['content'] = $form -> editar($cp, $this -> financeiros -> table_receber);
+		$_POST['dd12'] = get("dd11");
+
+		if ($id==0)
+			{
+				$data['content'] = $form -> editar($cp, '');
+			} else {
+				$data['content'] = $form -> editar($cp, $tabela);		
+			}
+		
+
 		$data['title'] = '';
 		$this -> load -> view('content', $data);
-
+		
 		if ($form -> saved > 0) {
+			$perio = get("dd6");
+			$venc = brtos(get("dd1"));
+			$cp[5][3] = False;
+			
+			if ($parcelas > 1)
+				{
+					$_POST['dd5'] = strzero(1, 2) . '/' . strzero($parcelas, 2);	
+				} else {
+					$_POST['dd5'] = 'ÚNICA';					
+				}
+			$form -> editar($cp, $tabela);
+			
+			if ($form->saved <> 1)
+				{
+					echo 'OPS';
+					exit;
+				}				
+
+			for ($r = 2; $r <= $parcelas; $r++) {
+				$_POST['dd5'] = strzero($r, 2) . '/' . strzero($parcelas, 2);
+				$prox_venc = stod(dateadd($perio, ($r - 1), $venc));
+				$wk = date("N", $prox_venc);
+				while ($wk > 5) {
+					$prox_venc = stod(dateadd('d', -1, date("Ymd", $prox_venc)));
+					$wk = date("N", $prox_venc);
+				}
+				$prox_venc = date("Ymd", $prox_venc);
+				$_POST['dd1'] = stodbr($prox_venc);
+				$data['content'] = $form -> editar($cp, $tabela);
+			}
+
 			echo '
 					<script> 
 						window.opener.location.reload();
@@ -266,27 +350,26 @@ class Financeiro extends CI_Controller {
 		$cliente = get("dd0");
 
 		if ((strlen($cliente) > 0) and (strlen($filial) > 0)) {
-			$sit = $this -> invoices -> abrir_recibo($cliente,$filial);
+			$sit = $this -> invoices -> abrir_recibo($cliente, $filial);
 		}
 
 		$this -> cab();
 		$data = $this -> clientes -> le($id);
 		$this -> load -> view('cliente/show', $data);
-		
+
 		$sql = "select * from _filiais where fi_ativo";
-		$rlt = $this->db->query($sql);
-		$rlt = $rlt->result_array();
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
 		$sx = '';
 		$sx .= 'Emissor:<br>';
 		$sx .= '<form>';
-		$sx .= '<input type="hidden" value="'.$id.'" name="dd0">';
-		$sx .= '<select name="dd1" id="dd1" class="form-control">'.cr();
-		for ($r=0;$r < count($rlt);$r++)
-			{
-				$line = $rlt[$r];
-				$sx .= '<option value="'.$line['id_fi'].'">'.$line['fi_razao_social'].' ('.number_format($line['fi_aliquota'],2,',','.').'%)</option>'.cr();
-			}
-		$sx .= '</select>'.cr();
+		$sx .= '<input type="hidden" value="' . $id . '" name="dd0">';
+		$sx .= '<select name="dd1" id="dd1" class="form-control">' . cr();
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$sx .= '<option value="' . $line['id_fi'] . '">' . $line['fi_razao_social'] . ' (' . number_format($line['fi_aliquota'], 2, ',', '.') . '%)</option>' . cr();
+		}
+		$sx .= '</select>' . cr();
 		$sx .= '<br>';
 		$sx .= '<br>';
 		$sx .= '<input type="submit" value="Confirmar" class="btn btn-primary" name="acao">';
@@ -298,9 +381,9 @@ class Financeiro extends CI_Controller {
 		if (count($sit) > 0) {
 			switch ($sit[0]) {
 				case '1' :
-					$dt = $this->invoices->le_last_cliente($id);
+					$dt = $this -> invoices -> le_last_cliente($id);
 					$id = $dt['nrs_id'];
-					$link = base_url('index.php/financeiro/fiscal_ver/'.$id.'/'.checkpost_link($id));
+					$link = base_url('index.php/financeiro/fiscal_ver/' . $id . '/' . checkpost_link($id));
 					$link = base_url('index.php/financeiro/fiscal');
 					redirect($link);
 					break;
@@ -310,7 +393,7 @@ class Financeiro extends CI_Controller {
 					<div class="alert alert-danger" role="alert">
 					  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 					  <span class="sr-only">Error:</span>
-					  '.$sit[1].'
+					  ' . $sit[1] . '
 					</div>
 					';
 					break;
@@ -346,7 +429,7 @@ class Financeiro extends CI_Controller {
 		switch ($data['iv_situacao']) {
 			case '1' :
 				$data['ac'] = '1';
-				$data['itens'] = $this->invoices->total_itens($id);
+				$data['itens'] = $this -> invoices -> total_itens($id);
 				$ed = true;
 				break;
 			case '2' :
@@ -354,7 +437,7 @@ class Financeiro extends CI_Controller {
 				break;
 			case '9' :
 				$data['ac'] = '9';
-				break;				
+				break;
 		}
 
 		$data['content'] = $this -> invoices -> ver_itens($data, $ed);
@@ -363,24 +446,24 @@ class Financeiro extends CI_Controller {
 		$data['content'] = $this -> load -> view('fiscal/acao', $data, true);
 		$this -> load -> view('content', $data);
 	}
-	
-	function fiscal_cancelar($id=0,$chk='')
-		{
+
+	function fiscal_cancelar($id = 0, $chk = '') {
 		$this -> load -> model('invoices');
 		$this -> invoices -> cancelar_edicao($id);
-		redirect(base_url('index.php/financeiro/fiscal_ver/' . $id . '/' . $chk));	
-		}
-	function fiscal_editar($id=0,$chk='')
-		{
+		redirect(base_url('index.php/financeiro/fiscal_ver/' . $id . '/' . $chk));
+	}
+
+	function fiscal_editar($id = 0, $chk = '') {
 		$this -> load -> model('invoices');
 		$this -> invoices -> ativar_edicao($id);
-		redirect(base_url('index.php/financeiro/fiscal_ver/' . $id . '/' . $chk));	
-		}
+		redirect(base_url('index.php/financeiro/fiscal_ver/' . $id . '/' . $chk));
+	}
+
 	function fiscal_fechar($id = 0, $chk = '') {
 		$this -> load -> model('invoices');
-		$data = $this->invoices->le($id);
+		$data = $this -> invoices -> le($id);
 		$cliente = $data['iv_cliente'];
-		$this -> invoices -> fechar_edicao($id,$cliente);
+		$this -> invoices -> fechar_edicao($id, $cliente);
 
 		redirect(base_url('index.php/financeiro/fiscal_ver/' . $id . '/' . $chk));
 	}
@@ -393,7 +476,7 @@ class Financeiro extends CI_Controller {
 		$data['title'] = '';
 		$data['pdf'] = true;
 		$data['content'] = $this -> load -> view('fiscal/invoice_locacao', $data, true);
-		$data['content'] .= $this -> invoices -> ver_itens($data,false) . '<br><br>';
+		$data['content'] .= $this -> invoices -> ver_itens($data, false) . '<br><br>';
 		$data['content_foot'] = $this -> load -> view('fiscal/rodape', $data, true);
 
 		$this -> load -> view("pdf/landscape", $data);
@@ -439,17 +522,16 @@ class Financeiro extends CI_Controller {
 		array_push($cp, array('$N20', '', 'Valor entre', false, true));
 		array_push($cp, array('$N20', '', 'Valor até', false, true));
 		array_push($cp, array('$A', '', 'Situação', false, true));
-		array_push($cp, array('$R 1:Todos&2:Abertos&3:Vencidos&4:Pagos', '', 'Tipo', false, true));	
-		array_push($cp, array('$B', '', 'Pesquisar', false, true));	
+		array_push($cp, array('$R 1:Todos&2:Abertos&3:Vencidos&4:Pagos', '', 'Tipo', false, true));
+		array_push($cp, array('$B', '', 'Pesquisar', false, true));
 		$data['content'] = $form -> editar($cp, '');
-		
-		if (strlen(get("acao")) >0)
-			{
-				$data['result'] = '1';
-			} else {
-				$data['result'] = '0';
-			}			
-		$this -> load -> view('financeiro/search', $data);		
+
+		if (strlen(get("acao")) > 0) {
+			$data['result'] = '1';
+		} else {
+			$data['result'] = '0';
+		}
+		$this -> load -> view('financeiro/search', $data);
 
 		if ($form -> saved > 0) {
 			$sx = $this -> financeiros -> busca(1);
@@ -479,13 +561,12 @@ class Financeiro extends CI_Controller {
 		array_push($cp, array('$R 1:Todos&2:Abertos&3:Vencidos&4:Pagos', '', 'Tipo', false, true));
 		array_push($cp, array('$B', '', 'Pesquisar', false, true));
 		$data['content'] = $form -> editar($cp, '');
-		
-		if (strlen(get("acao")) >0)
-			{
-				$data['result'] = '1';
-			} else {
-				$data['result'] = '0';
-			}
+
+		if (strlen(get("acao")) > 0) {
+			$data['result'] = '1';
+		} else {
+			$data['result'] = '0';
+		}
 		$this -> load -> view('financeiro/search', $data);
 
 		if ($form -> saved > 0) {
