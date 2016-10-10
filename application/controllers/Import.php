@@ -5,6 +5,8 @@ class Import extends CI_Controller {
 		parent::__construct();
 		$this -> lang -> load("app", "portuguese");
 		$this -> load -> helper('form_sisdoc');
+		$this -> load -> helper('email');
+		$this -> load -> model('users');
 
 		date_default_timezone_set('America/Sao_Paulo');
 	}
@@ -45,6 +47,16 @@ class Import extends CI_Controller {
 		
 		$this -> footer();
 	}
+	
+	function creceber() {
+		$this -> cab();
+		$this->load->model("imports");
+		
+		$this->imports->creceber();
+		
+		$this -> footer();
+	}
+		
 	function usuarios() {
 		$this -> cab();
 		$this->load->model("imports");

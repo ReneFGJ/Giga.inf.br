@@ -290,16 +290,16 @@ class financeiros extends CI_model {
 		$cp = array();
 		array_push($cp, array('$H8', 'id_cp', '', false, true));
 		array_push($cp, array('$D8', 'cp_vencimento', 'Vencimento', True, true));
-		array_push($cp, array('$S80', 'cp_historico', 'Historico', True, true));
-		array_push($cp, array('$S80', 'cp_pedido', 'Pedido', True, true));
+		array_push($cp, array('$S80', 'cp_historico', 'Historico', true, true));
+		array_push($cp, array('$S80', 'cp_pedido', 'Pedido/NF', False, true));
 		if ($id == 0)
 		{
 			array_push($cp, array('$A5', '', 'Parcelas', False, True));	
 			array_push($cp, array('$[1-48]', 'cp_parcela', 'Total de Parcelas', True, True));	
-			array_push($cp, array('$O 0:Único&m:Mensal&d:diario&w:Semanal', '', 'Próximos vencimentos', True, True));	
+			array_push($cp, array('$O 0:Único&m:Mensal&d:Diario&w:Semanal', '', 'Próximos vencimentos', True, True));	
 		} else {
 			array_push($cp, array('$H8', '', '', False, True));	
-			array_push($cp, array('$S80', '', 'cp_parcela', True, True));
+			array_push($cp, array('$S80', 'cp_parcela', 'Parcela', True, True));
 			array_push($cp, array('$H8', '', '', False, True));						
 		}
 		
@@ -307,7 +307,7 @@ class financeiros extends CI_model {
 		array_push($cp, array('$Q id_cd:cd_descricao:select * from cx_conta_codigo where cd_cpage = 1', 'cp_conta', 'Conta', False, true));
 		array_push($cp, array('$Q id_f:f_nome_fantasia:select * from clientes where f_fornecedor = 1 and f_ativo = 1', 'cp_fornecedor', 'Fornecedor', False, true));
 
-		array_push($cp, array('$HV', 'cp_situacao', '1', true, true));
+		array_push($cp, array('$Q id_cpa:cpa_descricao:select * from cx_pagar_situacao where cpa_ativo = 1', 'cp_situacao', 'Situação', true, true));
 
 		array_push($cp, array('$N8', 'cp_valor', 'Valor', True, True));
 		array_push($cp, array('$HV', 'cp_valor_pago', get("dd11"), True, true));
@@ -333,7 +333,7 @@ class financeiros extends CI_model {
 			array_push($cp, array('$O 0:Único&m:Mensal&d:diario&w:Semanal', '', 'Próximos vencimentos', True, True));	
 		} else {
 			array_push($cp, array('$H8', '', '', False, True));	
-			array_push($cp, array('$S80', '', 'cp_parcela', True, True));
+			array_push($cp, array('$S80', 'cp_parcela', 'Parcela', True, True));
 			array_push($cp, array('$H8', '', '', False, True));						
 		}
 
@@ -342,8 +342,8 @@ class financeiros extends CI_model {
 		array_push($cp, array('$Q id_f:f_nome:select id_f, concat(f_nome_fantasia,\' - \',f_razao_social) as f_nome from clientes where f_ativo = 1', 'cp_fornecedor', 'Sacado', False, true));
 		//array_push($cp, array('$Q id_f:f_nome_fantasia:select * from clientes where f_ativo = 1', 'cp_fornecedor', 'Sacado', False, true));
 
-		//array_push($cp, array('$Q id_cpa:cpa_descricao:select * from cx_pagar_situacao where cpa_ativo = 1', 'cp_situacao', 'Situação', true, true));
-		array_push($cp, array('$HV', 'cp_situacao', '1', true, true));
+		array_push($cp, array('$Q id_cpa:cpa_descricao:select * from cx_pagar_situacao where cpa_ativo = 1', 'cp_situacao', 'Situação', true, true));
+		//array_push($cp, array('$HV', 'cp_situacao', '1', true, true));
 
 		array_push($cp, array('$N8', 'cp_valor', 'Valor', True, True));
 		array_push($cp, array('$HV', 'cp_valor_pago', get("dd11"), True, true));
@@ -401,7 +401,7 @@ class financeiros extends CI_model {
 
 			$sx .= '<tr ' . $trc . '>';
 			//$sx .= '<td>'.$line['cp_situacao'].'</td>';
-			$sx .= '<td align="center" class="small">'.$line['cp_situacao'];
+			$sx .= '<td align="center" class="small">';
 			$sx .= substr(sonumero($line['cp_vencimento']), 6, 2);
 			$sx .= '/';
 			$sx .= substr(sonumero($line['cp_vencimento']), 4, 2);
