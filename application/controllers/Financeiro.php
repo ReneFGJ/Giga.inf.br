@@ -158,6 +158,35 @@ class Financeiro extends CI_Controller {
 		$form -> id = $id;
 		$_POST['dd12'] = get("dd11");
 
+		$data['content'] = $form -> editar($cp, $tabela);		
+		
+
+		$data['title'] = '';
+		$this -> load -> view('content', $data);
+		
+		if ($form -> saved > 0) {
+			echo '
+					<script> 
+						window.opener.location.reload();
+						close();
+					</script>';
+			return ('');
+		}
+	}
+
+	function cpagar_edit_multi($id = '', $chk = '') {
+		$this -> load -> model('financeiros');
+		$tabela = $this -> financeiros -> table_pagar;
+		$parcelas = round(get("dd5"));
+		
+		$data = array();
+		$data['nocab'] = true;
+		$this -> cab($data);
+		$cp = $this -> financeiros -> cp_cpagar_editar_multi($id);
+		$form = new form;
+		$form -> id = $id;
+		$_POST['dd12'] = get("dd11");
+
 		if ($id==0)
 			{
 				$data['content'] = $form -> editar($cp, '');
