@@ -6,6 +6,12 @@
 			} else {
 				$trc = '';
 			}
+			
+			/* situacao */
+			if ($line['cp_situacao'] == 9)
+				{
+					$trc = ' class="danger" ';
+				}
 
 			$id = $line['id_cp'];
 			$sit = '';
