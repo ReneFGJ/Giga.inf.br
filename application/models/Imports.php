@@ -72,7 +72,7 @@ class imports extends CI_model {
 	function creceber() {
 		ini_set('max_execution_time', 999999);
 		$file = '_temp/creceber.txt';
-		$file = '_documentacao/Financeiro/ccredeber-2013.txt';
+		$file = '_documentacao/Financeiro/ccredeber-2012.txt';
 		$rlt = fopen($file, 'r+');
 		$txt = '';
 		while (!feof($rlt)) {
@@ -128,8 +128,15 @@ class imports extends CI_model {
 					}
 				$prev = 0;
 				//echo $d1 . '|' . $d2 . '|' . $vlr;
-				echo '.';
-				$sql = "insert into cx_receber
+				echo '. ';
+				$sql = "select * from cx_receber where cp_vencimento = '$d2' and cp_doc = '$doc' and cp_historico = '$desc' and cp_pedido = '$ped'";
+				$rrr = $this->db->query($sql);
+				$rrr = $rrr->result_array();
+				
+				if (count($rrr) == 0)
+					{
+					echo 'I ';
+					$sql = "insert into cx_receber
 							(
 							cp_data, cp_vencimento, cp_doc,
 							cp_valor, cp_valor_pago, cp_conta,
@@ -142,8 +149,8 @@ class imports extends CI_model {
 							'$cod','$ped','$d2',
 							'$situacao','$desc','$parc',
 							'$prev')";
-				$rrr = $this -> db -> query($sql);
-
+							$rrr = $this -> db -> query($sql);					
+					}
 			}
 			$txt = substr($txt, $pos + 1, strlen($txt));
 		}
