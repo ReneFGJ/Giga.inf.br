@@ -292,16 +292,9 @@ class financeiros extends CI_model {
 		array_push($cp, array('$D8', 'cp_vencimento', 'Vencimento', True, true));
 		array_push($cp, array('$S80', 'cp_historico', 'Historico', true, true));
 		array_push($cp, array('$S80', 'cp_pedido', 'Pedido/NF', False, true));
-		if ($id == 0)
-		{
-			array_push($cp, array('$A5', '', 'Parcelas', False, True));	
-			array_push($cp, array('$[1-48]', 'cp_parcela', 'Total de Parcelas', True, True));	
-			array_push($cp, array('$O 0:Único&m:Mensal&d:Diario&w:Semanal', '', 'Próximos vencimentos', True, True));	
-		} else {
-			array_push($cp, array('$H8', '', '', False, True));	
-			array_push($cp, array('$S80', 'cp_parcela', 'Parcela', True, True));
-			array_push($cp, array('$H8', '', '', False, True));						
-		}
+		array_push($cp, array('$H8', '', '', False, True));	
+		array_push($cp, array('$S80', 'cp_parcela', 'Parcela', True, True));
+		array_push($cp, array('$H8', '', '', False, True));						
 		
 		array_push($cp, array('$S80', 'cp_doc', 'Documento', False, true));
 		array_push($cp, array('$Q id_cd:cd_descricao:select * from cx_conta_codigo where cd_cpage = 1', 'cp_conta', 'Conta', False, true));
@@ -309,8 +302,41 @@ class financeiros extends CI_model {
 
 		array_push($cp, array('$Q id_cpa:cpa_descricao:select * from cx_pagar_situacao where cpa_ativo = 1', 'cp_situacao', 'Situação', true, true));
 
+		$vlr = get("dd11");
+		$vlr = troca($vlr,'.','');
+		$vlr = troca($vlr,',','.');
 		array_push($cp, array('$N8', 'cp_valor', 'Valor', True, True));
-		array_push($cp, array('$HV', 'cp_valor_pago', get("dd11"), True, true));
+		array_push($cp, array('$HV', 'cp_valor_pago', $vlr , True, true));
+
+		array_push($cp, array('$S80', 'cp_nossonumero', 'Cod.Barras / Nosso Nº', False, True));
+		array_push($cp, array('$C', 'cp_previsao', 'Previsão (SIM)', False, true));
+
+		array_push($cp, array('$B8', '', 'Salvar >>>', false, true));
+		return ($cp);
+	}
+
+	function cp_cpagar_editar_multi($id = 0) {
+		$cp = array();
+		array_push($cp, array('$H8', 'id_cp', '', false, true));
+		array_push($cp, array('$D8', 'cp_vencimento', 'Vencimento', True, true));
+		array_push($cp, array('$S80', 'cp_historico', 'Historico', true, true));
+		array_push($cp, array('$S80', 'cp_pedido', 'Pedido/NF', False, true));
+		array_push($cp, array('$A5', '', 'Parcelas', False, True));	
+		array_push($cp, array('$[1-48]', 'cp_parcela', 'Total de Parcelas', True, True));
+			
+		array_push($cp, array('$O m:Mensal&d:Diário&w:Semanal', '', 'Próximos vencimentos', True, True));	
+		
+		array_push($cp, array('$S80', 'cp_doc', 'Documento', False, true));
+		array_push($cp, array('$Q id_cd:cd_descricao:select * from cx_conta_codigo where cd_cpage = 1', 'cp_conta', 'Conta', False, true));
+		array_push($cp, array('$Q id_f:f_nome_fantasia:select * from clientes where f_fornecedor = 1 and f_ativo = 1', 'cp_fornecedor', 'Fornecedor', False, true));
+
+		array_push($cp, array('$Q id_cpa:cpa_descricao:select * from cx_pagar_situacao where cpa_ativo = 1', 'cp_situacao', 'Situação', true, true));
+
+		$vlr = get("dd11");
+		$vlr = troca($vlr,'.','');
+		$vlr = troca($vlr,',','.');
+		array_push($cp, array('$N8', 'cp_valor', 'Valor', True, True));
+		array_push($cp, array('$HV', 'cp_valor_pago', $vlr , True, true));
 
 		array_push($cp, array('$S80', 'cp_nossonumero', 'Cod.Barras / Nosso Nº', False, True));
 		array_push($cp, array('$C', 'cp_previsao', 'Previsão (SIM)', False, true));
@@ -326,16 +352,9 @@ class financeiros extends CI_model {
 		array_push($cp, array('$S80', 'cp_historico', 'Historico', True, true));
 		array_push($cp, array('$S80', 'cp_pedido', 'Pedido', True, true));
 
-		if ($id == 0)
-		{
-			array_push($cp, array('$A5', '', 'Parcelas', False, True));	
-			array_push($cp, array('$[1-48]', 'cp_parcela', 'Total de Parcelas', True, True));	
-			array_push($cp, array('$O 0:Único&m:Mensal&d:diario&w:Semanal', '', 'Próximos vencimentos', True, True));	
-		} else {
-			array_push($cp, array('$H8', '', '', False, True));	
-			array_push($cp, array('$S80', 'cp_parcela', 'Parcela', True, True));
-			array_push($cp, array('$H8', '', '', False, True));						
-		}
+		array_push($cp, array('$H8', '', '', False, True));	
+		array_push($cp, array('$S80', 'cp_parcela', 'Parcela', True, True));
+		array_push($cp, array('$H8', '', '', False, True));						
 
 		array_push($cp, array('$S80', 'cp_doc', 'Documento', False, true));
 		array_push($cp, array('$Q id_cd:cd_descricao:select * from cx_conta_codigo where cd_cpage = 2', 'cp_conta', 'Conta', False, true));
@@ -345,8 +364,11 @@ class financeiros extends CI_model {
 		array_push($cp, array('$Q id_cpa:cpa_descricao:select * from cx_pagar_situacao where cpa_ativo = 1', 'cp_situacao', 'Situação', true, true));
 		//array_push($cp, array('$HV', 'cp_situacao', '1', true, true));
 
+		$vlr = get("dd11");
+		$vlr = troca($vlr,'.','');
+		$vlr = troca($vlr,',','.');
 		array_push($cp, array('$N8', 'cp_valor', 'Valor', True, True));
-		array_push($cp, array('$HV', 'cp_valor_pago', get("dd11"), True, true));
+		array_push($cp, array('$HV', 'cp_valor_pago', $vlr , True, true));
 
 		array_push($cp, array('$S80', 'cp_nossonumero', 'Cod.Barras / Nosso Nº', False, True));
 		array_push($cp, array('$C', 'cp_previsao', 'Previsão (SIM)', False, true));
@@ -356,7 +378,39 @@ class financeiros extends CI_model {
 		array_push($cp, array('$B8', '', 'Salvar >>>', false, true));
 		return ($cp);
 	}
+	function cp_creceber_editar_multi($id = 0) {
+		$cp = array();
+		array_push($cp, array('$H8', 'id_cp', '', false, true));
+		array_push($cp, array('$D8', 'cp_vencimento', 'Vencimento', True, true));
+		array_push($cp, array('$S80', 'cp_historico', 'Historico', True, true));
+		array_push($cp, array('$S80', 'cp_pedido', 'Pedido', True, true));
 
+		array_push($cp, array('$A5', '', 'Parcelas', False, True));	
+		array_push($cp, array('$[1-48]', 'cp_parcela', 'Total de Parcelas', True, True));	
+		array_push($cp, array('$O m:Mensal&d:Diário&w:Semanal', '', 'Próximos vencimentos', True, True));	
+
+		array_push($cp, array('$S80', 'cp_doc', 'Documento', False, true));
+		array_push($cp, array('$Q id_cd:cd_descricao:select * from cx_conta_codigo where cd_cpage = 2', 'cp_conta', 'Conta', False, true));
+		array_push($cp, array('$Q id_f:f_nome:select id_f, concat(f_nome_fantasia,\' - \',f_razao_social) as f_nome from clientes where f_ativo = 1', 'cp_fornecedor', 'Sacado', False, true));
+		//array_push($cp, array('$Q id_f:f_nome_fantasia:select * from clientes where f_ativo = 1', 'cp_fornecedor', 'Sacado', False, true));
+
+		array_push($cp, array('$Q id_cpa:cpa_descricao:select * from cx_pagar_situacao where cpa_ativo = 1', 'cp_situacao', 'Situação', true, true));
+		//array_push($cp, array('$HV', 'cp_situacao', '1', true, true));
+
+		$vlr = get("dd11");
+		$vlr = troca($vlr,'.','');
+		$vlr = troca($vlr,',','.');
+		array_push($cp, array('$N8', 'cp_valor', 'Valor', True, True));
+		array_push($cp, array('$HV', 'cp_valor_pago', $vlr , True, true));
+
+		array_push($cp, array('$S80', 'cp_nossonumero', 'Cod.Barras / Nosso Nº', False, True));
+		array_push($cp, array('$C', 'cp_previsao', 'Previsão (SIM)', False, true));
+		
+		
+
+		array_push($cp, array('$B8', '', 'Salvar >>>', false, true));
+		return ($cp);
+	}
 	function contas_receber($dt) {
 		$dt = sonumero($dt);
 		$dt = substr($dt, 0, 4) . '-' . substr($dt, 4, 2) . '-' . substr($dt, 6, 2);
@@ -733,6 +787,7 @@ class financeiros extends CI_model {
 	function busca($tipo) {
 
 		$dt1 = date("Y-m-d");
+		$dt1 = '0000-00-00';
 		$dt2 = "2099-01-01";
 		$t7 = troca(get("dd7"), '.', '');
 		$t7 = round(troca($t7, ',', '.'));
@@ -806,7 +861,7 @@ class financeiros extends CI_model {
 						";
 		} else {
 			$t3 = date("Y-m-d");
-			$t3 = '2000-01-01';
+			$t3 = '0001-01-01';
 			$wh .= " AND (cp_vencimento >='" . $t3 . "') ";
 		}
 		$t4 = trim(get("dd4"));
@@ -822,6 +877,7 @@ class financeiros extends CI_model {
 		$sql = "select count(*) as itens, sum(cp_valor) as total from $table 
 					left join clientes ON id_f = cp_fornecedor
 					where 1=1 $wh";
+					
 		$rlt = $this->db->query($sql);
 		$rlt = $rlt->result_array();
 		

@@ -156,7 +156,11 @@ class Financeiro extends CI_Controller {
 		$cp = $this -> financeiros -> cp_cpagar_editar($id);
 		$form = new form;
 		$form -> id = $id;
-		$_POST['dd12'] = get("dd11");
+		
+		$vlr = get("dd11");
+		$vlr = troca($vlr,'.','');
+		$vlr = troca($vlr,',','.');
+		$_POST['dd12'] = $vlr;
 
 		$data['content'] = $form -> editar($cp, $tabela);		
 		
@@ -185,7 +189,10 @@ class Financeiro extends CI_Controller {
 		$cp = $this -> financeiros -> cp_cpagar_editar_multi($id);
 		$form = new form;
 		$form -> id = $id;
-		$_POST['dd12'] = get("dd11");
+		$vlr = get("dd11");
+		$vlr = troca($vlr,'.','');
+		$vlr = troca($vlr,',','.');
+		$_POST['dd12'] = $vlr;
 
 		if ($id==0)
 			{
@@ -273,15 +280,45 @@ class Financeiro extends CI_Controller {
 		$cp = $this -> financeiros -> cp_creceber_editar($id);
 		$form = new form;
 		$form -> id = $id;
-		$_POST['dd12'] = get("dd11");
-
-		if ($id==0)
-			{
-				$data['content'] = $form -> editar($cp, '');
-			} else {
-				$data['content'] = $form -> editar($cp, $tabela);		
-			}
 		
+		$vlr = get("dd11");
+		$vlr = troca($vlr,'.','');
+		$vlr = troca($vlr,',','.');
+		$_POST['dd12'] = $vlr;
+
+		$data['content'] = $form -> editar($cp, $tabela);		
+
+		$data['title'] = '';
+		$this -> load -> view('content', $data);
+		
+		if ($form -> saved > 0) {
+			echo '
+					<script> 
+						window.opener.location.reload();
+						close();
+					</script>';
+			return ('');
+		}
+	}
+
+	function creceber_edit_multi($id = '', $chk = '') {
+		$this -> load -> model('financeiros');
+		$tabela = $this -> financeiros -> table_receber;
+		$parcelas = round(get("dd5"));
+		
+		$data = array();
+		$data['nocab'] = true;
+		$this -> cab($data);
+		$cp = $this -> financeiros -> cp_creceber_editar_multi($id);
+		$form = new form;
+		$form -> id = $id;
+		$vlr = get("dd11");
+		$vlr = troca($vlr,'.','');
+		$vlr = troca($vlr,',','.');
+		$_POST['dd12'] = $vlr;
+
+		$data['content'] = $form -> editar($cp, '');
+
 
 		$data['title'] = '';
 		$this -> load -> view('content', $data);

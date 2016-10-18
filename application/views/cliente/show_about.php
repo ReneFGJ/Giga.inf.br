@@ -22,11 +22,11 @@ if ($mensagens_total == 0)
 	{
 		$msg_total = '<span>&nbsp;</span>';
 	}
-/***************************** contrato ***********/	
-$contatos_total = '<span class="badge">'.$contratos_total.'</span>';
-if ($contratos_total == 0)
+/***************************** contato ***********/	
+$contatos_total = '<span class="badge">'.$contatos_total.'</span>';
+if ($contatos_total == 0)
 	{
-		$contratos_total = '<span>&nbsp;</span>';
+		$contatos_total = '<span>&nbsp;</span>';
 	}
 /***************************** laboratorio ***********/	
 $labo_total = '<span class="badge">'.$labos_total.'</span>';

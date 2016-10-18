@@ -387,11 +387,6 @@ class Main extends CI_Controller {
 		$data['labos_total'] = $this -> pedidos -> resumo($id, 4);
 		$data['labo'] = $this -> pedidos -> lista_por_cliente($id, 4);
 		$data['labo'] .= $this -> load -> view('pedido/pedido_botao_novo', null, true);
-		
-		/* contrato */
-		$data['contrato_total'] = $this -> contratos -> resumo($id, 4);
-		$data['contrato'] = $this -> contratos -> lista_por_cliente($id, 4);
-		//$data['contrato'] .= $this -> load -> view('contratos/contratos_botao_novo', null, true);		
 
 		$contato = $this -> clientes -> contatos($id);
 
