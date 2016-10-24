@@ -1,4 +1,6 @@
 <?php
+$class = '';
+
 	switch($pp_tipo_pedido)
 		{
 		case '1':
@@ -13,6 +15,7 @@
 		case '5':
 			break;
 		default:
+			$class = 'nopr';
 			break;
 		}
 ?>

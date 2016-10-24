@@ -652,6 +652,8 @@ class Financeiro extends CI_Controller {
 		$data['title_menu'] = 'Relatórios';
 		array_push($menu, array('Contas a Receber', '__Clientes em aberto', 'ITE', '/financeiro/creceber_abertos'));
 		array_push($menu, array('Contas a Receber', '__Resumo do contas a receber', 'ITE', '/financeiro/resumos_creceber'));
+		
+		array_push($menu, array('Contas a Receber', '__Enviar e-mail de Aviso de Vencimento', 'ITE', '/financeiro/creceber_aviso'));
 
 		array_push($menu, array('Contas a Pagar', '__Contas em aberto', 'ITE', '/financeiro/cpagar_abertos'));
 		array_push($menu, array('Contas a Pagar', '__Resumo do contas a pagar', 'ITE', '/financeiro/resumos_cpagar'));
@@ -666,6 +668,47 @@ class Financeiro extends CI_Controller {
 
 		$this -> footer();
 	}
+
+	function creceber_aviso()
+		{
+		$this -> load -> model('ics');
+		$this -> load -> model('clientes');
+		$this -> load -> model('financeiros');
+
+		$this -> cab();
+				
+		
+		$cp = array();
+		array_push($cp,array('$H8','','',False,True));
+		array_push($cp,array('$A3','','Vencimento',False,True));
+		array_push($cp,array('$D8','','de',True,True));
+		array_push($cp,array('$D8','','até',False,True));
+		array_push($cp,array('$O 1:Confirmar envio','','Enviar',True,True));
+		
+		if (strlen(get("acao")) == 0)
+			{
+				$dt1 = stod(date("Ymd"))+1*24*60*60;
+				$dt2 = stod(date("Ymd"))+1*24*60*60;
+				$_POST['dd2'] = date("d/m/Y",$dt1);
+				$_POST['dd3'] = date("d/m/Y",$dt2);
+			}
+		
+		$form = new form;
+		$form->id = 0;
+		$tela = $form->editar($cp,'');
+			
+		$data['de'] = get("dd2");
+		$data['ate'] = get("dd3");
+		$tela .= $this -> financeiros -> financeiro_abertos(2,$data);
+	
+		$tela .= $this->financeiros->creceber_enviar_email($data,$form -> saved);
+		
+		$data['title'] = 'Aviso de Vencimento - e-mail';
+		$data['content'] = $tela;
+		$this -> load -> view('content', $data);	
+				
+			
+		}
 
 	function creceber_contabil_edit($id = '', $chk = '') {
 		$this -> load -> model('financeiros');

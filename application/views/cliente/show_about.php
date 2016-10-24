@@ -78,7 +78,7 @@ echo $model;
 			<a href="#pedidos" aria-controls="pedido" role="tab" data-toggle="tab">Pedidos <?php echo $pedidos_total;?></a>
 		</li>
 		<li role="presentation">
-			<a href="#locacao" aria-controls="locacao" role="tab" data-toggle="tab">Locações <?php echo $locacao_total;?></a>
+			<a href="#locacao" aria-controls="locacao" role="tab" data-toggle="tab">Ped. de Locações <?php echo $locacao_total;?></a>
 		</li>
 		<li role="presentation">
 			<a href="#laboratorio" aria-controls="laboratorio" role="tab" data-toggle="tab">Serviços Lab. <?php echo $labo_total;?></a>

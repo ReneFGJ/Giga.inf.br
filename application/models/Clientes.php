@@ -24,6 +24,16 @@ class clientes extends CI_Model {
 		}
 	}
 
+	function le_contatos($id) {
+		$sql = "select * from " . $this -> table_contatos . " 
+					left join contato_funcao ON id_ct = cc_funcao
+					where cc_ativo = 1 and cc_cliente_id	= " . round($id);
+
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		return ($rlt);
+	}
+
 	function cp() {
 		$cp = array();
 		array_push($cp, array('$H8', 'id_f', '', False, True));
@@ -143,7 +153,7 @@ class clientes extends CI_Model {
 		return ($form -> saved);
 	}
 
-	function contatos($id) {
+	function contatos($id, $edit = 1) {
 		$sql = "select * from " . $this -> table_contatos . " 
 					left join contato_funcao ON id_ct = cc_funcao
 					where cc_ativo = 1 and cc_cliente_id	= " . round($id);
@@ -152,10 +162,11 @@ class clientes extends CI_Model {
 		$sx = '<table class="table middle" width="100%">';
 		$sx .= '<tr>
 						<th>nome</th>
+						<th>tipo</th>
 						<th>telefone</th>
-						<th>e-mail</th>
-						<th>editar</th>
-					</tr>';
+						<th>e-mail</th>';
+						if ($edit==1) { $sx .= '<th>editar</th>'; }
+		$sx .= '</tr>';
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
 			$bx = '<button type="button" class="btn btn-primary" aria-label="Left Align" onclick="newwin(\'' . base_url('index.php/main/cliente_contato_edit/' . $line['id_cc'] . '/' . $id) . '\');">';
@@ -167,8 +178,14 @@ class clientes extends CI_Model {
 			$sx .= '<td>' . $line['ct_nome'] . '</td>';
 			$sx .= '<td>' . mask_fone($line['cc_telefone']) . '</td>';
 			$sx .= '<td>' . $line['cc_email'] . '</td>';
-			$sx .= '<td>' . $bx . '</td>';
+			if ($edit == 1) {
+				$sx .= '<td>' . $bx . '</td>';
+			}
 		}
+		if (count($rlt) == 0)
+			{
+				$sx .= '<tr><td colspan=5><font color="red">Sem contatos registrados</td></tr>';
+			}	
 		$sx .= '</table>';
 		return ($sx);
 	}
@@ -216,7 +233,7 @@ class clientes extends CI_Model {
 				array_push($para, $email);
 			}
 		}
-		enviaremail($para, $assunto, $texto, $de );
+		enviaremail($para, $assunto, $texto, $de);
 	}
 
 }

@@ -2,6 +2,7 @@
 class financeiros extends CI_model {
 	var $table_pagar = 'cx_pagar';
 	var $table_receber = 'cx_receber';
+	var $sql = '';
 
 	function calendario($date, $tipo) {
 		$dt = $date;
@@ -268,6 +269,48 @@ class financeiros extends CI_model {
 		array_push($cp, array('$B8', '', 'Fechar pagamento', false, true));
 		return ($cp);
 	}
+	function creceber_enviar_email($data,$enviar=0)
+		{
+			$sql = $this->sql;
+			$rlt = $this->db->query($sql);
+			$rlt = $rlt->result_array();
+			$sx = '';
+			$txt = $this->ics->busca('AVISO_CRECE');
+			$msg = utf8_decode($txt['nw_texto']);
+			$tit = utf8_decode($txt['nw_titulo']);
+			$own = $txt['nw_own'];
+			for ($r=0;$r < count($rlt);$r++)
+				{
+					$line = $rlt[$r];
+					$idc = $line['id_f'];
+					$contact = $this->clientes->le_contatos($idc);
+					$line['contatos'] = $this->clientes->contatos($idc,0); 
+					
+					$tela = $this->load->view('financeiro/registro',$line,true);
+					$mensa = troca($msg,'$VENCIMENTO',utf8_decode($tela));
+					$emails = array();
+					for ($m=0;$m < count($contact);$m++)
+						{
+							$ln = $contact[$m];
+							$email = strtolower($ln['cc_email']).';';
+							$email = troca($email,'/',';');
+							$em = splitx(';',$email);
+							$emails = array_merge($emails,$em);							
+						}
+						
+					$emails = array();
+					
+					array_push($emails,$_SESSION['email']);
+					if ($enviar > 0)
+						{
+							enviaremail($emails,$tit.' - '.utf8_decode($line['f_razao_social']),$mensa,$own);
+						}
+					$sx .= $tela;
+					
+					
+				}
+			return($sx);
+		}
 
 	function cp_creceber_quitar() {
 		$cp = array();
@@ -693,10 +736,11 @@ class financeiros extends CI_model {
 		return ($sx);
 	}
 
-	function financeiro_abertos($tipo) {
+	function financeiro_abertos($tipo,$data = array()) {
 		$table = $this -> table_pagar;
 		$dt1 = date("Y-m-d");
 		$dt2 = "2099-01-01";
+
 		$wh = '';
 
 		if ($tipo == 2) {
@@ -705,6 +749,14 @@ class financeiros extends CI_model {
 
 		/* Data */
 		$t3 = trim(get("dd1"));
+		
+		if (isset($data['de']))
+			{
+				$t3 = $data['de'];
+			}
+	
+		
+		
 		if (strlen($t3) > 0) {
 			$t3 = brtos($t3);
 			$t3 = sonumero($t3);
@@ -716,6 +768,11 @@ class financeiros extends CI_model {
 			$wh .= " AND (cp_vencimento >='" . $t3 . "') ";
 		}
 		$t4 = trim(get("dd2"));
+		if (isset($data['ate']))
+			{
+				$t4 = $data['ate'];
+			}
+					
 		if (strlen($t4) > 0) {
 			$t4 = brtos($t4);
 			$t4 = sonumero($t4);
@@ -745,6 +802,7 @@ class financeiros extends CI_model {
 						";
 
 		/* SALDO */
+		$this->sql = $sql;
 		$sx = '';
 		$sqlx = "select count(*) as itens, sum(cp_valor) as valor from $table 
 							left join clientes ON id_f = cp_fornecedor

@@ -47,7 +47,7 @@ class Main extends CI_Controller {
 	function menu_pedidos($tipo = '', $situacao = '') {
 		$id_us = $_SESSION['id'];
 		if (strlen($tipo) == 0) {
-			$tipo = '1';
+			//$tipo = '1';
 		}
 		$model = "pedidos";
 		$this -> load -> model($model);
@@ -78,12 +78,15 @@ class Main extends CI_Controller {
 		}
 
 		$data['content'] = $tela;
-		$this -> load -> view('content', $data);
 
 		if ((strlen($tipo) > 0) and (strlen($situacao) > 0)) {
 			$data['br'] = true;
-			$data['content'] = $this -> $model -> mostra_lista_detalhes($id_us, $tipo, $situacao);
+			$data['content'] .= $this -> $model -> mostra_lista_detalhes($id_us, $tipo, $situacao);
 			$this -> load -> view('content', $data);
+		} else {
+			$data['br'] = true;
+			$data['content'] .= $this -> $model -> mostra_lista_detalhes($id_us, $tipo, $situacao);
+			$this -> load -> view('content', $data);			
 		}
 		$this -> footer();
 	}
@@ -247,6 +250,12 @@ class Main extends CI_Controller {
 		$client['data'] = data_completa($data['pp_data']);
 
 		$txt = $this -> ics -> busca('PED_' . $data['pp_tipo_pedido'], $client);
+		if (!isset($txt['nw_texto']))
+			{
+				echo 'Não existe texto para o código PED_'.$data['pp_tipo_pedido'];
+				echo '<br><br>Cadastre primeiro em -> Administrador -> Mensagens do sistema';
+				exit;
+			}
 		$data['cab'] = $txt['nw_texto'];
 
 		$data['dados_cliente'] = $this -> load -> view('cliente/show', $client, true);

@@ -345,13 +345,16 @@ class pedidos extends CI_model {
 				}
 			$wh .= "  (pp_situacao = $pp_situacao) ";
 		}
+		if ($pp_tipo_pedido > 0)
+			{
+				$wh .= " AND pp_tipo_pedido = $pp_tipo_pedido ";
+			}
 		$sql = "select * from " . $this -> table . " 
 					LEFT JOIN users on pp_vendor = id_us
 					LEFT JOIN clientes on pp_cliente = id_f
 					LEFT JOIN pedido_situacao ON pp_situacao = id_s
 					LEFT JOIN pedido_tipo on id_t = pp_tipo_pedido
 					$wh 
-						AND pp_tipo_pedido = $pp_tipo_pedido
 					ORDER BY id_pp desc, pp_situacao ";
 
 		$rlt = $this -> db -> query($sql);
@@ -404,8 +407,11 @@ class pedidos extends CI_model {
 		$wh = ' WHERE pp_tipo_pedido = ' . $pp_tipo_pedido;
 		if ($id_us > 0) {
 			$wh = " WHERE pp_vendor = " . round($id_us);
-			$wh .= ' AND pp_tipo_pedido = ' . $pp_tipo_pedido;
 		}
+		if ($pp_tipo_pedido > 0)
+			{
+				$wh .= " AND pp_tipo_pedido = $pp_tipo_pedido ";
+			}		
 		$sql = "select count(*) as total, s_class, pp_tipo_pedido, s_descricao, pp_situacao from " . $this -> table . " 
 					INNER JOIN users on pp_vendor = id_us
 					INNER JOIN clientes on pp_cliente = id_f

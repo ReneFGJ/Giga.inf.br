@@ -2,7 +2,7 @@
 class Ics extends CI_model {
 	var $tabela = 'mensagem';
 
-	function busca($ref, $data) {
+	function busca($ref, $data=array()) {
 
 		$sql = "select * from " . $this -> tabela . " where nw_ref = '$ref' ";
 		$rlt = $this -> db -> query($sql);
