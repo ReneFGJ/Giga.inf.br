@@ -617,7 +617,53 @@ class Main extends CI_Controller {
 	}
 
 	/************************************************************************* PRODUTOS ***************************/
-	function produtos() {
+	function produtos($id='') {
+		/* Load Model */
+		$model = 'produtos';
+		$this -> load -> model('produtos');
+
+		/* Controller */
+		$this -> cab();
+		$data = array();
+		$data['title'] = 'Produtos';
+		$data['content'] = $this->load->view('produto/search',null,true);
+		$this -> load -> view('content', $data);
+		
+		if (strlen(get("acao")))
+			{
+				$tela = $this->produtos->busca(get("dd1"),get("dd2"));
+				$data['content'] = $tela;
+				$data['title'] = '';
+				$this->load->view('content',$data);
+			}
+		$this -> footer();
+	}
+
+	function produtos_cadastrar($id='')
+		{
+		/* Load Model */
+		$model = 'produtos';
+		$this -> load -> model('produtos');
+
+		/* Controller */
+		$this -> cab();
+		$data = array();
+		$data['title'] = 'Produtos - Incorporar Item';
+		$data['content'] = $this->load->view('produto/search',null,true);
+		$data['content'] .= '<button onclick="newxy(\''.base_url('index.php/main/produto_item').'\',600,600);">Novo Item</button>';
+		$this -> load -> view('content', $data);
+		
+		if (strlen(get("acao")))
+			{
+				$tela = $this->produtos->busca(get("dd1"),get("dd2"));
+				$data['content'] = $tela;
+				$data['title'] = '';
+				$this->load->view('content',$data);
+			}
+		$this -> footer();	
+		}
+		
+	function produtos_categoria_editar() {
 		/* Load Model */
 		$model = 'produtos';
 		$this -> load -> model('produtos');
@@ -809,6 +855,7 @@ class Main extends CI_Controller {
 		$_POST['dd2'] = get("prod");
 
 		if ($form -> saved > 0) {
+			$this->produtos->updatex();
 			$data['title'] = '';
 			$data['content'] = '<script> wclose(); </script>';
 			$this -> load -> view('content', $data);
@@ -818,6 +865,15 @@ class Main extends CI_Controller {
 			$this -> load -> view('content', $data);
 		}
 	}
+	
+	function produtos_etiquetas()
+		{
+			$filename = 'etiqueta.prn';
+			header("Content-Type: application/force-download");
+			header("Content-Disposition: attachment; filename=" . $filename);
+			$this -> load -> model('produtos');
+			$this->produtos->etiquetas();
+		}
 
 	function produto_view($id = '') {
 		/* Load Model */

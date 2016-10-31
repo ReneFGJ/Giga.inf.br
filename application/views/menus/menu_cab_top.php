@@ -86,8 +86,11 @@ $us_nome = $_SESSION['user'];
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Equipamentos <span class="caret"></span></a>
 				<ul class="dropdown-menu">
 					<li>
-						<a href="<?php echo base_url('index.php/main/itens'); ?>">Itens</a>
+						<a href="<?php echo base_url('index.php/main/produtos'); ?>">Busca produtos</a>
 					</li>
+					<li>
+						<a href="<?php echo base_url('index.php/main/produtos_etiquetas'); ?>">Gerar Etiquetas</a>
+					</li>					
 				</ul>
 			</li>
 
@@ -110,10 +113,10 @@ $us_nome = $_SESSION['user'];
 			<a href="<?php echo base_url('index.php/main/produtos_categoria'); ?>">Produto - Categoria</a>
 			</li>
 			<li>
-			<a href="<?php echo base_url('index.php/main/produtos'); ?>">Produto - Equipamento</a>
+			<a href="<?php echo base_url('index.php/main/produtos_marca'); ?>">Produtos - Marcas</a>
 			</li>
 			<li>
-			<a href="<?php echo base_url('index.php/main/produtos_marca'); ?>">Produtos - Marcas</a>
+			<a href="<?php echo base_url('index.php/main/produtos_cadastrar'); ?>">Produto - Equipamento (itens)</a>
 			</li>
 
 			<li role="separator" class="divider"></li>

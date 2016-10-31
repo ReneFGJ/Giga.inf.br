@@ -178,3 +178,14 @@ th {
 .navbar-default .navbar-nav > li > a:hover {
 	color: white;
 }
+
+/* BG */
+.bg-success
+	{
+		background-color: #E0FFE0;
+	}
+.bg-default
+	{
+		background-color: #f0f0f0;
+		color: #808080;
+	}	

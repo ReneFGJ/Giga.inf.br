@@ -2,23 +2,22 @@
 class produtos extends CI_model {
 	var $table = 'produtos';
 	var $table_tipo = 'produtos_tipo';
-	var $table_tipo_2 = '(select * from produtos_tipo LEFT JOIN produtos_marca ON prd_marca = id_ma) as produtos_tipo ';
+	var $table_tipo_2 = '(select * from produtos_tipo LEFT JOIN produtos_marca ON pr_marca = id_ma) as produtos_tipo ';
 	var $table_categoria = 'produtos_categoria';
 	var $table_marca = 'produtos_marca';
 	var $table_produto = '(SELECT * FROM produtos
-							INNER JOIN produtos_tipo ON pr_produto = id_prd
 							LEFT JOIN produtos_situacao ON pr_ativo = id_ps
 							LEFT JOIN clientes ON pr_cliente = id_f
-							LEFT JOIN produtos_marca ON prd_marca = id_ma
+							LEFT JOIN produtos_marca ON pr_marca = id_ma
 							LEFT JOIN _filiais ON pr_filial = id_fi
-							LEFT JOIN produtos_categoria ON id_pc = prd_categoria
+							LEFT JOIN produtos_categoria ON id_pc = pr_categoria
 						   ) as produtos ';
 
 	/************************************************************************** PRODUTOS *****************************/
 	function le($id) {
 		$sql = "select * from " . $this -> table_tipo . "
-						LEFT JOIN produtos_marca ON prd_marca = id_ma
-						LEFT JOIN produtos_categoria ON prd_categoria = id_pc
+						LEFT JOIN produtos_marca ON pr_marca = id_ma
+						LEFT JOIN produtos_categoria ON pr_categoria = id_pc
 						WHERE id_prd = " . round($id);
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -34,8 +33,8 @@ class produtos extends CI_model {
 	function le_produto($id) {
 		$sql = "select * from " . $this -> table . "
 						LEFT JOIN " . $this -> table_tipo . " ON pr_produto = id_prd
-						LEFT JOIN produtos_marca ON prd_marca = id_ma
-						LEFT JOIN produtos_categoria ON prd_categoria = id_pc
+						LEFT JOIN produtos_marca ON pr_marca = id_ma
+						LEFT JOIN produtos_categoria ON pr_categoria = id_pc
 						LEFT JOIN produtos_situacao ON pr_ativo = id_ps
 						LEFT JOIN clientes ON pr_cliente = id_f
 						LEFT JOIN _filiais ON pr_filial = id_fi				
@@ -59,6 +58,93 @@ class produtos extends CI_model {
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		return ($rlt);
+	}
+
+	function busca($t, $cat) {
+		$t = troca($t, ' ', ';');
+		$t = splitx(';', $t . ';');
+		$wh1 = '';
+		$wh2 = '';
+		$wh3 = '';
+		$wh4 = '';
+		for ($r = 0; $r < count($t); $r++) {
+			$term = $t[$r];
+			if (strlen($term) > 0) {
+				if (strlen($wh1) > 0) {
+					$wh1 .= ' AND ';
+				}
+				$wh1 .= " pr_modelo like '%$term%' ";
+				if (strlen($wh2) > 0) {
+					$wh2 .= ' AND ';
+				}
+				$wh2 .= " pr_serial like '%$term%' ";
+			}
+		}
+		if (strlen($wh1) == 0) {
+			$wh1 = '1=1';
+			$wh2 = '1=1';
+		}
+		if (strlen($cat) > 0) {
+			$wh3 = 'AND (id_pc = ' . $cat . ')';
+		}
+		/* total */
+		$sql = "select count(*) as total from produtos
+						LEFT JOIN produtos_categoria ON id_pc = pr_categoria
+						LEFT JOIN produtos_situacao ON id_ps = pr_ativo
+						LEFT JOIN _filiais ON pr_filial = id_fi
+						WHERE (($wh1) OR ($wh2)) $wh3
+						ORDER BY pc_nome, pr_serial
+						LIMIT 100
+						";
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$total = $rlt[0]['total'];
+
+		$sql = "select * from produtos
+						LEFT JOIN produtos_categoria ON id_pc = pr_categoria
+						LEFT JOIN produtos_situacao ON id_ps = pr_ativo
+						LEFT JOIN _filiais ON pr_filial = id_fi
+						WHERE (($wh1) OR ($wh2)) $wh3
+						ORDER BY pc_nome, pr_serial
+						";
+
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$sx = '<table class="table" width="100%">';
+		$sx .= '<tr class="middle"><td colspan=9>Total Recuperado ' . $total . '</td></tr>' . cr();
+		$sx .= '<tr class="small">' . cr();
+		$sx .= '	<th colspan="1" width="2%"><b>#</b></th>' . cr();
+		$sx .= '	<th colspan="1" width="33%"><b>Produto</b></th>' . cr();
+		$sx .= '	<th colspan="1" width="10%"><b>Serial</b></th>' . cr();
+		$sx .= '	<th colspan="2" width="10%"><b>Característica</b></th>' . cr();
+		$sx .= '	<th colspan="5" width="45%"><b>Situação / Filial</b></th>' . cr();
+		$sx .= '</tr>' . cr();
+		$ID = 0;
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$ID++;
+			$sx .= '<tr class="' . trim($line['ps_class']) . '">' . cr();
+			$sx .= '	<td class="small" >';
+			$sx .= strzero($ID, 3) . '. ';
+			$sx .= '	</td>' . cr();
+			$sx .= '	<td >';
+			$sx .= $line['pr_modelo'];
+			$sx .= '	</td>' . cr();
+			$sx .= '	<td class="middle">';
+			$sx .= $line['pr_serial'];
+			$sx .= '	</td>' . cr();
+			$sx .= '	<td  class="small">';
+			$sx .= $line['pc_nome'];
+			$sx .= '	</td>' . cr();
+			$sx .= '	<td colspan=5 class="small" >';
+			$sx .= $line['ps_descricao'];
+			$sx .= ' (' . $line['pr_patrimonio'] . ')';
+			$sx .= ' - ' . $line['fi_nome_fantasia'] . '&nbsp;';
+			$sx .= '	</td>' . cr();
+			$sx .= '</tr>' . cr();
+		}
+		$sx .= '</table>';
+		return ($sx);
 	}
 
 	function contratos_situacao($sit) {
@@ -142,13 +228,21 @@ class produtos extends CI_model {
 		$cp = array();
 		array_push($cp, array('$H8', 'id_prd', '', False, True));
 		array_push($cp, array('$A', '', 'Dados do produto', False, True));
-		array_push($cp, array('$Q id_prd:prd_nome:select * from produtos_tipo where prd_ativo = 1', 'pr_produto', 'Produto', True, True));
+		array_push($cp, array('$S80', 'pr_modelo', 'Produto', True, True));
 		array_push($cp, array('$S40', 'pr_serial', 'Nº de Série', False, True));
-		array_push($cp, array('$S40', 'pr_patrimonio', 'Nº do patrimonio', False, True));
-		array_push($cp, array('$S40', 'pr_tag', 'Nº do Tag', False, True));
+		//array_push($cp, array('$S40', 'pr_patrimonio', 'Nº do patrimonio', False, True));
+		//array_push($cp, array('$S40', 'pr_tag', 'Nº do Tag', False, True));
 
-		$sql = "select * from produtos_situacao where ps_ativo = 1 order by id_ps";
-		array_push($cp, array('$Q id_ps:ps_descricao:' . $sql, 'pr_ativo', 'Situação', True, True));
+		$sql = "select * from produtos_marca where ma_ativo = 1 order by id_ma";
+		array_push($cp, array('$Q id_ma:ma_nome:' . $sql, 'pr_marca', 'Marca', True, True));
+
+		$sql = "select * from produtos_categoria where pc_ativo = 1 order by id_pc";
+		array_push($cp, array('$Q id_pc:pc_nome:' . $sql, 'pr_categoria', 'Categoria', True, True));
+
+		$sql = "select * from _filiais where fi_ativo = 1 order by id_fi";
+		array_push($cp, array('$Q id_fi:fi_nome_fantasia:' . $sql, 'pr_filial', 'Filial', True, True));
+
+		array_push($cp, array('$HV', 'pr_ativo', '1', True, True));
 
 		array_push($cp, array('$A', '', 'Fornecedor', False, True));
 		array_push($cp, array('$Q id_f:f_nome_fantasia:select * from clientes where f_ativo = 1 and f_fornecedor=1', 'pr_fornecedor', 'Fornecedor', False, True));
@@ -166,9 +260,9 @@ class produtos extends CI_model {
 		array_push($cp, array('$A', '', 'Dados do produto', False, True));
 		array_push($cp, array('$S80', 'prd_nome', 'Nome do produto', True, True));
 		$sql = "select * from produtos_marca where ma_ativo = 1 order by ma_nome";
-		array_push($cp, array('$Q id_ma:ma_nome:' . $sql, 'prd_marca', 'Marca', True, True));
+		array_push($cp, array('$Q id_ma:ma_nome:' . $sql, 'pr_marca', 'Marca', True, True));
 		$sql = "select * from produtos_categoria where pc_ativo = 1 order by pc_nome";
-		array_push($cp, array('$Q id_pc:pc_nome:' . $sql, 'prd_categoria', 'Categoria', True, True));
+		array_push($cp, array('$Q id_pc:pc_nome:' . $sql, 'pr_categoria', 'Categoria', True, True));
 		array_push($cp, array('$T80:5', 'prd_descricao', 'Dados técnicos / Descrição', False, True));
 
 		$sql = "select * from produtos_situacao where ps_ativo = 1 order by id_ps";
@@ -359,6 +453,54 @@ class produtos extends CI_model {
 		return ($form -> saved);
 	}
 
+	function etiquetas() {
+		$sql = "select * from produtos 
+						WHERE pr_etiqueta = 1
+			";
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$sx = '';
+		$i = 35;
+		for ($r = 0; $r < count($rlt); $r = $r + 1) {
+			$line = $rlt[$r];
+			$mod = trim($line['pr_modelo']);
+			$mod2 = '';
+			if (strlen($mod) > $i) {
+				$mod2 = substr($mod, $i, 30);
+				$mod = substr($mod, 0, $i);
+			}
+			$sx .= 'N' . cr();
+			$sx .= 'q816' . cr();
+			$sx .= 'Q200,24' . cr();
+			$sx .= 'A270,10,0,1,2,2,N,"GiGa"' . cr();
+			//$sx .= 'A250,40,0,1,1,2,N,"INFORMATICA"' . cr();
+			$sx .= 'A10,110,0,1,1,2,N,"' . $mod . '"' . cr();
+			$sx .= 'A10,140,0,1,1,2,N,"' . $mod2 . '"' . cr();
+			$sx .= 'A10,170,0,1,1,1,N,"' . $line['pr_serial'] . '"' . cr();
+			$sx .= 'B0,0,0,E80,3,7,80,B,"' . $line['pr_patrimonio'] . '"' . cr();
+
+			if (isset($rlt[$r + 1])) {
+				$line = $rlt[$r + 1];
+				$mod = trim($line['pr_modelo']);
+				$mod2 = '';
+				if (strlen($mod) > $i) {
+					$mod2 = substr($mod, $i, 30);
+					$mod = substr($mod, 0, $i);
+				}
+				$sx .= '' . cr();
+				$sx .= 'A690,10,0,1,2,2,N,"GiGa"' . cr();
+				//$sx .= 'A670,40,0,1,1,2,N,"INFORMATICA"' . cr();
+				$sx .= 'A440,110,0,1,1,2,N,"' . $mod . '"' . cr();
+				$sx .= 'A440,140,0,1,1,2,N,"' . $mod2 . '"' . cr();
+				$sx .= 'A440,170,0,1,1,1,N,"' . $line['pr_serial'] . '"' . cr();
+				$sx .= 'B400,0,0,E80,3,7,80,B,"' . $line['pr_patrimonio'] . '"' . cr();
+			}
+			$sx .= '' . cr();
+			$sx .= 'P1' . cr();
+		}
+		echo '<pre>' . $sx . '</pre>';
+	}
+
 	function lista_produtos_categoria($id) {
 		$sql = 'select * from ' . $this -> table_produto . ' WHERE id_pc = ' . round($id);
 		$rlt = $this -> db -> query($sql);
@@ -416,11 +558,11 @@ class produtos extends CI_model {
 	}
 
 	function locacao_item($id, $ct) {
-		$sql = "SELECT * FROM `produtos_tipo` 
-					INNER JOIN produtos ON pr_produto = id_prd
-					LEFT JOIN produtos_marca ON prd_marca = id_ma 
+		$sql = "SELECT * FROM `produtos_categoria` 
+					INNER JOIN produtos ON pr_categoria = id_pc
+					LEFT JOIN produtos_marca ON pr_marca = id_ma 
 					LEFT JOIN _filiais ON pr_filial = id_fi
-					WHERE prd_categoria = $ct and prd_ativo = 1
+					WHERE pr_categoria = $ct and prd_ativo = 1
 					";
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -447,17 +589,17 @@ class produtos extends CI_model {
 		$sx .= '</table>';
 		return ($sx);
 	}
-	function produto_registra($prod,$ped,$d1,$d2,$cliente=1)
-		{
-			$data = date("Y-m-d");
-			$hora = date("H:i:s");
-			$cliente = 1;
-			$res = 0;
-			$sit = 1;
-			$vend = $_SESSION['id'];
-			$sql = "select * from produto_agenda 
+
+	function produto_registra($prod, $ped, $d1, $d2, $cliente = 1) {
+		$data = date("Y-m-d");
+		$hora = date("H:i:s");
+		$cliente = 1;
+		$res = 0;
+		$sit = 1;
+		$vend = $_SESSION['id'];
+		$sql = "select * from produto_agenda 
 						WHERE ";
-			$sql = "insert into produto_agenda 
+		$sql = "insert into produto_agenda 
 						(ag_produto, ag_data, ag_cliente, 
 						ag_vendedor, ag_data_reserva, ag_data_reserva_ate, 
 						ag_hora_reserva, ag_reservado, ag_situacao,
@@ -469,8 +611,13 @@ class produtos extends CI_model {
 						$ped
 						)
 			";
-			$rlt = $this->db->query($sql);
-		}
+		$rlt = $this -> db -> query($sql);
+	}
+
+	function updatex() {
+		$sql = "update produtos set pr_patrimonio = lpad(id_pr,7,0) where pr_patrimonio = '' or pr_patrimonio is null";
+		$rlt = $this -> db -> query($sql);
+	}
 
 }
 ?>
