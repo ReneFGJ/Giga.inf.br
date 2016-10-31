@@ -34,13 +34,17 @@
 
 			$sx .= '<td class="middle">';
 			$dados = UpperCase($line['cp_historico']);
+			$dados2 = '';
 			if (strlen($line['f_nome_fantasia']) > 0) {
+				$dados2 = '<a href="'.base_url('index.php/main/cliente/'.$line['id_f'].'/'.checkpost_link($line['id_f'])).'" target="_new">';
+				$dados2 .= '<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>';
+				$dados2 .= '</a>';				
 				$dados = $line['f_nome_fantasia'] . '  - ' . $dados . ' ';
 			}
 			if (strlen(trim($line['cp_nossonumero'])) > 0) {
 				$dados .= ' - Boleto '.$line['cp_nossonumero'];
 			}
-			$sx .= $link_edit . $dados . '</a>';
+			$sx .= $dados2 . $link_edit . $dados . '</a>';
 			$sx .= '</td>';
 
 			$sx .= '<td class="small">';

@@ -80,6 +80,7 @@ class Financeiro extends CI_Controller {
 
 	function creceber($dia = '') {
 		$this -> load -> model('financeiros');
+		$this->financeiros->deleta_excluidos();
 
 		/* Importar */
 		$this -> load -> model('imports');
@@ -433,7 +434,7 @@ class Financeiro extends CI_Controller {
 		$sx .= '<select name="dd1" id="dd1" class="form-control">' . cr();
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
-			$sx .= '<option value="' . $line['id_fi'] . '">' . $line['fi_razao_social'] . ' (' . number_format($line['fi_aliquota'], 2, ',', '.') . '%)</option>' . cr();
+			$sx .= '<option value="' . $line['id_fi'] . '">' . $line['fi_razao_social'] . ' (' . number_format($line['fi_aliquota'], 2, ',', '.') . '%) - Próxima fatura: '.strzero($line['fi_nr_recibo'],7).'</option>' . cr();
 		}
 		$sx .= '</select>' . cr();
 		$sx .= '<br>';
@@ -541,6 +542,7 @@ class Financeiro extends CI_Controller {
 		$data = $this -> invoices -> le($id);
 		$data['title'] = '';
 		$data['pdf'] = true;
+
 		$data['content'] = $this -> load -> view('fiscal/invoice_locacao', $data, true);
 		$data['content'] .= $this -> invoices -> ver_itens($data, false) . '<br><br>';
 		$data['content_foot'] = $this -> load -> view('fiscal/rodape', $data, true);

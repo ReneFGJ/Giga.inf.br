@@ -62,7 +62,7 @@ $class = '';
 <div class="npr nopr"><br></div>
 <div class="container">
 	<div class="row" >
-		<h3>Contatos</h3>
+		<h3 class="nopr">Contatos</h3>
 		<?php echo $contatos; ?>
 	</div>
 </div>

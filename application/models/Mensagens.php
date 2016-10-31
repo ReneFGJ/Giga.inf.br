@@ -53,9 +53,17 @@ class mensagens extends CI_model {
 	}
 
 	function nova_mensagem($id) {
-		$sx = '<button type="button" class="btn btn-primary" aria-label="Left Align" onclick="newwin(\'' . base_url('index.php/main/cliente_mensagem_edit/0/' . $id) . '\');">';
+		$sx = '<button type="button" class="btn btn-default" aria-label="Left Align" onclick="newwin(\'' . base_url('index.php/main/cliente_mensagem_edit/0/' . $id) . '\');">';
 		$sx .= 'nova mensagem';
 		$sx .= '</button>';
+		$sx .= '&nbsp;';
+		$sx .= '<button type="button" class="btn btn-default" aria-label="Left Align" onclick="newwin(\'' . base_url('index.php/main/cliente_mensagem_aviso_vencimento/0/' . $id) . '\');">';
+		$sx .= 'aviso de vencimento';
+		$sx .= '</button>';
+		$sx .= '&nbsp;';
+		$sx .= '<button type="button" class="btn btn-default" aria-label="Left Align" onclick="newwin(\'' . base_url('index.php/main/cliente_mensagem_vencidas/0/' . $id) . '\');">';
+		$sx .= 'aviso de vencidas';
+		$sx .= '</button>';		
 		return ($sx);
 	}
 

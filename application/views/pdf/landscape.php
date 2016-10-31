@@ -31,7 +31,6 @@ if (isset($content_foot))
 	}
 
 /* Arquivo de saida */
-$nome_asc = UpperCaseSql('11111');
 //$nome_asc = troca($nome_asc,' ','_');
-$pdf -> Output('certificado-' . $nome_asc . '.pdf', 'I');
+$pdf -> Output($iv_numero.'-RECIBO-' . UpperCaseSQL($f_razao_social) . '.pdf', 'I');
 ?>

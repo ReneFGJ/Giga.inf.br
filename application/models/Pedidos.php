@@ -74,7 +74,8 @@ class pedidos extends CI_model {
 					LEFT JOIN prazo_entrega ON id_pz = pp_prazo_entrega AND pz_visivel = 1
 					LEFT JOIN prazo_montagem ON id_pm = pp_montagem AND pm_visivel = 1
 					LEFT JOIN pedido_validade ON id_vd = pp_validade_ppdido AND vd_visivel = 1
-					LEFT JOIN pedido_tipo ON id_t = pp_tipo_pedido					
+					LEFT JOIN pedido_tipo ON id_t = pp_tipo_pedido	
+					LEFT JOIN clientes on pp_cliente = id_f				
 					WHERE id_pp = " . round($id);
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -336,7 +337,7 @@ class pedidos extends CI_model {
 		if ($id_us > 0) {
 			$wh = " WHERE pp_vendor = " . round($id_us);
 		}
-		if ($pp_situacao > 0) {
+		if (strlen($pp_situacao) > 0) {
 			if (strlen($wh) == 0)
 				{
 					$wh .= ' WHERE ';
@@ -356,7 +357,7 @@ class pedidos extends CI_model {
 					LEFT JOIN pedido_tipo on id_t = pp_tipo_pedido
 					$wh 
 					ORDER BY id_pp desc, pp_situacao ";
-
+		
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 
@@ -491,7 +492,32 @@ class pedidos extends CI_model {
 									<a href="' . base_url('index.php/main/pedido_editar/' . $id . '/' . checkpost_link($id)) . '" class="btn btn-primary nopr">Enviar para edição </a>
 							</div>';
 				break;
+			case '2':
+				$sx .= '<div class="col-md-2">																
+									<a href="' . base_url('index.php/main/pedido_editar/' . $id . '/' . checkpost_link($id)) . '" class="btn btn-primary nopr">Enviar para edição </a>
+							</div>';
+				$sx .= '<div class="col-md-2">	
+									<span class="btn btn-default nopr" onclick="confirmar_email();">Enviar email para cliente</span>															
+							</div>'.cr();
+				$sx .= '<div class="col-md-2">	
+									<span class="btn btn-default nopr" onclick="imprimir();">Imprimir</span>															
+							</div>'.cr();							
+				$sx .= '<script>
+							function imprimir()
+								{
+									window.print();
+								}
+							function confirmar_email()
+								{
+								if (confirmar() > 0)
+									{
+										window.location= "' . base_url('index.php/main/pedido_enviar_email/' . $id . '/' . checkpost_link($id)) . '";
+									}
+								}								
+							</script>';
+				break;
 			default :
+				$sx .= 'Ação: '.$sit;
 				break;
 		}
 		return ($sx);
@@ -527,7 +553,7 @@ class pedidos extends CI_model {
 			';
 
 		/************************ table ******************/
-		$sx .= '<table wdith="100%" class="table">';
+		$sx .= '<table wdith="100%" class="table nopr">';
 		$sx .= '<tr>
 						<th>#</th>
 						<th>Nome</th>

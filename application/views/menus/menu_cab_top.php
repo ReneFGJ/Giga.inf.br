@@ -83,13 +83,19 @@ $us_nome = $_SESSION['user'];
 			?>
 
 			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Equipamentos <span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li>
+						<a href="<?php echo base_url('index.php/main/itens'); ?>">Itens</a>
+					</li>
+				</ul>
+			</li>
+
+			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Locação <span class="caret"></span></a>
 				<ul class="dropdown-menu">
 					<li>
 						<a href="<?php echo base_url('index.php/main/locacao'); ?>">Locação</a>
-					</li>
-					<li>
-						<a href="<?php echo base_url('index.php/main/contrato_pdf'); ?>">Contrato PDF</a>
 					</li>
 				</ul>
 			</li>

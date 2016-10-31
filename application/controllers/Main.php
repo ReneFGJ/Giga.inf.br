@@ -233,6 +233,56 @@ class Main extends CI_Controller {
 		}
 	}
 
+	function pedido_mostra($id,$chk='')
+		{
+		$editar = 0;
+		/* Load Model */
+		$this -> load -> model('clientes');
+		$this -> load -> model('pedidos');
+		$this -> load -> model('ics');
+
+		$data = $this -> pedidos -> le($id);
+		$id_cliente = $data['pp_cliente'];
+		$id_cliente_f = $data['pp_cliente_faturamento'];
+
+		$client = $this -> clientes -> le($id_cliente);
+		$data['nocab'] = true;
+		$this -> cab($data);
+
+		$client['data'] = data_completa($data['pp_data']);
+
+		$txt = $this -> ics -> busca('PED_' . $data['pp_tipo_pedido'], $client);
+		if (!isset($txt['nw_texto']))
+			{
+				echo 'Não existe texto para o código PED_'.$data['pp_tipo_pedido'];
+				echo '<br><br>Cadastre primeiro em -> Administrador -> Mensagens do sistema';
+				exit;
+			}
+		$data['cab'] = $txt['nw_texto'];
+
+		$data['dados_cliente'] = $this -> load -> view('cliente/show', $client, true);
+		if ($data['pp_cliente_faturamento'] > 0) {
+			$client_f = $this -> clientes -> le($id_cliente_f);
+			$client_f['id_pp'] = $id;
+			$client_f['editar'] = $editar;
+			$data['dados_faturamento'] = $this -> load -> view('cliente/show_faturamento', $client_f, true);
+		} else {
+			$client_f['id_pp'] = $id;
+			$client_f['editar'] = $editar;
+			$data['dados_faturamento'] = $this -> load -> view('cliente/show_faturamento_sem', $client_f, true);
+		}
+		$data['dados_proposta'] = $this -> load -> view('pedido/pedido_header', $data, true);
+		$data['id_pp'] = $id;
+		$data['dados_item'] = $this -> pedidos -> pedido_items($id);
+		//$data['dados_acoes'] = $this -> pedidos -> pedido_acoes($data);
+		$data['dados_acoes'] = '';
+		//$data['contatos'] = $this -> pedidos -> contatos_do_pedido($id, $id_cliente, $editar);
+
+		//$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
+		$data['dados_condicoes'] = $this -> pedidos -> pedido_condicoes($id, $editar);
+		$this -> load -> view('pedido/pedido', $data);
+		}
+
 	function pedido($id, $chk = '') {
 		$editar = 0;
 		/* Load Model */
@@ -273,12 +323,85 @@ class Main extends CI_Controller {
 		$data['id_pp'] = $id;
 		$data['dados_item'] = $this -> pedidos -> pedido_items($id);
 		$data['dados_acoes'] = $this -> pedidos -> pedido_acoes($data);
+		$data['contatos'] = $this -> pedidos -> contatos_do_pedido($id, $id_cliente, $editar);
 
 		//$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
 		$data['dados_condicoes'] = $this -> pedidos -> pedido_condicoes($id, $editar);
 		$this -> load -> view('pedido/pedido', $data);
 	}
 
+	function locacao_item($id, $chk = '')
+		{
+		$editar = 0;
+		/* Load Model */
+		$this -> load -> model('clientes');
+		$this -> load -> model('pedidos');
+		$this -> load -> model('ics');
+
+		$data = $this -> pedidos -> le($id);
+		$id_cliente = $data['pp_cliente'];
+		$id_cliente_f = $data['pp_cliente_faturamento'];
+
+		$client = $this -> clientes -> le($id_cliente);
+		$this -> cab();
+
+		$client['data'] = data_completa($data['pp_data']);
+
+		$txt = $this -> ics -> busca('PED_' . $data['pp_tipo_pedido'], $client);
+		if (!isset($txt['nw_texto']))
+			{
+				echo 'Não existe texto para o código PED_'.$data['pp_tipo_pedido'];
+				echo '<br><br>Cadastre primeiro em -> Administrador -> Mensagens do sistema';
+				exit;
+			}
+		$data['cab'] = $txt['nw_texto'];
+
+		$data['dados_cliente'] = $this -> load -> view('cliente/show', $client, true);
+		if ($data['pp_cliente_faturamento'] > 0) {
+			$client_f = $this -> clientes -> le($id_cliente_f);
+			$client_f['id_pp'] = $id;
+			$client_f['editar'] = $editar;
+			$data['dados_faturamento'] = $this -> load -> view('cliente/show_faturamento', $client_f, true);
+		} else {
+			$client_f['id_pp'] = $id;
+			$client_f['editar'] = $editar;
+			$data['dados_faturamento'] = $this -> load -> view('cliente/show_faturamento_sem', $client_f, true);
+		}
+		$data['dados_proposta'] = '';
+		$data['id_pp'] = $id;
+		$data['dados_item'] = $this -> pedidos -> pedido_items($id);
+		$data['dados_acoes'] = '<button onclick="newwin(\''.base_url('index.php/main/locacao_item_novo/'.$id).'\',800,600);" class="btn btn-primary">Indicar equipamentos</button>';
+		$data['dados_acoes'] .= ' | <button onclick="newwin(\''.base_url('index.php/main/contrato_pdf/'.$id).'\',800,600);" class="btn btn-primary">Contrato Imprimir</button>';
+		$data['contatos'] = '';
+
+		//$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
+		$data['dados_condicoes'] = '';
+		$this -> load -> view('pedido/pedido', $data);
+		}
+	function locacao_item_novo($id='',$tp='',$it='')
+		{
+			$this->load->model('produtos');
+			$data['nocab'] = true;
+			
+			if (strlen($it) > 0)
+				{
+					$d1 = "2016-11-01";
+					$d2 = "2016-11-10";
+					$cliente = 1;
+					$this->produtos->produto_registra($it,$id,$d1,$d2);
+				}
+			$this->cab($data);
+			$tela = '';
+			if (strlen($tp==0))
+				{
+					$tela .= $this->produtos->locacao_categorias($id);
+				} else {
+					$tela .= $this->produtos->locacao_item($id,$tp);
+				}
+			$data['content'] = $tela;
+			$data['title'] = '';
+			$this->load->view('content',$data);	
+		}
 	function cliente_faturamento($id, $chk = '') {
 		$data = array();
 		$data['clie_sel'] = $id;
@@ -466,6 +589,8 @@ class Main extends CI_Controller {
 		/* Controller */
 		$this -> cab();
 		$data = array();
+		$data['locacoes_aberto'] = $this->$model->contratos_situacao(2);
+		$data['locacoes_em_locacao'] = $this->$model->contratos_situacao(3);
 
 		$this -> load -> view('locacao/resumo', $data);
 		$this -> footer();
@@ -989,8 +1114,32 @@ class Main extends CI_Controller {
 	function contrato_pdf($id = 0) {
 		$this -> load -> helper('tcpdf');
 		$this -> load -> model('contratos');
+		$this -> load -> model('pedidos');
+		$this -> load -> model('empresas');
+		
 		$data = $this -> contratos -> le($id);
-		$data['content'] = $data['c_contrato'];
+		$data2 = $this->pedidos->le($id);
+		$data3 = $this->empresas->le(1);
+
+		//$data2 = $this->filiais->le(1);
+		$data = array_merge($data,$data2,$data3);
+		$anexo = $this->contratos->anexos($id);
+		$condicoes = '';
+		
+		$contrato = $data['c_contrato'];
+		$contrato = troca($contrato,'$LOCATARIO_DADOS',$this->load->view('contrato/contrato_locatario',$data,true));
+		$contrato = troca($contrato,'$LOCADORA_DADOS',$this->load->view('contrato/contrato_locador',$data,true));
+		$contrato = troca($contrato,'$EQUIPAMENTOS', $anexo);
+		$contrato = troca($contrato,'$CONDICOES', $condicoes);
+		$contrato = troca($contrato,'$LOCATARIA',$data['f_razao_social']);
+		$contrato = troca($contrato,'$LOCADORA',$data['f_razao_social']);
+		
+		$data['content'] = $contrato;
+		
+		
+		
+
+		
 		$this -> load -> view('contrato/contrato_pdf', $data);
 	}
 

@@ -41,17 +41,31 @@
 
 			$sx .= '<td class="middle">';
 			$dados = UpperCase($line['cp_historico']);
+			$dados2 = '';
 			if (strlen($line['f_nome_fantasia']) > 0) {
+				$dados2 = '<a href="'.base_url('index.php/main/cliente/'.$line['id_f'].'/'.checkpost_link($line['id_f'])).'" target="_new">';
+				$dados2 .= '<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>';
+				$dados2 .= '</a>';
 				$dados = $line['f_nome_fantasia'] . '  - ' . $dados . ' ';
 			}
-			if (strlen(trim($line['cp_nossonumero'])) > 0) {
+			if (strlen(trim($line['cp_nossonumero'])) > 0) {				
 				$dados .= ' - Boleto '.$line['cp_nossonumero'];
 			}
-			$sx .= $link_edit . $dados . '</a>';
+			$sx .= $dados2.' '.$link_edit . $dados . '</a>';
 			$sx .= '</td>';
 
 			$sx .= '<td class="small">';
-			$sx .= $line['cp_pedido'];
+			$pedido = $line['cp_pedido'];
+			if (substr($pedido, 5, 1) == '/') {
+				$link = 'http://10.1.1.123:8080/pedidos/pedido_mostra.asp?dd1=' . $pedido;
+				$pedido = '<a href="#" onclick="newxy(\'' . $link . '\',800,800);">' . $pedido . '</a>';
+			}
+			if ((substr($pedido, 7, 1) == '/') and (substr($pedido,0,1) == '0')) {
+				$idped = round(substr($pedido,0,7));
+				$link = base_url('index.php/main/pedido_mostra/' . round($idped).'/'.checkpost_link($idped));
+				$pedido = '<a href="#" onclick="newxy(\'' . $link . '\',800,800);">' . $pedido . '</a>';
+			}
+			$sx .= $pedido;
 			$sx .= '</td>';
 
 			$sx .= '<td class="small">';

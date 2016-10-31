@@ -31,7 +31,7 @@ if ($ac == 1) {
 if ($ac == 2) {
 	echo '<a href="' . base_url('index.php/financeiro/fiscal_pdf/' . $id_iv . '/' . checkpost_link($id_iv)) . '" class="btn btn-primary">Imprimir Recibo</a>' . cr();
 	
-	if (perfil("#ADM"))
+	if (perfil("#ADM#FIS"))
 	{
 		echo ' | ';
 		echo '<a href="' . base_url('index.php/financeiro/fiscal_editar/' . $id_iv . '/' . checkpost_link($id_iv)) . '" class="btn btn-default">Voltar para Edição</a>' . cr();	
