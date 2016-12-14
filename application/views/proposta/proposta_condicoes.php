@@ -15,14 +15,16 @@
 	if ($pp_periodo_locacao > 0) { echo '<div class="row"><div class="col-md-12">Período de locação: <b>' . $pp_periodo_locacao . ' dia(s)</b></div></div>' . cr();
 	}
 	if (round(substr($pp_dt_ini_evento, 0, 4)) > 2010) {
-		echo '<div class="row"><div class="col-md-12">Data do evento: <b>' . stodbr($pp_dt_ini_evento) . ' ';
+		echo '<div class="row"><div class="col-md-12">Data de entrega: <b>' . stodbr($pp_dt_ini_evento) . '</b>' . ' ';
 		if (round(substr($pp_dt_fim_evento, 0, 4)) > 2010) {
-			echo ' - '.stodbr($pp_dt_fim_evento);
+			echo '<br>Data da retirada ou devolução: <b>' . stodbr($pp_dt_fim_evento) . '</b>';
+		}
+		if (isset($pp_dt_fim_evento_hora)) {
+			echo '<br>Horário de devolução: <b>' . ($pp_dt_fim_evento_hora) . '</b>';
 		}
 		echo '</b></div></div>' . cr();
 	}
 	if (strlen($pm_nome) > 0) { echo '<div class="row"><div class="col-md-12">Montagem: <b>' . $pm_nome . '</b></div></div>' . cr();
 	}
-
 	?>
 </div>

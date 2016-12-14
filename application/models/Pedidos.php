@@ -56,8 +56,20 @@ class pedidos extends CI_model {
 
 		/* SOBRE O EVENTO */
 		//array_push($cp, array('$[0-800]', 'pp_periodo_locacao', 'Período de locação (dias)', False, True));
-		array_push($cp, array('$D8', 'pp_dt_ini_evento', 'Dt. início evento', False, True));
-		array_push($cp, array('$D8', 'pp_dt_fim_evento', 'Dt. final do evento', False, True));
+		array_push($cp, array('$D8', 'pp_dt_ini_evento', 'Dt. de entrega', False, True));
+		array_push($cp, array('$D8', 'pp_dt_fim_evento', 'Dt. de devolução', False, True));
+		$op = '';
+		for ($r=0;$r < 24;$r++)
+			{
+				for ($y=0;$y < 60;$y=$y+30)
+					{
+						$op .= '&';
+						$op .= strzero($r,2).'h'.strzero($y,2);
+						$op .= ':';
+						$op .= strzero($r,2).'h'.strzero($y,2);		
+					}
+			}
+		array_push($cp, array('$O '.$op, 'pp_dt_fim_evento_hora', 'Prev. da Hora de devolução', False, True));
 
 		array_push($cp, array('$T80:5', 'pp_obs', 'Observações', False, True));
 

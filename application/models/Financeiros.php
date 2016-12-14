@@ -866,6 +866,11 @@ class financeiros extends CI_model {
 		$t8 = troca(get("dd8"), '.', '');
 		$t8 = round(troca($t8, ',', '.'));
 		
+		if (($t7 > 0) and ($t8 == 0)) { $t8 = ($t7 + 1); }
+		if (($t8 > 0) and ($t7 == 0)) { $t7 = ($t8 - 1); }
+		if ($t7 > 0) { $t7--; }
+		if ($t8 > 0) { $t8++; }
+		
 		$t10 = get("dd10");
 
 		$table = $this -> table_pagar;
@@ -891,7 +896,7 @@ class financeiros extends CI_model {
 			$wh .= " AND (cp_valor >= $t7) ";
 		}
 		if ($t8 > 0) {
-			$wh .= " AND (cp_valor <= $t8) ";
+			$wh .= " AND (cp_valor <= $t8) ";		
 		}
 		/* Tipos */
 		if (strlen($t10) > 0)
@@ -962,7 +967,7 @@ class financeiros extends CI_model {
 						order by cp_vencimento desc, cp_valor desc 
 						limit 150
 						";
-
+						
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		$sx .= '<br><table width="100%" class="table" border=1>';
