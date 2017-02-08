@@ -82,6 +82,7 @@ $us_nome = $_SESSION['user'];
 			}
 			?>
 
+			<!---- Equipamentos --->
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Equipamentos <span class="caret"></span></a>
 				<ul class="dropdown-menu">
@@ -90,7 +91,14 @@ $us_nome = $_SESSION['user'];
 					</li>
 					<li>
 						<a href="<?php echo base_url('index.php/main/produtos_etiquetas'); ?>">Gerar Etiquetas</a>
+					</li>
+					<li role="separator" class="divider"></li>
+					<li>
+						<a href="<?php echo base_url('index.php/main/produtos_movimentacao/0'); ?>">Consulta produto</a>
 					</li>					
+					<li>
+						<a href="<?php echo base_url('index.php/main/produtos_movimentacao/1'); ?>">Entrada na Unidade</a>
+					</li>										
 				</ul>
 			</li>
 

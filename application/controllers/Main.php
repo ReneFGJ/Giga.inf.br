@@ -336,6 +336,7 @@ class Main extends CI_Controller {
 		/* Load Model */
 		$this -> load -> model('clientes');
 		$this -> load -> model('pedidos');
+		$this -> load -> model('produtos');
 		$this -> load -> model('ics');
 
 		$data = $this -> pedidos -> le($id);
@@ -375,9 +376,29 @@ class Main extends CI_Controller {
 		$data['contatos'] = '';
 
 		//$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
-		$data['dados_condicoes'] = '';
+		$data['dados_condicoes'] = $this->produtos->produtos_reservados($id);
 		$this -> load -> view('pedido/pedido', $data);
 		}
+
+	function locacao_item_editar($id='',$chk='')
+		{
+			$this->load->model('produtos');
+			$data['nocab'] = true;
+			
+			$this->cab($data);
+			$tela = '';
+			$form = new form;
+			$cp = $this->produtos->cp_agenda();
+			$tabela = 'produto_agenda';
+			$form->id = $id;
+			
+			$tela .= $form->editar($cp,$tabela);
+			
+			$data['content'] = $tela;
+			$data['title'] = '';
+			$this->load->view('content',$data);	
+		}
+
 	function locacao_item_novo($id='',$tp='',$it='')
 		{
 			$this->load->model('produtos');
@@ -389,6 +410,7 @@ class Main extends CI_Controller {
 					$d2 = "2016-11-10";
 					$cliente = 1;
 					$this->produtos->produto_registra($it,$id,$d1,$d2);
+					
 				}
 			$this->cab($data);
 			$tela = '';
@@ -650,7 +672,7 @@ class Main extends CI_Controller {
 		$data = array();
 		$data['title'] = 'Produtos - Incorporar Item';
 		$data['content'] = $this->load->view('produto/search',null,true);
-		$data['content'] .= '<button onclick="newxy(\''.base_url('index.php/main/produto_item').'\',600,600);">Novo Item</button>';
+		$data['content'] .= '<button class="btn btn-default" onclick="newxy(\''.base_url('index.php/main/produto_item').'\',600,600);">Novo Item</button>';
 		$this -> load -> view('content', $data);
 		
 		if (strlen(get("acao")))
@@ -802,7 +824,54 @@ class Main extends CI_Controller {
 		$this -> cab();
 		$data = $this -> $model -> le_marca($id);
 		$this -> load -> view('marca/show', $data);
+		$this -> footer();
 	}
+	
+	function produtos_movimentacao($tipo='')
+		{
+		/* Load Model */
+		$model = 'produtos';
+		$this -> load -> model($model);
+		$cod = get("dd1");
+		$acao = get("acao");
+		$data = array();
+
+		/* Controller */
+		$this -> cab();
+		$data['dados_produto'] = '';
+		$data['title'] = 'Consulta produto';
+		
+		if (strlen($acao) > 0)
+			{
+				$cod = substr($cod,0,7);
+				$cod = strzero($cod,7);
+				
+				$data2 = $this->$model->le_produto_ean($cod);
+				if (count($data2) > 0)
+					{
+						$data['dados_produto'] = $this->load->view('produto/view_6',$data2,true);
+						switch ($tipo)
+							{
+							case '1':
+								/* Entrada na filial */	
+								$data['title'] = 'Entrada de produto na unidade';		
+								$this->$model->movimenta_para_estoque($data2['id_pr']);
+								break;
+							default:
+								break;
+							}
+					} else {
+						$data['erro'] = 'Código Inválido<br>'.$cod;
+						$data['dados_produto'] = $this->load->view('alert',$data,true);
+					}	
+			}
+		
+		
+		$data['cod'] = $cod;
+		$data['content'] = $this->load->view('produto/leitor_codigo',$data,true);
+		$this->load->view('content',$data);
+		$this -> footer();
+		}
 
 	function myaccount() {
 		$id = $_SESSION['id'];

@@ -31,8 +31,8 @@ class produtos extends CI_model {
 	}
 
 	function le_produto($id) {
+		/* LEFT JOIN " . $this -> table_tipo . " ON pr_produto = id_prd */
 		$sql = "select * from " . $this -> table . "
-						LEFT JOIN " . $this -> table_tipo . " ON pr_produto = id_prd
 						LEFT JOIN produtos_marca ON pr_marca = id_ma
 						LEFT JOIN produtos_categoria ON pr_categoria = id_pc
 						LEFT JOIN produtos_situacao ON pr_ativo = id_ps
@@ -50,6 +50,25 @@ class produtos extends CI_model {
 		}
 	}
 
+	function le_produto_ean($id) {
+		$sql = "select * from " . $this -> table . "
+						LEFT JOIN produtos_marca ON pr_marca = id_ma
+						LEFT JOIN produtos_categoria ON pr_categoria = id_pc
+						LEFT JOIN produtos_situacao ON pr_ativo = id_ps
+						LEFT JOIN clientes ON pr_cliente = id_f
+						LEFT JOIN _filiais ON pr_filial = id_fi				
+						WHERE pr_patrimonio = '" . $id."'";
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		if (count($rlt) > 0) {
+			$line = $rlt[0];
+			$line['imgs'] = $this -> le_imagem($id);
+			return ($line);
+		} else {
+			return ( array());
+		}
+	}
+		
 	function le_imagem($id) {
 		$sql = "select * from produto_doc_ged
 						INNER JOIN produto_doc_ged_tipo on doc_tipo = id_doct
@@ -558,11 +577,11 @@ class produtos extends CI_model {
 	}
 
 	function locacao_item($id, $ct) {
-		$sql = "SELECT * FROM `produtos_categoria` 
+		$sql = "SELECT * FROM produtos_categoria 
 					INNER JOIN produtos ON pr_categoria = id_pc
 					LEFT JOIN produtos_marca ON pr_marca = id_ma 
 					LEFT JOIN _filiais ON pr_filial = id_fi
-					WHERE pr_categoria = $ct and prd_ativo = 1
+					WHERE pr_categoria = $ct and pr_ativo > 0
 					";
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -574,7 +593,7 @@ class produtos extends CI_model {
 			$link = '<a href="' . $link . '">';
 			$sx .= '<tr>';
 			$sx .= '<td>';
-			$sx .= $link . $line['prd_nome'] . '</a>';
+			$sx .= $link . $line['pc_desc_basica'] . '</a>';
 			$sx .= '</td>';
 			$sx .= '<td>';
 			$sx .= $link . $line['ma_nome'] . '</a>';
@@ -589,6 +608,30 @@ class produtos extends CI_model {
 		$sx .= '</table>';
 		return ($sx);
 	}
+	/****************** LOGISTICA *************/
+	function movimenta_para_estoque($id)
+		{
+			$user = $_SESSION['id'];
+			$sql = "update produtos set
+						pr_etiqueta = 0,
+						pr_ativo = 1,
+						pr_cliente = 0,
+						pr_doc = 0
+					where id_pr = ".round($id);
+			$rlt = $this->db->query($sql); 
+			$sql = "insert into produtos_historico
+						(
+							ph_produto, ph_historico, ph_log,
+							ph_pedido
+						)
+						values
+						(
+							$id,1,$user,
+							0
+						)";
+			$rlt = $this->db->query($sql);
+			return(1);
+		}
 
 	function produto_registra($prod, $ped, $d1, $d2, $cliente = 1) {
 		$data = date("Y-m-d");
@@ -613,6 +656,61 @@ class produtos extends CI_model {
 			";
 		$rlt = $this -> db -> query($sql);
 	}
+	
+	function produtos_reservados($id)
+		{
+			$sql = "select * from produto_agenda
+						inner join produtos on id_pr = ag_produto
+						inner join produtos_categoria  ON pr_categoria = id_pc						
+					where ag_pedido = $id
+					";
+			$rlt = $this->db->query($sql);
+			$rlt = $rlt->result_array();
+			$sx = '<table class="table" width="100%">';
+			$sx .= '<tr class="small">';
+			$sx .= '<th>patrimônio</th>';
+			$sx .= '<th>descrição</th>';
+			$sx .= '<th>serial</th>';
+			$sx .= '<th style="text-center" width="10%">início</th>';
+			$sx .= '<th style="text-center" width="10%">fim</th>';
+			$sx .= '<th style="text-center" width="3%">#</th>';
+			$sx .= '</tr>';
+			for ($r=0;$r < count($rlt);$r++)
+				{
+					$line = $rlt[$r];
+					$link = 'onclick="newxy(\''.base_url('index.php/main/locacao_item_editar/'.$id.'/'.checkpost_link($id)).'\',800,600);" style="cursor: pointer;" ';
+					$sx .= '<tr>';
+					
+					
+					$sx .= '<td align="left">';
+					$sx .= $line['pr_patrimonio'];
+					$sx .= '</td>';
+					
+					$sx .= '<td align="left">';
+					$sx .= $line['pc_nome'];
+					$sx .= '</td>';					
+
+					$sx .= '<td align="left">';
+					$sx .= $line['pr_serial'];
+					$sx .= '</td>';					
+					
+					$sx .= '<td align="center">';
+					$sx .= stodbr($line['ag_data_reserva']);
+					$sx .= '</td>';
+					
+					$sx .= '<td align="center">';
+					$sx .= stodbr($line['ag_data_reserva_ate']);
+					$sx .= '</td>';
+					
+					$sx .= '<td>';
+					$sx .= '<span class="glyphicon glyphicon-pencil" aria-hidden="true" '.$link.'></span>';
+					$sx .= '</td>';
+					
+					$sx .= '</tr>';
+				}
+			$sx .= '</table>';
+			return($sx);
+		}
 
 	function updatex() {
 		$sql = "update produtos set pr_patrimonio = lpad(id_pr,7,0) where pr_patrimonio = '' or pr_patrimonio is null";

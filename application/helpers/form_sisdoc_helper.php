@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category	Helpers
  * @author		Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link		http://www.sisdoc.com.br/CodIgniter
- * @version		v0.16.31
+ * @version		v0.17.02.02
  */
 $dd = array();
 
@@ -1809,6 +1809,8 @@ if (!function_exists('form_edit')) {
 		}
 		if (substr($type, 0, 3) == '$UF') { $tt = 'UF';
 		}
+		if (substr($type, 0, 4) == '$RDF') { $tt = 'RDF';
+		}		
 
 		/* form */
 		$max = 100;
@@ -2367,12 +2369,47 @@ if (!function_exists('form_edit')) {
 
 				$size = sonumero($type);
 
-				$dados = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'maxlenght' => $max, 'size' => $size, 'placeholder' => $label, 'class' => 'form_string form_s' . $size);
+				$dados = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'maxlenght' => $max, 'size' => $size, 'placeholder' => $label, 'class' => 'form-control form_string form_s' . $size, 'style'=>'width: '.$size.'%;');
 				if ($readonly == false) { $dados['readonly'] = 'readonly';
 				}
 				$tela .= $td . form_input($dados);
 				$tela .= $tdn . $trn;
 				break;
+				
+			/* RDF */
+			case 'RDF' :
+				
+				$ntype = trim(substr($type, 4, strlen($type)));
+				$ntype = troca($ntype, ':', ';') . ';';
+				$param = splitx(';', $ntype);
+				$options = array('' => msg('::select an option::'));
+
+				/* recupera dados */
+				$sql = "select * from rdf as tabela
+							where rdf_class = '".$param[0]."' 
+							order by rdf_value";
+				$CI = &get_instance();
+				$query = $CI -> db -> query($sql);
+				foreach ($query->result_array() as $row) {
+					/* recupera ID */
+					$flds = $row['rdf_resource'];
+					$vlrs = $row['rdf_value'];
+					$options[$flds] = $vlrs;
+				}
+
+				$dados = array('name' => $dn, 'id' => $dn, 'size' => 1, 'class' => 'form-control  ');
+
+				$tela .= $tr;
+
+				/* label */
+				if (strlen($label) > 0) {
+					$tela .= $tdl . $label . ' ';
+				}
+				if ($required == 1) { $tela .= ' <font color="red">*</font> ';
+				}
+				$tela .= '<TD>';
+				$tela .= form_dropdown($dados, $options, $vlr);
+				break;				
 
 			case 'SW' :
 				{
@@ -2443,7 +2480,7 @@ if (!function_exists('form_edit')) {
 				if ($required == 1) { $tela .= ' <font color="red">*</font> ';
 				}
 
-				$data = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'rows' => $param[1], 'cols' => $param[0], 'class' => 'form_textarea ');
+				$data = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'rows' => $param[1], 'cols' => $param[0], 'class' => 'form-control form_textarea ');
 				$tela .= $td . form_textarea($data);
 				$tela .= $tdn . $trn;
 				break;

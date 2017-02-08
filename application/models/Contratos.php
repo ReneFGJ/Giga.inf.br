@@ -20,7 +20,13 @@ class contratos extends CI_model
 				$sql = "select * from produto_agenda
 							INNER JOIN produtos ON ag_produto = id_pr
 							INNER JOIN produtos_tipo ON id_prd = pr_produto
-							WHERE ag_pedido = $id";
+							WHERE ag_pedido = $id and ag_situacao > 0";
+							
+				$sql = "select * from produto_agenda
+						inner join produtos on id_pr = ag_produto
+						inner join produtos_categoria  ON pr_categoria = id_pc						
+					where ag_pedido = $id
+					";							
 				$rlt = $this->db->query($sql);
 				$rlt = $rlt->result_array();
 				$sx = '<br>';
@@ -33,7 +39,7 @@ class contratos extends CI_model
 					{
 						$line = $rlt[$r];
 						$sx .= '<tr>';
-						$sx .= '<td>'.$line['prd_nome'].'</td>';
+						$sx .= '<td>'.$line['pc_nome'].'</td>';
 						$sx .= '<td>'.$line['pr_serial'].'</td>';
 						$sx .= '<td>'.stodbr($line['ag_data_reserva']).'</td>';
 						$sx .= '<td>'.stodbr($line['ag_data_reserva_ate']).'</td>';
