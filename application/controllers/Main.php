@@ -86,7 +86,7 @@ class Main extends CI_Controller {
 		} else {
 			$data['br'] = true;
 			$data['content'] .= $this -> $model -> mostra_lista_detalhes($id_us, $tipo, $situacao);
-			$this -> load -> view('content', $data);			
+			$this -> load -> view('content', $data);
 		}
 		$this -> footer();
 	}
@@ -233,8 +233,7 @@ class Main extends CI_Controller {
 		}
 	}
 
-	function pedido_mostra($id,$chk='')
-		{
+	function pedido_mostra($id, $chk = '') {
 		$editar = 0;
 		/* Load Model */
 		$this -> load -> model('clientes');
@@ -252,12 +251,11 @@ class Main extends CI_Controller {
 		$client['data'] = data_completa($data['pp_data']);
 
 		$txt = $this -> ics -> busca('PED_' . $data['pp_tipo_pedido'], $client);
-		if (!isset($txt['nw_texto']))
-			{
-				echo 'Não existe texto para o código PED_'.$data['pp_tipo_pedido'];
-				echo '<br><br>Cadastre primeiro em -> Administrador -> Mensagens do sistema';
-				exit;
-			}
+		if (!isset($txt['nw_texto'])) {
+			echo 'Não existe texto para o código PED_' . $data['pp_tipo_pedido'];
+			echo '<br><br>Cadastre primeiro em -> Administrador -> Mensagens do sistema';
+			exit ;
+		}
 		$data['cab'] = $txt['nw_texto'];
 
 		$data['dados_cliente'] = $this -> load -> view('cliente/show', $client, true);
@@ -281,7 +279,7 @@ class Main extends CI_Controller {
 		//$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
 		$data['dados_condicoes'] = $this -> pedidos -> pedido_condicoes($id, $editar);
 		$this -> load -> view('pedido/pedido', $data);
-		}
+	}
 
 	function pedido($id, $chk = '') {
 		$editar = 0;
@@ -300,12 +298,11 @@ class Main extends CI_Controller {
 		$client['data'] = data_completa($data['pp_data']);
 
 		$txt = $this -> ics -> busca('PED_' . $data['pp_tipo_pedido'], $client);
-		if (!isset($txt['nw_texto']))
-			{
-				echo 'Não existe texto para o código PED_'.$data['pp_tipo_pedido'];
-				echo '<br><br>Cadastre primeiro em -> Administrador -> Mensagens do sistema';
-				exit;
-			}
+		if (!isset($txt['nw_texto'])) {
+			echo 'Não existe texto para o código PED_' . $data['pp_tipo_pedido'];
+			echo '<br><br>Cadastre primeiro em -> Administrador -> Mensagens do sistema';
+			exit ;
+		}
 		$data['cab'] = $txt['nw_texto'];
 
 		$data['dados_cliente'] = $this -> load -> view('cliente/show', $client, true);
@@ -330,8 +327,7 @@ class Main extends CI_Controller {
 		$this -> load -> view('pedido/pedido', $data);
 	}
 
-	function locacao_item($id, $chk = '')
-		{
+	function locacao_item($id, $chk = '') {
 		$editar = 0;
 		/* Load Model */
 		$this -> load -> model('clientes');
@@ -349,12 +345,11 @@ class Main extends CI_Controller {
 		$client['data'] = data_completa($data['pp_data']);
 
 		$txt = $this -> ics -> busca('PED_' . $data['pp_tipo_pedido'], $client);
-		if (!isset($txt['nw_texto']))
-			{
-				echo 'Não existe texto para o código PED_'.$data['pp_tipo_pedido'];
-				echo '<br><br>Cadastre primeiro em -> Administrador -> Mensagens do sistema';
-				exit;
-			}
+		if (!isset($txt['nw_texto'])) {
+			echo 'Não existe texto para o código PED_' . $data['pp_tipo_pedido'];
+			echo '<br><br>Cadastre primeiro em -> Administrador -> Mensagens do sistema';
+			exit ;
+		}
 		$data['cab'] = $txt['nw_texto'];
 
 		$data['dados_cliente'] = $this -> load -> view('cliente/show', $client, true);
@@ -371,59 +366,56 @@ class Main extends CI_Controller {
 		$data['dados_proposta'] = '';
 		$data['id_pp'] = $id;
 		$data['dados_item'] = $this -> pedidos -> pedido_items($id);
-		$data['dados_acoes'] = '<button onclick="newwin(\''.base_url('index.php/main/locacao_item_novo/'.$id).'\',800,600);" class="btn btn-primary">Indicar equipamentos</button>';
-		$data['dados_acoes'] .= ' | <button onclick="newwin(\''.base_url('index.php/main/contrato_pdf/'.$id).'\',800,600);" class="btn btn-primary">Contrato Imprimir</button>';
+		$data['dados_acoes'] = '<button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo/' . $id) . '\',800,600);" class="btn btn-primary">Indicar equipamentos</button>';
+		$data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/contrato_pdf/' . $id) . '\',800,600);" class="btn btn-primary">Contrato Imprimir</button>';
 		$data['contatos'] = '';
 
 		//$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
-		$data['dados_condicoes'] = $this->produtos->produtos_reservados($id);
+		$data['dados_condicoes'] = $this -> produtos -> produtos_reservados($id);
 		$this -> load -> view('pedido/pedido', $data);
-		}
+	}
 
-	function locacao_item_editar($id='',$chk='')
-		{
-			$this->load->model('produtos');
-			$data['nocab'] = true;
-			
-			$this->cab($data);
-			$tela = '';
-			$form = new form;
-			$cp = $this->produtos->cp_agenda();
-			$tabela = 'produto_agenda';
-			$form->id = $id;
-			
-			$tela .= $form->editar($cp,$tabela);
-			
-			$data['content'] = $tela;
-			$data['title'] = '';
-			$this->load->view('content',$data);	
-		}
+	function locacao_item_editar($id = '', $chk = '') {
+		$this -> load -> model('produtos');
+		$data['nocab'] = true;
 
-	function locacao_item_novo($id='',$tp='',$it='')
-		{
-			$this->load->model('produtos');
-			$data['nocab'] = true;
-			
-			if (strlen($it) > 0)
-				{
-					$d1 = "2016-11-01";
-					$d2 = "2016-11-10";
-					$cliente = 1;
-					$this->produtos->produto_registra($it,$id,$d1,$d2);
-					
-				}
-			$this->cab($data);
-			$tela = '';
-			if (strlen($tp==0))
-				{
-					$tela .= $this->produtos->locacao_categorias($id);
-				} else {
-					$tela .= $this->produtos->locacao_item($id,$tp);
-				}
-			$data['content'] = $tela;
-			$data['title'] = '';
-			$this->load->view('content',$data);	
+		$this -> cab($data);
+		$tela = '';
+		$form = new form;
+		$cp = $this -> produtos -> cp_agenda();
+		$tabela = 'produto_agenda';
+		$form -> id = $id;
+
+		$tela .= $form -> editar($cp, $tabela);
+
+		$data['content'] = $tela;
+		$data['title'] = '';
+		$this -> load -> view('content', $data);
+	}
+
+	function locacao_item_novo($id = '', $tp = '', $it = '') {
+		$this -> load -> model('produtos');
+		$data['nocab'] = true;
+
+		if (strlen($it) > 0) {
+			$d1 = "2016-11-01";
+			$d2 = "2016-11-10";
+			$cliente = 1;
+			$this -> produtos -> produto_registra($it, $id, $d1, $d2);
+
 		}
+		$this -> cab($data);
+		$tela = '';
+		if (strlen($tp == 0)) {
+			$tela .= $this -> produtos -> locacao_categorias($id);
+		} else {
+			$tela .= $this -> produtos -> locacao_item($id, $tp);
+		}
+		$data['content'] = $tela;
+		$data['title'] = '';
+		$this -> load -> view('content', $data);
+	}
+
 	function cliente_faturamento($id, $chk = '') {
 		$data = array();
 		$data['clie_sel'] = $id;
@@ -573,10 +565,9 @@ class Main extends CI_Controller {
 
 		/****************/
 		if ($saved > 0) {
-			if ($id > 0)
-				{
-					redirect(base_url('index.php/main/cliente/'.$id.'/'.checkpost_link($id)).'#contatos');
-				}
+			if ($id > 0) {
+				redirect(base_url('index.php/main/cliente/' . $id . '/' . checkpost_link($id)) . '#contatos');
+			}
 			redirect(base_url('index.php/main/clientes'));
 		}
 	}
@@ -611,8 +602,8 @@ class Main extends CI_Controller {
 		/* Controller */
 		$this -> cab();
 		$data = array();
-		$data['locacoes_aberto'] = $this->$model->contratos_situacao(2);
-		$data['locacoes_em_locacao'] = $this->$model->contratos_situacao(3);
+		$data['locacoes_aberto'] = $this -> $model -> contratos_situacao(2);
+		$data['locacoes_em_locacao'] = $this -> $model -> contratos_situacao(3);
 
 		$this -> load -> view('locacao/resumo', $data);
 		$this -> footer();
@@ -639,7 +630,7 @@ class Main extends CI_Controller {
 	}
 
 	/************************************************************************* PRODUTOS ***************************/
-	function produtos($id='') {
+	function produtos($id = '') {
 		/* Load Model */
 		$model = 'produtos';
 		$this -> load -> model('produtos');
@@ -648,21 +639,19 @@ class Main extends CI_Controller {
 		$this -> cab();
 		$data = array();
 		$data['title'] = 'Produtos';
-		$data['content'] = $this->load->view('produto/search',null,true);
+		$data['content'] = $this -> load -> view('produto/search', null, true);
 		$this -> load -> view('content', $data);
-		
-		if (strlen(get("acao")))
-			{
-				$tela = $this->produtos->busca(get("dd1"),get("dd2"));
-				$data['content'] = $tela;
-				$data['title'] = '';
-				$this->load->view('content',$data);
-			}
+
+		if (strlen(get("acao"))) {
+			$tela = $this -> produtos -> busca(get("dd1"), get("dd2"));
+			$data['content'] = $tela;
+			$data['title'] = '';
+			$this -> load -> view('content', $data);
+		}
 		$this -> footer();
 	}
 
-	function produtos_cadastrar($id='')
-		{
+	function produtos_cadastrar($id = '') {
 		/* Load Model */
 		$model = 'produtos';
 		$this -> load -> model('produtos');
@@ -671,20 +660,19 @@ class Main extends CI_Controller {
 		$this -> cab();
 		$data = array();
 		$data['title'] = 'Produtos - Incorporar Item';
-		$data['content'] = $this->load->view('produto/search',null,true);
-		$data['content'] .= '<button class="btn btn-default" onclick="newxy(\''.base_url('index.php/main/produto_item').'\',600,600);">Novo Item</button>';
+		$data['content'] = $this -> load -> view('produto/search', null, true);
+		$data['content'] .= '<button class="btn btn-default" onclick="newxy(\'' . base_url('index.php/main/produto_item') . '\',600,600);">Novo Item</button>';
 		$this -> load -> view('content', $data);
-		
-		if (strlen(get("acao")))
-			{
-				$tela = $this->produtos->busca(get("dd1"),get("dd2"));
-				$data['content'] = $tela;
-				$data['title'] = '';
-				$this->load->view('content',$data);
-			}
-		$this -> footer();	
+
+		if (strlen(get("acao"))) {
+			$tela = $this -> produtos -> busca(get("dd1"), get("dd2"));
+			$data['content'] = $tela;
+			$data['title'] = '';
+			$this -> load -> view('content', $data);
 		}
-		
+		$this -> footer();
+	}
+
 	function produtos_categoria_editar() {
 		/* Load Model */
 		$model = 'produtos';
@@ -735,6 +723,55 @@ class Main extends CI_Controller {
 		}
 	}
 
+	/************************************************************************* PRODUTOS NOME *****************/
+	function produtos_nomes() {
+		/* Load Model */
+		$model = 'produtos';
+		$this -> load -> model('produtos');
+
+		/* Controller */
+		$this -> cab();
+		$data = array();
+		$data['title'] = 'Descrição dos produtos';
+		$data['content'] = $this -> $model -> row_descricao();
+		$this -> load -> view('content', $data);
+		$this -> footer();
+	}
+
+	function produtos_nomes_edit($id = 0, $chk = '') {
+		$modal = 'produtos';
+		/* Load Model */
+		$this -> load -> model($modal);
+
+		/* Controller */
+		$this -> cab();
+		$saved = $this -> $modal -> editar_produto($id, $chk);
+		$this -> footer();
+
+		/****************/
+		if ($saved > 0) {
+			redirect(base_url('index.php/main/produtos_nomes'));
+		}
+	}
+
+	function produtos_nomes_view($id = '') {
+		/* Load Model */
+		$model = 'produtos';
+		$this -> load -> model($model);
+
+		/* Controller */
+		$this -> cab();
+		$data = $this -> $model -> le_descricao($id);
+		$this -> load -> view('produto/view_pn', $data);
+
+		$data['title'] = '';
+		$data['content'] = $this -> produtos -> lista_produtos_descricao($id);
+		$data['content'] .= $this -> load -> view('produto/descricao_novo', $data, True);
+
+		$this -> load -> view('content', $data);
+		$this -> footer();
+	}
+
 	/************************************************************************* PRODUTOS CATEGORIA *****************/
 	function produtos_categoria() {
 		/* Load Model */
@@ -783,6 +820,49 @@ class Main extends CI_Controller {
 		$this -> load -> view('content', $data);
 		$this -> footer();
 	}
+	
+	/************************************************************************* PRODUTOS MODELO *****************/
+	function produtos_modelo() {
+		/* Load Model */
+		$model = 'produtos';
+		$this -> load -> model('produtos');
+
+		/* Controller */
+		$this -> cab();
+		$data = array();
+		$data['title'] = 'Modelo dos produtos';
+		$data['content'] = $this -> $model -> row_modelos();
+		$this -> load -> view('content', $data);
+		$this -> footer();
+	}
+
+	function produtos_modelos_edit($id = 0, $chk = '') {
+		$modal = 'produtos';
+		/* Load Model */
+		$this -> load -> model($modal);
+
+		/* Controller */
+		$this -> cab();
+		$saved = $this -> $modal -> editar_modelos($id, $chk);
+		$this -> footer();
+
+		/****************/
+		if ($saved > 0) {
+			redirect(base_url('index.php/main/produtos_modelo'));
+		}
+	}
+
+	function produtos_modelos_view($id, $chk) {
+		/* Load Model */
+		$model = 'produtos';
+		$this -> load -> model($model);
+
+		/* Controller */
+		$this -> cab();
+		$data = $this -> $model -> le_modelos($id);
+		$this -> load -> view('modelos/show', $data);
+		$this -> footer();
+	}	
 
 	/************************************************************************* PRODUTOS MARC *****************/
 	function produtos_marca() {
@@ -826,9 +906,8 @@ class Main extends CI_Controller {
 		$this -> load -> view('marca/show', $data);
 		$this -> footer();
 	}
-	
-	function produtos_movimentacao($tipo='')
-		{
+
+	function produtos_movimentacao($tipo = '') {
 		/* Load Model */
 		$model = 'produtos';
 		$this -> load -> model($model);
@@ -840,38 +919,34 @@ class Main extends CI_Controller {
 		$this -> cab();
 		$data['dados_produto'] = '';
 		$data['title'] = 'Consulta produto';
-		
-		if (strlen($acao) > 0)
-			{
-				$cod = substr($cod,0,7);
-				$cod = strzero($cod,7);
-				
-				$data2 = $this->$model->le_produto_ean($cod);
-				if (count($data2) > 0)
-					{
-						$data['dados_produto'] = $this->load->view('produto/view_6',$data2,true);
-						switch ($tipo)
-							{
-							case '1':
-								/* Entrada na filial */	
-								$data['title'] = 'Entrada de produto na unidade';		
-								$this->$model->movimenta_para_estoque($data2['id_pr']);
-								break;
-							default:
-								break;
-							}
-					} else {
-						$data['erro'] = 'Código Inválido<br>'.$cod;
-						$data['dados_produto'] = $this->load->view('alert',$data,true);
-					}	
+
+		if (strlen($acao) > 0) {
+			$cod = substr($cod, 0, 7);
+			$cod = strzero($cod, 7);
+
+			$data2 = $this -> $model -> le_produto_ean($cod);
+			if (count($data2) > 0) {
+				$data['dados_produto'] = $this -> load -> view('produto/view_6', $data2, true);
+				switch ($tipo) {
+					case '1' :
+						/* Entrada na filial */
+						$data['title'] = 'Entrada de produto na unidade';
+						$this -> $model -> movimenta_para_estoque($data2['id_pr']);
+						break;
+					default :
+						break;
+				}
+			} else {
+				$data['erro'] = 'Código Inválido<br>' . $cod;
+				$data['dados_produto'] = $this -> load -> view('alert', $data, true);
 			}
-		
-		
-		$data['cod'] = $cod;
-		$data['content'] = $this->load->view('produto/leitor_codigo',$data,true);
-		$this->load->view('content',$data);
-		$this -> footer();
 		}
+
+		$data['cod'] = $cod;
+		$data['content'] = $this -> load -> view('produto/leitor_codigo', $data, true);
+		$this -> load -> view('content', $data);
+		$this -> footer();
+	}
 
 	function myaccount() {
 		$id = $_SESSION['id'];
@@ -917,14 +992,26 @@ class Main extends CI_Controller {
 		$data['nocab'] = true;
 		$this -> cab($data);
 
-		$cp = $this -> produtos -> cp_item_patrimonio();
+		$cp = $this -> produtos -> cp_item_patrimonio($id);
 		$form = new form;
 		$form -> id = $id;
+
 		$tela = $form -> editar($cp, $this -> produtos -> table);
-		$_POST['dd2'] = get("prod");
+		//$_POST['dd3'] = get("prod");
 
 		if ($form -> saved > 0) {
-			$this->produtos->updatex();
+			$quant = round(get("dd7"));
+			/* Multiplas entradas */
+			if (strlen($id)==0)
+				{
+					$s = get("dd6");
+					for ($z=2;$z <= $quant;$z++)
+						{
+							$_POST['dd6'] = $s.'#'.$z;
+							$tela = $form -> editar($cp, $this -> produtos -> table);			
+						}
+				}
+			$this -> produtos -> updatex();
 			$data['title'] = '';
 			$data['content'] = '<script> wclose(); </script>';
 			$this -> load -> view('content', $data);
@@ -934,15 +1021,14 @@ class Main extends CI_Controller {
 			$this -> load -> view('content', $data);
 		}
 	}
-	
-	function produtos_etiquetas()
-		{
-			$filename = 'etiqueta.prn';
-			header("Content-Type: application/force-download");
-			header("Content-Disposition: attachment; filename=" . $filename);
-			$this -> load -> model('produtos');
-			$this->produtos->etiquetas();
-		}
+
+	function produtos_etiquetas() {
+		$filename = 'etiqueta.prn';
+		header("Content-Type: application/force-download");
+		header("Content-Disposition: attachment; filename=" . $filename);
+		$this -> load -> model('produtos');
+		$this -> produtos -> etiquetas();
+	}
 
 	function produto_view($id = '') {
 		/* Load Model */
@@ -1241,30 +1327,26 @@ class Main extends CI_Controller {
 		$this -> load -> model('contratos');
 		$this -> load -> model('pedidos');
 		$this -> load -> model('empresas');
-		
+
 		$data = $this -> contratos -> le($id);
-		$data2 = $this->pedidos->le($id);
-		$data3 = $this->empresas->le(1);
+		$data2 = $this -> pedidos -> le($id);
+		$data3 = $this -> empresas -> le(1);
 
 		//$data2 = $this->filiais->le(1);
-		$data = array_merge($data,$data2,$data3);
-		$anexo = $this->contratos->anexos($id);
+		$data = array_merge($data, $data2, $data3);
+		$anexo = $this -> contratos -> anexos($id);
 		$condicoes = '';
-		
-		$contrato = $data['c_contrato'];
-		$contrato = troca($contrato,'$LOCATARIO_DADOS',$this->load->view('contrato/contrato_locatario',$data,true));
-		$contrato = troca($contrato,'$LOCADORA_DADOS',$this->load->view('contrato/contrato_locador',$data,true));
-		$contrato = troca($contrato,'$EQUIPAMENTOS', $anexo);
-		$contrato = troca($contrato,'$CONDICOES', $condicoes);
-		$contrato = troca($contrato,'$LOCATARIA',$data['f_razao_social']);
-		$contrato = troca($contrato,'$LOCADORA',$data['f_razao_social']);
-		
-		$data['content'] = $contrato;
-		
-		
-		
 
-		
+		$contrato = $data['c_contrato'];
+		$contrato = troca($contrato, '$LOCATARIO_DADOS', $this -> load -> view('contrato/contrato_locatario', $data, true));
+		$contrato = troca($contrato, '$LOCADORA_DADOS', $this -> load -> view('contrato/contrato_locador', $data, true));
+		$contrato = troca($contrato, '$EQUIPAMENTOS', $anexo);
+		$contrato = troca($contrato, '$CONDICOES', $condicoes);
+		$contrato = troca($contrato, '$LOCATARIA', $data['f_razao_social']);
+		$contrato = troca($contrato, '$LOCADORA', $data['f_razao_social']);
+
+		$data['content'] = $contrato;
+
 		$this -> load -> view('contrato/contrato_pdf', $data);
 	}
 

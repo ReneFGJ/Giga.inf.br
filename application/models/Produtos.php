@@ -5,6 +5,9 @@ class produtos extends CI_model {
 	var $table_tipo_2 = '(select * from produtos_tipo LEFT JOIN produtos_marca ON pr_marca = id_ma) as produtos_tipo ';
 	var $table_categoria = 'produtos_categoria';
 	var $table_marca = 'produtos_marca';
+	var $table_descricao = 'produto_nome';
+	var $table_modelo = 'produto_modelo';
+		
 	var $table_produto = '(SELECT * FROM produtos
 							LEFT JOIN produtos_situacao ON pr_ativo = id_ps
 							LEFT JOIN clientes ON pr_cliente = id_f
@@ -49,6 +52,14 @@ class produtos extends CI_model {
 			return ( array());
 		}
 	}
+	
+	function le_descricao($id) {
+		$sql = "select * from " . $this -> table_descricao . " where id_pn = " . round($id);
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$line = $rlt[0];
+		return ($line);
+	}	
 
 	function le_produto_ean($id) {
 		$sql = "select * from " . $this -> table . "
@@ -120,6 +131,7 @@ class produtos extends CI_model {
 		$total = $rlt[0]['total'];
 
 		$sql = "select * from produtos
+						LEFT JOIN produto_nome ON id_pn = pr_produto
 						LEFT JOIN produtos_categoria ON id_pc = pr_categoria
 						LEFT JOIN produtos_situacao ON id_ps = pr_ativo
 						LEFT JOIN _filiais ON pr_filial = id_fi
@@ -133,10 +145,11 @@ class produtos extends CI_model {
 		$sx .= '<tr class="middle"><td colspan=9>Total Recuperado ' . $total . '</td></tr>' . cr();
 		$sx .= '<tr class="small">' . cr();
 		$sx .= '	<th colspan="1" width="2%"><b>#</b></th>' . cr();
-		$sx .= '	<th colspan="1" width="33%"><b>Produto</b></th>' . cr();
+		$sx .= '	<th colspan="1" width="18%"><b>Produto</b></th>' . cr();
+		$sx .= '	<th colspan="1" width="18%"><b>Modelo</b></th>' . cr();
 		$sx .= '	<th colspan="1" width="10%"><b>Serial</b></th>' . cr();
 		$sx .= '	<th colspan="2" width="10%"><b>Característica</b></th>' . cr();
-		$sx .= '	<th colspan="5" width="45%"><b>Situação / Filial</b></th>' . cr();
+		$sx .= '	<th colspan="5" width="35%"><b>Situação / Filial</b></th>' . cr();
 		$sx .= '</tr>' . cr();
 		$ID = 0;
 		for ($r = 0; $r < count($rlt); $r++) {
@@ -146,6 +159,9 @@ class produtos extends CI_model {
 			$sx .= '	<td class="small" >';
 			$sx .= strzero($ID, 3) . '. ';
 			$sx .= '	</td>' . cr();
+			$sx .= '	<td >';
+			$sx .= $line['pn_descricao'];
+			$sx .= '	</td>' . cr();			
 			$sx .= '	<td >';
 			$sx .= $line['pr_modelo'];
 			$sx .= '	</td>' . cr();
@@ -221,7 +237,11 @@ class produtos extends CI_model {
 		$cp = array();
 		array_push($cp, array('$H8', 'id_prd', '', False, True));
 		array_push($cp, array('$A', '', 'Dados do produto', False, True));
-		array_push($cp, array('$S80', 'pr_nome', 'Nome do produto', True, True));
+		
+		$sql = "select * from produto_nome where pn_ativo = 1 order by pn_descricao";
+		array_push($cp, array('$Q id_pn:pn_descricao:' . $sql, 'pr_produto', 'Prodto', True, True));
+		
+		//array_push($cp, array('$S80', 'pr_nome', 'Nome do produto', True, True));
 		array_push($cp, array('$S40', 'pr_serial', 'Nº de Série', False, True));
 		array_push($cp, array('$S40', 'pr_patrimonio', 'Nº do patrimonio', False, True));
 		$sql = "select * from produtos_marca where ma_ativo = 1 order by ma_nome";
@@ -243,20 +263,38 @@ class produtos extends CI_model {
 		return ($cp);
 	}
 
-	function cp_item_patrimonio() {
+	function cp_item_patrimonio($id='') {
 		$cp = array();
 		array_push($cp, array('$H8', 'id_prd', '', False, True));
 		array_push($cp, array('$A', '', 'Dados do produto', False, True));
-		array_push($cp, array('$S80', 'pr_modelo', 'Produto', True, True));
+		
+
+		$sql = "select * from produtos_categoria where pc_ativo = 1 order by id_pc";
+		array_push($cp, array('$Q id_pc:pc_nome:' . $sql, 'pr_categoria', 'Categoria', True, True));	
+		
+		$sql = "select * from produto_nome where pn_ativo = 1 order by pn_descricao";
+		array_push($cp, array('$Q id_pn:pn_descricao:' . $sql, 'pr_produto', 'Prodto (Tipo)', True, True));
+		
+		$sql = "select * from produtos_marca where ma_ativo = 1 order by id_ma";
+		array_push($cp, array('$Q id_ma:ma_nome:' . $sql, 'pr_marca', 'Marca', True, True));		
+				
+		//array_push($cp, array('$S80', 'pr_modelo', 'Modelo', True, True));
+		$sql = "select * from produto_modelo where pm_ativo = 1 order by pm_descricao";
+		
+		array_push($cp, array('$Q pm_descricao:pm_descricao:' . $sql, 'pr_modelo', 'Modelo', True, True));		
+		
 		array_push($cp, array('$S40', 'pr_serial', 'Nº de Série', False, True));
 		//array_push($cp, array('$S40', 'pr_patrimonio', 'Nº do patrimonio', False, True));
 		//array_push($cp, array('$S40', 'pr_tag', 'Nº do Tag', False, True));
 
-		$sql = "select * from produtos_marca where ma_ativo = 1 order by id_ma";
-		array_push($cp, array('$Q id_ma:ma_nome:' . $sql, 'pr_marca', 'Marca', True, True));
-
-		$sql = "select * from produtos_categoria where pc_ativo = 1 order by id_pc";
-		array_push($cp, array('$Q id_pc:pc_nome:' . $sql, 'pr_categoria', 'Categoria', True, True));
+		if (strlen($id) == 0)
+			{
+				array_push($cp, array('$[1-999]', '', 'Quantidade de itens', True, True));
+			} else {
+				array_push($cp, array('$HV', '', '0', True, True));				
+			}
+		
+		array_push($cp, array('$T80:5', 'pm_obs', 'Observação do produtos', False, True));
 
 		$sql = "select * from _filiais where fi_ativo = 1 order by id_fi";
 		array_push($cp, array('$Q id_fi:fi_nome_fantasia:' . $sql, 'pr_filial', 'Filial', True, True));
@@ -273,6 +311,31 @@ class produtos extends CI_model {
 		return ($cp);
 	}
 
+	function cp_produtos() {
+		$cp = array();
+		array_push($cp, array('$H8', 'id_pn', '', False, True));
+		array_push($cp, array('$A', '', 'Descrição do produto', False, True));
+		array_push($cp, array('$S80', 'pn_descricao', 'Nome do produto', True, True));
+
+		$sql = "select * from produtos_situacao where ps_ativo = 1 order by id_ps";
+		array_push($cp, array('$O 1:Ativo&0:Inativo', 'pn_ativo', 'Situação', True, True));
+
+		array_push($cp, array('$B8', '', 'Gravar', False, True));
+		return ($cp);
+	}
+	
+	function cp_modelos() {
+		$cp = array();
+		array_push($cp, array('$H8', 'id_pm', '', False, True));
+		array_push($cp, array('$A', '', 'Descrição do modelo', False, True));
+		array_push($cp, array('$S80', 'pm_descricao', 'Nome do modelo', True, True));
+
+		$sql = "select * from produtos_situacao where ps_ativo = 1 order by id_ps";
+		array_push($cp, array('$O 1:Ativo&0:Inativo', 'pm_ativo', 'Situação', True, True));
+
+		array_push($cp, array('$B8', '', 'Gravar', False, True));
+		return ($cp);
+	}	
 	function cp() {
 		$cp = array();
 		array_push($cp, array('$H8', 'id_prd', '', False, True));
@@ -355,6 +418,45 @@ class produtos extends CI_model {
 		return ($cp);
 	}
 
+	function row_descricao($id = '') {
+		$form = new form;
+
+		$form -> fd = array('id_pn', 'pn_descricao', 'pn_ativo');
+		$form -> lb = array('id', msg('pc_nome'), msg('pc_ativo'));
+		$form -> mk = array('', 'L', 'A');
+
+		$form -> tabela = $this -> table_descricao;
+		$form -> see = true;
+		$form -> novo = true;
+		$form -> edit = true;
+
+		$form -> row_edit = base_url('index.php/main/produtos_nomes_edit');
+		$form -> row_view = base_url('index.php/main/produtos_nomes_view');
+		$form -> row = base_url('index.php/main/produtos_nomes');
+
+		return (row($form, $id));
+	}
+	
+	function row_modelos($id = '') {
+		$form = new form;
+
+		$form -> fd = array('id_pm', 'pm_descricao', 'pm_ativo');
+		$form -> lb = array('id', msg('pc_nome'), msg('pc_ativo'));
+		$form -> mk = array('', 'L', 'A');
+
+		$form -> tabela = $this -> table_modelo;
+		$form -> see = true;
+		$form -> novo = true;
+		$form -> edit = true;
+
+		$form -> row_edit = base_url('index.php/main/produtos_modelos_edit');
+		$form -> row_view = base_url('index.php/main/produtos_modelos_view');
+		$form -> row = base_url('index.php/main/produtos_modelos');
+
+		return (row($form, $id));
+	}	
+	
+	
 	function row_categoria($id = '') {
 		$form = new form;
 
@@ -383,7 +485,25 @@ class produtos extends CI_model {
 		$this -> load -> view('content', $data);
 		return ($form -> saved);
 	}
-
+	
+	function editar_produto($id, $chk) {
+		$form = new form;
+		$form -> id = $id;
+		$cp = $this -> cp_produtos();
+		$data['title'] = '';
+		$data['content'] = $form -> editar($cp, $this -> table_descricao);
+		$this -> load -> view('content', $data);
+		return ($form -> saved);
+	}
+	
+	/************************************************************************** PRODUTOS MODELO ****************************/
+	function le_modelos($id) {
+		$sql = "select * from " . $this -> table_modelo . " where id_pm = " . round($id);
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$line = $rlt[0];
+		return ($line);
+	}
 	/************************************************************************** PRODUTOS MARCA ****************************/
 	function le_marca($id) {
 		$sql = "select * from " . $this -> table_marca . " where id_ma = " . round($id);
@@ -472,6 +592,16 @@ class produtos extends CI_model {
 		return ($form -> saved);
 	}
 
+	function editar_modelos($id, $chk) {
+		$form = new form;
+		$form -> id = $id;
+		$cp = $this -> cp_modelos();
+		$data['title'] = '';
+		$data['content'] = $form -> editar($cp, $this -> table_modelo);
+		$this -> load -> view('content', $data);
+		return ($form -> saved);
+	}
+
 	function etiquetas() {
 		$sql = "select * from produtos 
 						WHERE pr_etiqueta = 1
@@ -522,6 +652,46 @@ class produtos extends CI_model {
 
 	function lista_produtos_categoria($id) {
 		$sql = 'select * from ' . $this -> table_produto . ' WHERE id_pc = ' . round($id);
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$sx = '<table width="100%" class="table">' . cr();
+		$sx .= '<tr>
+						<th>descrição</th>
+						<th>nº patrimonio</th>
+						<th>nº série</th>
+						<th>situação</th>
+					</tr>';
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$link = base_url('index.php/main/produto_view/' . $line['id_pr'] . '/' . checkpost_link($line['id_pr']));
+			$link = '<a href="' . $link . '">';
+			$sx .= '<tr class="' . $line['ps_class'] . '">';
+			$sx .= '<td>';
+			$sx .= $link . $line['prd_nome'] . '</a>';
+			$sx .= '</td>';
+
+			$sx .= '<td>';
+			$sx .= $line['pr_patrimonio'];
+			$sx .= '</td>';
+
+			$sx .= '<td>';
+			$sx .= $line['pr_serial'];
+			$sx .= '</td>';
+
+			$sx .= '<td>';
+			$sx .= $line['ps_descricao'];
+			$sx .= '</td>';
+
+			$sx .= '</tr>' . cr();
+		}
+		$sx .= '</table>' . cr();
+		return ($sx);
+	}
+
+	function lista_produtos_descricao($id) {
+		$sql = 'select * from ' . $this -> table_produto . '
+					inner join produto_nome on id_pn = pr_produto 
+					WHERE pr_produto = ' . round($id);
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		$sx = '<table width="100%" class="table">' . cr();
@@ -715,6 +885,7 @@ class produtos extends CI_model {
 	function updatex() {
 		$sql = "update produtos set pr_patrimonio = lpad(id_pr,7,0) where pr_patrimonio = '' or pr_patrimonio is null";
 		$rlt = $this -> db -> query($sql);
+
 	}
 
 }

@@ -118,15 +118,20 @@ $us_nome = $_SESSION['user'];
 			<a href="<?php echo base_url('index.php/main/clientes'); ?>">Clientes</a>
 			</li>
 			<li>
-			<a href="<?php echo base_url('index.php/main/produtos_categoria'); ?>">Produto - Categoria</a>
+			<a href="<?php echo base_url('index.php/main/produtos_categoria'); ?>">Produtos - Categoria</a>
+			</li>
+			<li>
+			<a href="<?php echo base_url('index.php/main/produtos_nomes'); ?>">Produtos - Nomes</a>
 			</li>
 			<li>
 			<a href="<?php echo base_url('index.php/main/produtos_marca'); ?>">Produtos - Marcas</a>
 			</li>
 			<li>
-			<a href="<?php echo base_url('index.php/main/produtos_cadastrar'); ?>">Produto - Equipamento (itens)</a>
+			<a href="<?php echo base_url('index.php/main/produtos_modelo'); ?>">Produtos - Modelos</a>
+			</li>			
+			<li>
+			<a href="<?php echo base_url('index.php/main/produtos_cadastrar'); ?>">Produtos - Equipamento (itens)</a>
 			</li>
-
 			<li role="separator" class="divider"></li>
 			<li>
 			<a href="<?php echo base_url('index.php/main/prazo_entrega'); ?>">Condições - Prazo de entrega</a>
