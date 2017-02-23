@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category	Helpers
  * @author		Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link		http://www.sisdoc.com.br/CodIgniter
- * @version		v0.17.02.02
+ * @version		v0.17.02.23
  */
 $dd = array();
 
@@ -1424,11 +1424,11 @@ if (!function_exists('form_edit')) {
 					$link = '';
 					$linkf = '';
 				}
-				$data .= chr(15) . '<td ' . $mskm . '>' . $link . '<font ' . $style . '>' . trim($row[$flds]) . '</font>' . $linkf . '</td>';
+				$data .= '<td ' . $mskm . '>' . $link . '<font ' . $style . '>' . trim($row[$flds]) . '</font>' . $linkf . '</td>';
 			}
 			if ($obj -> edit == True) {
 				$idr = trim($row[$fd[0]]);
-				$data .= chr(15) . '<td width="1%" align="center"><A HREF="' . $obj -> row_edit . '/' . $idr . '/' . checkpost_link($idr) . '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></td>';
+				$data .= '<td width="1%" align="center"><A HREF="' . $obj -> row_edit . '/' . $idr . '/' . checkpost_link($idr) . '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></td>';
 			}
 			$data .= '</tr>' . chr(13) . chr(10);
 		}
