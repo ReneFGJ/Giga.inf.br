@@ -34,14 +34,17 @@ if (!file_exists($pict)) {
 				echo '<ul class="item_menu">' . cr();
 				echo '<li><a href="' . base_url('index.php/main/change_password') . '" class="middle">Alterar senha</a></li>';
 				echo '<li><a href="' . base_url('index.php/main/change_my_email') . '" class="middle">Alterar e-mail</a></li>';
-				echo '<li><a href="' . base_url('index.php/main/change_my_data') . '" class="middle">Atualizar dados pessoais</a></li>';
+				echo '<li><a href="' . base_url('index.php/admin/user_drh_edit') . '" class="middle">Atualizar dados pessoais</a></li>';
 				echo '<li><a href="' . base_url('index.php/main/change_my_sign') . '" class="middle">Atualizar assinatura comercial</a></li>';
+				echo '<li><a href="' . base_url('index.php/main/change_my_picture/'.$id_us.'/'.checkpost_link($id_us)) . '" class="middle">Atualizar fotografia</a></li>';
 				echo '</ul>' . cr();
 			}
-			if (perfil("#ADM"))
+			if (perfil("#ADM#DRH"))
 				{
 				echo '<ul class="item_menu">' . cr();
 				echo '<li><a href="' . base_url('index.php/admin/user_reset_password/'.$id_us.'/'.checkpost_link($id_us)) . '" class="middle">Gerar nova senha</a></li>';
+                echo '<li><a href="'.base_url('index.php/admin/user_drh_edit/'.$id_us.'/'.checkpost_link($id_us)).'" class="middle">'.msg('edit_person_data').'</a></li>';
+                echo '<li><a href="' . base_url('index.php/main/change_my_picture/'.$id_us.'/'.checkpost_link($id_us)) . '" class="middle">Atualizar fotografia</a></li>';                                
 				echo '</ul>' . cr();					
 				}
 			?>
@@ -85,8 +88,8 @@ if (!file_exists($pict)) {
 			<font class="middle"><?php echo $fi_razao_social; ?>&nbsp;</font><br>
 			<font class="small">Cargo / departamento</font><br>
 			<font class="middle"><?php echo $usd_cargo . ' / ' . $usd_departamento; ?>&nbsp;</font><br>
-			<font class="small">Dt. adminssão</font><br>
-			<font class="middle"><?php echo stodbr($usd_dt_admissao); ?>&nbsp;</font><br>
+			<font class="small">Dt. adminssão / demissão</font><br>
+			<font class="middle"><?php echo stodbr($usd_dt_admissao); ?>&nbsp;</font> - <?php echo stodbr($usd_dt_demissao); ?>&nbsp;</font><br>
 			<font class="small">Crachá</font><br>
 			<font class="middle"><?php echo($us_badge); ?>&nbsp;</font><br>			
 		</div>

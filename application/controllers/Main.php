@@ -966,6 +966,25 @@ class Main extends CI_Controller {
 		$data['content'] = $this -> users -> change_password($id);
 		$this -> load -> view('content', $data);
 	}
+    
+    function change_my_picture($id='',$chk='')
+        {
+        if (strlen($id) == 0)
+            {
+                $id = $_SESSION['id'];
+                $chk = checkpost_link($id);        
+            }
+        $this->load->model('users');
+        $data = $this->users->le($id);
+        $data['picture'] = $this->users->picture($id);  
+
+        $this -> cab();
+        $data['title'] = '';
+
+        $data['content'] = $this -> users -> change_picture($id);
+        $this -> load -> view('content', $data);
+            
+        }
 
 	function change_my_email() {
 		$id = $_SESSION['id'];

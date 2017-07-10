@@ -244,11 +244,55 @@ class Admin extends CI_controller {
 	}
 
 	function user($id, $chk = '') {
+	    $this->load->model('users');
+        $this->users->le($id);
+        $data['content'] = $this -> users -> my_account($id);
+        
 		$this -> cab();
 		$data['title'] = '';
 		$data['content'] = $this -> users -> my_account($id);
+        
+        $tela = '';
+        $data['content'] .= $tela;
 		$this -> load -> view('content', $data);
 	}
+    
+    function user_drh_edit($id='',$chk='') 
+        {
+            if (strlen($id) == 0)
+                {
+                    $id = $_SESSION['id'];
+                    $chk = checkpost_link($id);
+                }            
+            
+            $this->load->model('users');
+            $this->load->model('user_drh');
+            $this -> cab();
+            $data = $this->users->le($id);
+            $data['title'] = '';
+            
+
+            
+            $tela = 'Acesso não permitido!';
+            if ((perfil("#ADM#DRH")) or ($id == $_SESISSION['id']))
+                {                  
+                    $tabela = 'user_drh';
+                    $cp = $this->user_drh->cp($id);
+                    $form = new form;
+                    $form->id = $id;
+                    
+                    $tela = $this->load->view('user/user_simple',$data,true);
+                    $tela .= $form->editar($cp,$tabela);
+                    $data['content'] = $tela;
+                    $this -> load -> view('content', $data);
+                    
+                    if ($form->saved > 0)
+                        {
+                            redirect(base_url('index.php/admin/user/'.$id.'/'.$chk));
+                        }
+                    
+                }
+        }
 
 	function user_reset_password($id = 0, $chk = '') {
 		if (perfil("#ADM#DRH")) {

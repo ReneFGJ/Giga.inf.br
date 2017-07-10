@@ -43,7 +43,7 @@ $week_day = name_weekday(date("w",$data));
 			<table align="center">
 				<tr>
 					<td style="padding: 10px;"><a href="<?php echo $lk_new;?>" title="parcela única"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></a></td>
-					<td style="padding: 10px;"><a href="<?php echo $lk_new_multi;?>" title="Multiplas parcelas"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></a></td>
+					<td style="padding: 10px;"><a href="<?php echo $lk_new_multi;?>" title="Multiplas parcelas"><span class="glyphicon glyphicon-plus" aria-hidden="true"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></td>
 					<td style="padding: 10px;"><a href="<?php echo $lk_search;?>"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a></td>
 					<td style="padding: 10px;"><a href="<?php echo $lk_refresh;?>"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></a></td>
 					<td style="padding: 10px;"><a href="#"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></a></td>

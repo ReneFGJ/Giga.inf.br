@@ -35,6 +35,7 @@ $lang['login_password'] = 'Informe sua senha';
 $lang['login_enter'] = 'Entar';
 $lang['login_social'] = 'Logue com uma conta existente (recomendado)';
 $lang['your_passoword'] = 'sua senha';
+$lang['edit_person_data'] = 'Editar dados pessoais';
 
 $lang['bt_new'] = 'novo';
 $lang['bt_search'] = 'busca';
