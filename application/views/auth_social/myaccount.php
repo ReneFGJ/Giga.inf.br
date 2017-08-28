@@ -26,7 +26,11 @@ if (!file_exists($pict)) {
 			
 			<br><br>
 			<font class="small">login</font><br>
-			<font class="middle"><?php echo $us_login; ?></font>			
+			<font class="middle"><?php echo $us_login; ?></font>
+			
+            <br><br>
+            <font class="small">Data nascimento</font><br>
+            <font class="middle"><?php echo stodbr($usd_nascimento); ?></font>						
 
 			<hr>
 			<?php

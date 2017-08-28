@@ -20,7 +20,7 @@ $dd2 = get("dd2");
 	<div class="col-lg-12">	
 		<font class="supersmall"><?php echo msg('categoria');?></font>	
 				<select class="form-control" name="dd2" call="form-control">
-					<option value=""  style="width: 100%;">::Todas as categorias</option>
+					<option value=""  style="width: 100%;">::Todas as descrições</option>
 					<?php
 					$sql = "select * from produtos_categoria where pc_ativo = 1 order by pc_nome ";
 					$rlt = $this->db->query($sql);

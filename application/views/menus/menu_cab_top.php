@@ -118,7 +118,7 @@ $us_nome = $_SESSION['user'];
 			<a href="<?php echo base_url('index.php/main/clientes'); ?>">Clientes</a>
 			</li>
 			<li>
-			<a href="<?php echo base_url('index.php/main/produtos_categoria'); ?>">Produtos - Categoria</a>
+			<a href="<?php echo base_url('index.php/main/produtos_categoria'); ?>">Produtos - Descrição</a>
 			</li>
 			<li>
 			<a href="<?php echo base_url('index.php/main/produtos_nomes'); ?>">Produtos - Nomes</a>

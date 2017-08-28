@@ -1,5 +1,5 @@
 <?php
-$msg_total = '<span class="badge"><?php echo $mensagens_total;?></span>';
+$msg_total = '<span class="badge">'.$mensagens_total.'</span>';
 if ($mensagens_total == 0)
 	{
 		$msg_total = '<span>&nbsp;</span>';

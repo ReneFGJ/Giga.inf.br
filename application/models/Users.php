@@ -123,6 +123,42 @@ class users extends CI_model {
         }
     }
 
+    function user_list($id='')
+        {
+           $sql = "select * from users
+                        LEFT JOIN user_drh on id_us = usd_id_us
+                        LEFT JOIN _filiais ON id_fi = usd_empresa
+                        WHERE us_ativo = 1
+                    ORDER BY fi_nome_fantasia, us_nome  
+                    ";
+           $rlt = $this->db->query($sql);
+           $rlt = $rlt->result_array();
+           $sx = '<table width="100%" class="table middle">';
+           $xemp = '';
+           $nr = 1;
+           for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $emp = $line['fi_razao_social'];
+                    
+                    if ($xemp != $emp)
+                        {
+                            $nr = 1;
+                            $sx .= '<tr><td colspan=5 class="big">'.$emp.'</td></tr>';
+                            $xemp = $emp;                            
+                        }
+                    
+                    $sx .= '<tr>';
+                    $sx .= '<td align="center">'.$nr.'</td>';
+                    $sx .= '<td>'.$line['us_nome'].'</td>';
+                    
+                    $nr++;
+                } 
+           $sx .= '</table>';
+                   
+           return($sx);
+        }
+
     function picture($id = '') {
         $us_badge = strzero($id, 5);
         $pict = 'img/picture/photo-' . $us_badge . '.jpg';

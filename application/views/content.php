@@ -1,9 +1,14 @@
 <?php
+echo cr();
+echo '<!--- div start --->'.cr();
+echo cr();
+
+if (!isset($class)) { $class = ''; }
 if (isset($br) and ($br == true)) { echo '<br>'; }
 if (isset($fluid) == 1) {
-	echo '<div class="container-fluid">' . cr();
+	echo '<div class="container-fluid" class="'.$class.'">' . cr();
 } else {
-	echo '<div class="container">' . cr();
+	echo '<div class="container" class="'.$class.'">' . cr();
 }
 /*********** TITLE ************/
 if (isset($title)) {
@@ -16,4 +21,8 @@ if (isset($title)) {
 /************ CONTENT *************/
 echo $content;
 echo '</div>';
+
+echo cr();
+echo '<!--- div stop --->'.cr();
+echo cr();
 ?>

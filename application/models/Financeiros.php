@@ -353,6 +353,11 @@ class financeiros extends CI_model {
 
 		array_push($cp, array('$S80', 'cp_nossonumero', 'Cod.Barras / Nosso Nº', False, True));
 		array_push($cp, array('$C', 'cp_previsao', 'Previsão (SIM)', False, true));
+        
+        if ($id > 0)
+            {
+                array_push($cp, array('$C', 'cp_recebivel', 'Título pagável', False, true));
+            }        
 
 		array_push($cp, array('$B8', '', 'Salvar >>>', false, true));
 		return ($cp);
@@ -416,6 +421,10 @@ class financeiros extends CI_model {
 
 		array_push($cp, array('$S80', 'cp_nossonumero', 'Cod.Barras / Nosso Nº', False, True));
 		array_push($cp, array('$C', 'cp_previsao', 'Previsão (SIM)', False, true));
+        if ($id > 0)
+            {
+                array_push($cp, array('$C', 'cp_recebivel', 'Título recebivel', False, true));
+            }
 		
 		
 
@@ -662,6 +671,13 @@ class financeiros extends CI_model {
 			$wh .= " AND (cp_vencimento >='" . $t3 . "') ";
 		}
 		$wh .= ' and cp_situacao = 1 ';
+        
+        if (isset($data['recebiveis']))
+            {
+                $wh .= ' and (cp_recebivel = 0) ';
+            } else {
+                $wh .= ' and (cp_recebivel = 1) ';
+            }
 		$t4 = trim(get("dd2"));
 		if (isset($data['ate']))
 			{
@@ -692,7 +708,7 @@ class financeiros extends CI_model {
 							left join clientes ON id_f = cp_fornecedor
 							where 1=1
 							$wh
-						order by cp_vencimento, cp_valor desc 
+						order by cp_vencimento desc, cp_valor desc 
 						limit 200
 						";
 

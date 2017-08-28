@@ -177,9 +177,23 @@ class Admin extends CI_controller {
 		$this -> cab();
 		$data = array();
 		$data['title'] = 'Usuários do sistema';
-		$data['content'] = $this -> $model -> row($id);
+        $data['content'] = 'Relatórios: <a href="'.base_url('index.php/admin/users_list').'">funcionários</a> |';
+		$data['content'] .= $this -> $model -> row($id);
 		$this -> load -> view('content', $data);
 	}
+
+    function users_list($id='') {
+        /* Load Model */
+        $model = 'users';
+        $this -> load -> model($model);
+
+        /* Controller */
+        $this -> cab();
+        $data = array();
+        $data['title'] = 'Funcionários';
+        $data['content'] = $this -> $model -> user_list($id);
+        $this -> load -> view('content', $data);
+    }
 
 	function user_edit($id = 0, $chk = '') {
 		/* Load Model */

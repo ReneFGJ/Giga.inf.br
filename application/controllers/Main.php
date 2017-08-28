@@ -38,8 +38,17 @@ class Main extends CI_Controller {
 	}
 
 	function index() {
+	    $this->load->model("user_drh");
+        
 		$this -> cab();
 		$this -> load -> view('home', null);
+        
+        $data['content'] = $this->user_drh->aniversariantes();
+        $data['title'] = '';
+        if (strlen($data['content']) > 0)
+            {
+                $this->load->view('content',$data);
+            }
 		$this -> footer();
 	}
 
@@ -150,6 +159,20 @@ class Main extends CI_Controller {
 		$idp = $this -> pedidos -> pedido_novo($id, $tipo);
 		redirect(base_url('index.php/main/pedido_editar/' . $idp . '/' . checkpost_link($id)));
 	}
+    
+    function pedido_enviar_email($id)
+        {
+        $editar = 1;
+        $this->load->library('tcpdf');
+        /* Load Model */
+        $this -> load -> model('clientes');
+        $this -> load -> model('pedidos');       
+        
+        $this->pedidos->pedido_pdf($id);
+        return('');
+
+   
+        }
 
 	function pedido_editar($id) {
 		$editar = 1;
@@ -203,10 +226,11 @@ class Main extends CI_Controller {
 		$data['dados_item'] .= $this -> load -> view('pedido/pedido_item', $data, true);
 		$data['dados_condicoes'] = $this -> pedidos -> pedido_condicoes($id, $editar);
 
+        /* contatos do pedido */
 		$data['contatos'] = $this -> pedidos -> contatos_do_pedido($id, $id_cliente, $editar);
+        
 		/* habilita cancelamento */
 		$data['pp_situacao'] = 0;
-
 		$data['dados_acoes'] = $this -> pedidos -> pedido_acoes($data);
 		$this -> load -> view('pedido/pedido', $data);
 	}
@@ -781,7 +805,7 @@ class Main extends CI_Controller {
 		/* Controller */
 		$this -> cab();
 		$data = array();
-		$data['title'] = 'Categorias de produtos';
+		$data['title'] = 'Descrições dos produtos';
 		$data['content'] = $this -> $model -> row_categoria();
 		$this -> load -> view('content', $data);
 		$this -> footer();
@@ -1006,6 +1030,55 @@ class Main extends CI_Controller {
 		$this -> load -> view('content', $data);
 	}
 
+    function produto_reimpressao($id = '', $at = '')
+        {
+        $this -> load -> model('produtos');
+        
+        if (strlen($at) > 0)
+            {
+                $this->produtos->seta_etiqueta($id,$at);
+            }
+        $data['nocab'] = true;
+        $this -> cab($data);
+        $data = $this->produtos->le_produto($id);
+        $tela = $this->load->view('produto/produtos_detalhes',$data, true);
+        
+        if ($data['pr_etiqueta'] == 1)
+            {
+                $tela .= 'Etiqueta: <span class="btn btn-success">Para impressão</span>';
+                $tela .= ' | <a href="'.base_url('index.php/main/produto_reimpressao/'.$id.'/0').'" class="btn btn-default">Cancelar impressão</a>';
+            } else {
+                $tela .= 'Etiqueta: <span class="btn btn-warning">Impressa</span>';
+                $tela .= ' | <a href="'.base_url('index.php/main/produto_reimpressao/'.$id.'/1').'" class="btn btn-default">Reimprimir etiqueta</a>';
+            }
+         $data['content'] = $tela;
+         $data['title'] = '';
+         $this->load->view('content',$data);
+        }
+
+    function produto_item_editar($id = '') {
+        $this -> load -> model('produtos');
+        $data['nocab'] = true;
+        $this -> cab($data);
+        $cp = $this -> produtos -> cp_item_patrimonio($id);
+        $form = new form;
+        $form -> id = $id;
+
+        $tela = $form -> editar($cp, $this -> produtos -> table);
+        
+        if ($form->saved == 0)
+            {
+                $data['content'] = $tela;
+                $data['title'] = '';
+                $this -> load -> view('content', $data);
+            } else {
+                $data['title'] = '';
+                $data['content'] = '<script> wclose(); </script>';
+                $this -> load -> view('content', $data);
+            }        
+        
+        }
+
 	function produto_item($id = '') {
 		$this -> load -> model('produtos');
 		$data['nocab'] = true;
@@ -1019,14 +1092,14 @@ class Main extends CI_Controller {
 		//$_POST['dd3'] = get("prod");
 
 		if ($form -> saved > 0) {
-			$quant = round(get("dd7"));
+			$quant = round(get("dd8"));
 			/* Multiplas entradas */
 			if (strlen($id)==0)
 				{
-					$s = get("dd6");
+					$s = get("dd7");
 					for ($z=2;$z <= $quant;$z++)
 						{
-							$_POST['dd6'] = $s.'#'.$z;
+							$_POST['dd7'] = $s.'#'.$z;
 							$tela = $form -> editar($cp, $this -> produtos -> table);			
 						}
 				}

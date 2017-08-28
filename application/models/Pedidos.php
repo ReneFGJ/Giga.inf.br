@@ -285,25 +285,34 @@ class pedidos extends CI_model {
 		$sxf = '';
 		$sx = '<div class="col-md-12">';
 		$sx .= '<table width="100%" class="table">' . cr();
-		$sx .= '<tr class="small">
-					<th width="2%">#</th>
-					<th width="70%">produto / serviço</th>
-					<th width="8%">quant.</th>
-					<th width="5%" class="locacao">diárias</th>
-					<th width="10%">vlr.unitário/diária</th>
-					<th width="10%">vlr.total</th>					
+		$sx .= '<tr style="font-size: 75%; border-top: 1px solid #000000;" valign="center">
+					<th width="2%" style="border-bottom: 1px solid #808080;"><b>#</b></th>
+					<th width="60%" style="border-bottom: 1px solid #808080;"><b>produto / serviço</b></th>
+					<th width="8%" style="border-bottom: 1px solid #808080;"><b>quant.</b></th>
+					<th width="10%" style="border-bottom: 1px solid #808080;" class="locacao"><b>diárias</b></th>
+					<th width="10%" style="border-bottom: 1px solid #808080;" align="center"><b>vlr.unit.<br>/ diária</b></th>
+					<th width="15%" style="border-bottom: 1px solid #808080;"><b>vlr.total</b></th>					
 					<th width="1%" class="nopr">&nbsp;</th>
 				</tr>' . cr();
 		$tot1 = 0;
 		$tot2 = 0;
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
-
-			$sx .= '<tr class="middle">';
-			$sx .= '<td align="center">' . ($r + 1) . '</td>';
+            $comp = '';
+            if ($r/2 == round($r/2))
+                {
+                    $comp = ' style="background-color: #e8e8e8;"';
+                }
+			$sx .= '<tr class="middle" '.$comp.'>';
+			$sx .= '<td align="center"><sup>' . ($r + 1) . '</sup></td>';
 			$sx .= '<td align="left" class="big">' . $line['pi_produto'] . '</td>';
-			$sx .= '<td align="right"><b>' . number_format($line['pi_quant'], 1, ',', '.') . '</b></td>';
-			$sx .= '<td align="right">' . number_format($line['pi_qt_diarias'], 0, ',', '.') . '</td>';
+			$sx .= '<td align="right"><b>' . number_format($line['pi_quant'], 0, ',', '.') . '</b></td>';
+            if ($line['pi_qt_diarias'] > 0)
+                {
+			         $sx .= '<td align="center">' . number_format($line['pi_qt_diarias'], 0, ',', '.') . '</td>';
+			    } else {
+			         $sx .= '<td></td>';         
+			    }
 			$sx .= '<td align="right">' . number_format($line['pi_valor_unit'], 2, ',', '.') . '</td>';
 			$vd = $line['pi_qt_diarias'];
 			if ($vd == 0) { $vd = 1;
@@ -323,22 +332,26 @@ class pedidos extends CI_model {
 			$tot2 = $tot2 + ($line['pi_quant'] * $line['pi_valor_unit'] * $vd);
 
 			if (strlen($line['pi_descricao']) > 0) {
-				$sx .= '<tr class="small"><td></td><td>' . mst($line['pi_descricao']) . '</td></tr>';
+				$sx .= '<tr style="font-size: 75%"><td></td><td><i>' . mst($line['pi_descricao']) . '</i></td></tr>';
 			}
 
 		}
 		if (count($rlt) == 0) {
 			$sx .= '<tr><td colspan="10"><font class="red">' . msg('not_register') . '</font></td></tr>' . cr();
 		} else {
-			$sx .= '<tr><td colspan="10" align="right"><b>' . $tot1 . ' itens, total da pedido R$ ' . number_format($tot2, 2, ',', '.') . '</b></td></tr>' . cr();
+			$sx .= '<tr><td colspan="3" align="left" style="border-top: 1px solid #808080;"></td>';
+			$sx .= '<td align="right" colspan=2 style="border-top: 1px solid #808080;">total</td>';
+            $sx .= '<td colspan="2" align="right" style="background-color: #d0d0d0; border-top: 1px solid #808080;"><b>R$ ' . number_format($tot2, 2, ',', '.') . '</b></td>';
+            $sx .= '</tr>' . cr();
 		}
 		$sx .= '</table>' . cr();
-
-		$sx .= '<script> function item_editar($it,$id)
-			{
-				newwin("' . base_url('index.php/main/pedido_item_editar') . '" + "/" + $it + "/" + $id + "/' . checkpost_link($id) . '");
-			} </script>' . cr();
-
+        if ($edit==1)
+        {
+    		$sx .= '<script> function item_editar($it,$id)
+    			{
+    				newwin("' . base_url('index.php/main/pedido_item_editar') . '" + "/" + $it + "/" + $id + "/' . checkpost_link($id) . '");
+    			} </script>' . cr();
+		}
 		$sx .= $sxf;
 		$sx .= '</div>';
 		return ($sx);
@@ -536,6 +549,9 @@ class pedidos extends CI_model {
 	}
 
 	function contatos_do_pedido($ped, $clie, $editar = 0) {
+
+ 
+	    
 		$sx = '';
 		$ped = round($ped);
 		$sql = "select * from clientes_contatos 
@@ -565,9 +581,9 @@ class pedidos extends CI_model {
 			';
 
 		/************************ table ******************/
-		$sx .= '<table wdith="100%" class="table nopr">';
+		$sx .= '<table class="table">';
 		$sx .= '<tr>
-						<th>#</th>
+						<th class="nopr">#</th>
 						<th>Nome</th>
 						<th>Função</th>
 						<th>Telefone</th>
@@ -577,11 +593,13 @@ class pedidos extends CI_model {
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
 			$check = '';
+			$class = 'nopr';
 			if ($line['pct_ativo'] == '1') {
 				$check = 'checked';
+				$class = '';
 			}
-			$sx .= '<tr>';
-			$sx .= '<td><input type="checkbox" onclick="markit(' . $line['id_cc'] . ',this);" ' . $check . '></td>';
+			$sx .= '<tr class="'.$class.'">';
+			$sx .= '<td class="nopr"><input type="checkbox" onclick="markit(' . $line['id_cc'] . ',this);" ' . $check . '></td>';
 			$sx .= '<td>' . $line['cc_nome'] . '</td>';
 			$sx .= '<td>' . $line['ct_nome'] . '</td>';
 			$sx .= '<td>' . mask_fone($line['cc_telefone']) . '</td>';
@@ -591,6 +609,91 @@ class pedidos extends CI_model {
 
 		return ($sx);
 	}
+    function pedido_pdf($id)
+        {   
+        // create new PDF document
+        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+        
+        // set document information
+        $pdf->SetCreator(PDF_CREATOR);
+        $pdf->SetAuthor('Giga Informática');
+        $pdf->SetTitle('Orçamento');
+        $pdf->SetSubject('TCPDF Tutorial');
+        $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
+        
+        // set default header data
+        $logo_img = '../../../img/logo/logo_jpg.jpg';
+        $PDF_HEADER_LOGO_WIDTH = 15;
+        $PDF_HEADER_TITLE = 'Giga Informática';
+        $PDF_HEADER_STRING = 'Filial - Curitiba';
+        $pdf->SetHeaderData($logo_img, $PDF_HEADER_LOGO_WIDTH, $PDF_HEADER_TITLE, $PDF_HEADER_STRING);
+        
+        // set header and footer fonts
+        $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+        $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+        
+        // set default monospaced font
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        
+        // set margins
+        $PDF_MARGIN_LEFT = PDF_MARGIN_LEFT;
+        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER+10);
+        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+                
+        // set auto page breaks
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        
+        // ---------------------------------------------------------
+        
+        // set font
+        $pdf->SetFont('Courier', '', 10);
+        
+        // add a page
+        $pdf->AddPage(); 
+        
+        $pdf->writeHTML($this->mostra_pedido_html($id), true, false, true, false, '');
+        
+        //Close and output PDF document
+        $pdf->Output('giga_'.strzero($id,7).'.pdf', 'I');           
+        }
+    function mostra_pedido_html($id)
+    {
+        $editar = 0;
+        $data = $this -> pedidos -> le($id);
+        $id_cliente = $data['pp_cliente'];
+        $id_cliente_f = $data['pp_cliente_faturamento'];
+        $data['dados_cliente'] = $this -> clientes -> le($id_cliente);
+
+
+        /***************************************************************************************************************************/
+        //$this -> cab();
+
+        if ($data['pp_cliente_faturamento'] > 0) {
+            $data['dados_faturamento'] = $this -> clientes -> le($id_cliente_f);
+        } else {
+            $data['dados_faturamento'] = 'Mesmo do cliente';
+        }
+
+        $data['id_pp'] = $id;
+        $data['dados_item_form'] = $this -> pedidos -> form_item_novo(0, $id);
+        $data['dados_item'] = $this -> pedidos -> pedido_items($id, $editar);                
+        //$data['dados_item'] .= $this -> load -> view('pedido/pedido_item', $data, true);
+        
+        $data['dados_proposta'] = $this -> load -> view('pedido/pedido_header', $data, true);
+        $data['dados_condicoes'] = $this -> pedidos -> pedido_condicoes($id, $editar);
+
+        /* contatos do pedido */
+        $data['contatos'] = $this -> pedidos -> contatos_do_pedido($id, $id_cliente, $editar);
+        
+        /* habilita cancelamento */
+        $data['pp_situacao'] = 0;
+        $data['dados_acoes'] = $this -> pedidos -> pedido_acoes($data);
+        
+
+        $sx = $this -> load -> view('pedido/pedido_pdf', $data, true);
+        return($sx);
+    }
 
 }
 ?>

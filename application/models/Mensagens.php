@@ -29,7 +29,7 @@ class mensagens extends CI_model {
 			$t = sonumero($line['msg_data']);
 			$sx .= '<tr>';
 			$sx .= '<td><nobr>' . stodbr($line['msg_data']) . ' ' . substr($t, 8, 2) . ':' . substr($t, 10, 2) . '</nobr></td>';
-			$sx .= '<td>' . ($line['msg_subject']) . '</td>';
+			$sx .= '<td><b>' . ($line['msg_subject']) . '</b></td>';
 			$sx .= '<td>' . ($line['us_nome']) . '</td>';
 			if ($line['msg_tipo'] == 1)
 				{
@@ -41,7 +41,7 @@ class mensagens extends CI_model {
 
 			if (strlen($line['msg_text']) > 0) {
 				$sx .= '<tr><td></td>';
-				$sx .= '<td class="small" colspan=3>' . mst($line['msg_text']) . '</td>';
+				$sx .= '<td colspan=3><i>' . mst($line['msg_text']) . '</i></td>';
 				$sx .= '</tr>';
 			}
 		}

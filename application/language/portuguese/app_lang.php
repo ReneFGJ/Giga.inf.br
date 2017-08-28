@@ -37,6 +37,8 @@ $lang['login_social'] = 'Logue com uma conta existente (recomendado)';
 $lang['your_passoword'] = 'sua senha';
 $lang['edit_person_data'] = 'Editar dados pessoais';
 
+$lang['contas_receber_relatorio'] = 'Relatório de Contas a Receber';
+
 $lang['bt_new'] = 'novo';
 $lang['bt_search'] = 'busca';
 $lang['bt_clear'] = 'limpa filtro';

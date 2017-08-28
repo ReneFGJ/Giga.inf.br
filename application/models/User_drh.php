@@ -27,6 +27,7 @@ class user_drh extends CI_Model {
         array_push($cp, array('$A', '', 'Filiação', False, True));
         array_push($cp, array('$S80', 'usd_nome_pai', 'Nome do pai', False, True));
         array_push($cp, array('$S80', 'usd_nome_mae', 'Nome da mãe', False, True));
+        array_push($cp, array('$D80', 'usd_nascimento', 'Data nascimento', False, True));
         
         array_push($cp, array('$A', '', 'Dados na empresa', False, True));
         $sql = "SELECT * FROM _filiais where fi_ativo = 1";
@@ -64,5 +65,35 @@ class user_drh extends CI_Model {
         array_push($cp, array('$B', '', 'Gravar dados', False, True));
 		return ($cp);
 	}
+
+    function aniversariantes()
+        {
+            $sql = "select * from user_drh
+                        INNER JOIN users ON id_us = usd_id_us  
+                        where EXTRACT(MONTH FROM usd_nascimento) = '".date("m")."' 
+                        order by usd_nascimento";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx = '<div class="col-md-12"><h2>Aniversariantes do mês</h2></div>'.cr();
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $img = 'photo-'.strzero($line['id_us'],5).'.jpg';
+                    $filename = 'img/picture/'.$img;
+                    if (file_exists($filename))
+                        {
+                            
+                        } else {
+                            $img = 'img-no-picture.png';        
+                        }
+                    $sx .= '<div class="col-md-2 text-center">';
+                    $sx .= '<img src="'.base_url('img/picture/'.$img).'" class="img-responsive">'.cr();
+                    $sx .= '<h4>'.$line['us_nome'].'</h4>'.cr();
+                    $sx .= substr(stodbr($line['usd_nascimento']),0,5).cr();
+                    $sx .= '</div>';
+                }
+            if (count($rlt) == 0) { $sx = ''; }
+            return($sx);
+        }
 
 }

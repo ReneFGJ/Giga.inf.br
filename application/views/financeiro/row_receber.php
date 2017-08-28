@@ -1,6 +1,7 @@
 <?php
 $fld1 = 'f_razao_social';
 $fld2 = 'f_nome_fantasia';
+            
 			$sx = '';
 			/* previsao */
 			if ($line['cp_previsao'] == '1') {
@@ -14,6 +15,14 @@ $fld2 = 'f_nome_fantasia';
 				{
 					$trc = ' class="danger" ';
 				}
+            /****************************************************************************/   
+            /* inrecebivel                                                              */
+            /****************************************************************************/
+            $ir = $line['cp_recebivel'];
+            if ($ir == 0)
+                {
+                    $trc = ' class="danger" ';    
+                }                
 
 			$id = $line['id_cp'];
 			$sit = '';
@@ -52,8 +61,15 @@ $fld2 = 'f_nome_fantasia';
 				$dados2 .= '</a>';
 				$dados = $line[$fld1] . '  - ' . $dados . ' ';
 			}
+			
+			/* inclui icone de credido nao recebivel */
+			if ($ir == 0)
+                {
+                    $dados2 .= '<span class="glyphicon glyphicon-thumbs-down" style="color: red;" aria-hidden="true" title="não recebivel"></span>';
+                }
+			
 			if (strlen(trim($line['cp_nossonumero'])) > 0) {				
-				$dados .= ' - Boleto '.$line['cp_nossonumero'];
+				$dados .= ' - '.$line['cp_nossonumero'];
 			}
 			$sx .= $dados2.' '.$link_edit . $dados . '</a>';
 			$sx .= '</td>';

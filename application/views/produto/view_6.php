@@ -26,7 +26,7 @@ $linkp = '<a href="' . $linkp . '">';
 			<span class="small">serial</span><br>
 			<span class="big"><?php echo $pr_serial; ?></span><br>
 
-			<span class="small">categoria</span><br>
+			<span class="small">descrição</span><br>
 			<a href="<?php echo base_url('index.php/main/produtos_categoria_view/' . $id_pc . '/' . checkpost_link($id_pc)); ?>"><span class="big"><?php echo $pc_nome; ?></span></a><br>
 			<hr>
 			<span class="small">situação</span><br>	

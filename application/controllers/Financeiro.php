@@ -746,11 +746,17 @@ class Financeiro extends CI_Controller {
 		array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
 		array_push($cp, array('$D8', '', 'Vencimento final', True, true));
 		array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', True, true));
+        array_push($cp, array('$C', '', '<span class="middle">Somente não recebiveis</font>', False, true));
 		$data['content'] = $form -> editar($cp, '');
 		$this -> load -> view('content', $data);
 
 		if ($form -> saved > 0) {
-			$sx = $this -> financeiros -> financeiro_abertos(2);
+		    $pm = array();
+            if (strlen(get("dd4") > 0))
+                {
+                    $pm['recebiveis'] = get("dd4");
+                } 
+			$sx = $this -> financeiros -> financeiro_abertos(2,$pm);
 			$data['content'] = $sx;
 			$this -> load -> view('content', $data);
 		}

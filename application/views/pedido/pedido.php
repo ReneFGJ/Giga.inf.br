@@ -62,8 +62,10 @@ $class = '';
 <div class="npr nopr"><br></div>
 <div class="container">
 	<div class="row" >
+	    <div class="col-md-12">
 		<h3 class="nopr">Contatos</h3>
 		<?php echo $contatos; ?>
+		</div>
 	</div>
 </div>
 <?php } ?>

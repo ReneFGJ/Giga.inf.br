@@ -103,7 +103,11 @@ class produtos extends CI_model {
 				if (strlen($wh1) > 0) {
 					$wh1 .= ' AND ';
 				}
-				$wh1 .= " pr_modelo like '%$term%' ";
+				$wh1 .= " (pr_modelo like '%$term%' ";
+				$wh1 .= " or pr_serial like '%$term%' ";
+				$wh1 .= " or pc_nome like '%$term%' ";
+                $wh1 .= " ) ";
+                
 				if (strlen($wh2) > 0) {
 					$wh2 .= ' AND ';
 				}
@@ -117,6 +121,7 @@ class produtos extends CI_model {
 		if (strlen($cat) > 0) {
 			$wh3 = 'AND (id_pc = ' . $cat . ')';
 		}
+
 		/* total */
 		$sql = "select count(*) as total from produtos
 						LEFT JOIN produtos_categoria ON id_pc = pr_categoria
@@ -126,6 +131,7 @@ class produtos extends CI_model {
 						ORDER BY pc_nome, pr_serial
 						LIMIT 100
 						";
+                       
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		$total = $rlt[0]['total'];
@@ -144,12 +150,16 @@ class produtos extends CI_model {
 		$sx = '<table class="table" width="100%">';
 		$sx .= '<tr class="middle"><td colspan=9>Total Recuperado ' . $total . '</td></tr>' . cr();
 		$sx .= '<tr class="small">' . cr();
-		$sx .= '	<th colspan="1" width="2%"><b>#</b></th>' . cr();
-		$sx .= '	<th colspan="1" width="18%"><b>Produto</b></th>' . cr();
-		$sx .= '	<th colspan="1" width="18%"><b>Modelo</b></th>' . cr();
-		$sx .= '	<th colspan="1" width="10%"><b>Serial</b></th>' . cr();
-		$sx .= '	<th colspan="2" width="10%"><b>Característica</b></th>' . cr();
-		$sx .= '	<th colspan="5" width="35%"><b>Situação / Filial</b></th>' . cr();
+		$sx .= '	<th width="2%"><b>#</b></th>' . cr();
+		$sx .= '	<th width="18%"><b>Produto</b></th>' . cr();
+		$sx .= '	<th width="18%"><b>Modelo</b></th>' . cr();
+		$sx .= '	<th width="10%"><b>Serial</b></th>' . cr();
+		$sx .= '	<th width="10%"><b>Característica</b></th>' . cr();
+		$sx .= '	<th width="35%"><b>Situação / Filial</b></th>' . cr();
+        if (perfil("#ADM"))
+            {
+                $sx .= '    <th colspan="1">-</th>' . cr();        
+            }
 		$sx .= '</tr>' . cr();
 		$ID = 0;
 		for ($r = 0; $r < count($rlt); $r++) {
@@ -171,11 +181,24 @@ class produtos extends CI_model {
 			$sx .= '	<td  class="small">';
 			$sx .= $line['pc_nome'];
 			$sx .= '	</td>' . cr();
-			$sx .= '	<td colspan=5 class="small" >';
+			$sx .= '	<td class="small" >';
 			$sx .= $line['ps_descricao'];
 			$sx .= ' (' . $line['pr_patrimonio'] . ')';
 			$sx .= ' - ' . $line['fi_nome_fantasia'] . '&nbsp;';
 			$sx .= '	</td>' . cr();
+            
+        if (perfil("#ADM#GEC"))
+            {
+                $link1 = '<a href="#" onclick="newxy(\''.base_url('index.php/main/produto_item_editar/'.$line['id_pr']).'\',600,600);" title="editar produto">';
+                $link2 = '<a href="#" onclick="newxy(\''.base_url('index.php/main/produto_reimpressao/'.$line['id_pr']).'\',600,600);" title="reimprimir etiqueta">';
+                $sx .= '    <td colspan="1">';
+                $sx .= $link1.'<span class="glyphicon glyphicon-pencil"></span></a>';
+                $sx .= ' ';
+                $sx .= $link2.'<span class="glyphicon glyphicon-print"></span></a>';
+                    
+                $sx .= '</td>' . cr();        
+            }
+                        
 			$sx .= '</tr>' . cr();
 		}
 		$sx .= '</table>';
@@ -239,7 +262,7 @@ class produtos extends CI_model {
 		array_push($cp, array('$A', '', 'Dados do produto', False, True));
 		
 		$sql = "select * from produto_nome where pn_ativo = 1 order by pn_descricao";
-		array_push($cp, array('$Q id_pn:pn_descricao:' . $sql, 'pr_produto', 'Prodto', True, True));
+		array_push($cp, array('$Q id_pn:pn_descricao:' . $sql, 'pr_produto', 'Produto', True, True));
 		
 		//array_push($cp, array('$S80', 'pr_nome', 'Nome do produto', True, True));
 		array_push($cp, array('$S40', 'pr_serial', 'Nº de Série', False, True));
@@ -265,23 +288,30 @@ class produtos extends CI_model {
 
 	function cp_item_patrimonio($id='') {
 		$cp = array();
-		array_push($cp, array('$H8', 'id_prd', '', False, True));
+		array_push($cp, array('$H8', 'id_pr', '', False, True));
 		array_push($cp, array('$A', '', 'Dados do produto', False, True));
 		
+        $sql = "select * from produto_nome where pn_ativo = 1 order by pn_descricao";
+        array_push($cp, array('$Q id_pn:pn_descricao:' . $sql, 'pr_produto', 'Produto (Tipo)', True, True));
 
 		$sql = "select * from produtos_categoria where pc_ativo = 1 order by id_pc";
-		array_push($cp, array('$Q id_pc:pc_nome:' . $sql, 'pr_categoria', 'Categoria', True, True));	
-		
-		$sql = "select * from produto_nome where pn_ativo = 1 order by pn_descricao";
-		array_push($cp, array('$Q id_pn:pn_descricao:' . $sql, 'pr_produto', 'Prodto (Tipo)', True, True));
+		array_push($cp, array('$Q id_pc:pc_nome:' . $sql, 'pr_categoria', 'Descrição', True, True));		
 		
 		$sql = "select * from produtos_marca where ma_ativo = 1 order by id_ma";
 		array_push($cp, array('$Q id_ma:ma_nome:' . $sql, 'pr_marca', 'Marca', True, True));		
 				
 		//array_push($cp, array('$S80', 'pr_modelo', 'Modelo', True, True));
-		$sql = "select * from produto_modelo where pm_ativo = 1 order by pm_descricao";
-		
-		array_push($cp, array('$Q pm_descricao:pm_descricao:' . $sql, 'pr_modelo', 'Modelo', True, True));		
+		$sql = "select * from produto_modelo where pm_ativo = 1 order by pm_descricao";		
+		array_push($cp, array('$Q pm_descricao:pm_descricao:' . $sql, 'pr_modelo', 'Modelo', True, True));
+        
+        $texto = 'Clique no nome para cadastrar um item no listbox:<br>';
+        $texto .= '| ';
+        $texto .= '<a href="'.base_url('index.php/main/produtos_nomes').'" target="_new_'.date("His").'a">Produtos</a> | ';
+        $texto .= '<a href="'.base_url('index.php/main/produtos_categoria').'" target="_new_'.date("His").'b">Descrições</a> | ';
+        $texto .= '<a href="'.base_url('index.php/main/produtos_marca').'" target="_new_'.date("His").'c">Marca</a> | ';
+        $texto .= '<a href="'.base_url('index.php/main/produtos_modelo').'" target="_new_'.date("His").'c">Modelo</a> | ';
+        
+        array_push($cp, array('$M', '', $texto, False, True));		
 		
 		array_push($cp, array('$S40', 'pr_serial', 'Nº de Série', False, True));
 		//array_push($cp, array('$S40', 'pr_patrimonio', 'Nº do patrimonio', False, True));
@@ -308,6 +338,7 @@ class produtos extends CI_model {
 		array_push($cp, array('$N8', 'pr_vlr_custo', 'Valor de custo', False, True));
 
 		array_push($cp, array('$B8', '', 'Gravar', False, True));
+        
 		return ($cp);
 	}
 
@@ -411,8 +442,8 @@ class produtos extends CI_model {
 		$cp = array();
 		array_push($cp, array('$H8', 'id_pc', '', False, True));
 		array_push($cp, array('$S80', 'pc_nome', 'Nome da categoria', True, True));
-		array_push($cp, array('$S80', 'pc_codigo', 'Código', True, True));
-		array_push($cp, array('$T80:5', 'pc_desc_basica', 'Descrição Básica', True, True));
+		array_push($cp, array('$S80', 'pc_codigo', 'Código', False, True));
+		array_push($cp, array('$T80:5', 'pc_desc_basica', 'Descrição Básica', False, True));
 		array_push($cp, array('$O 1:SIM&0:NÃO', 'pc_ativo', 'Ativo', True, True));
 
 		return ($cp);
@@ -602,6 +633,14 @@ class produtos extends CI_model {
 		return ($form -> saved);
 	}
 
+    function seta_etiqueta($id,$st)
+        {
+            $st = round($st);
+            $sql = "update produtos set pr_etiqueta = $st where id_pr = ".round($id);
+            $rlt = $this -> db -> query($sql);
+            return(1);
+        }
+
 	function etiquetas() {
 		$sql = "select * from produtos 
 						WHERE pr_etiqueta = 1
@@ -733,7 +772,7 @@ class produtos extends CI_model {
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		$sx = '<table width="100%" class="table">';
-		$sx .= '<tr><th>Categorias</th></tr>';
+		$sx .= '<tr><th>Descrição</th></tr>';
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
 			$link = base_url('index.php/main/locacao_item_novo/' . $id . '/' . $line['id_pc']);
