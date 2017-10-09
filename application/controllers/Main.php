@@ -7,6 +7,8 @@ class Main extends CI_Controller {
 		$this -> load -> helper('form_sisdoc');
 		$this -> load -> helper('email');
 		$this -> load -> model('users');
+        $this -> load -> helper('url');
+        $this -> load -> library('session');
 
 		date_default_timezone_set('America/Sao_Paulo');
 	}

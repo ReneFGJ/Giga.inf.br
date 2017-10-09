@@ -49,4 +49,9 @@ $lang['not_register'] = 'nenhum registro';
 $lang['contas_pagar'] = 'Contas a Pagar';
 $lang['contas_receber'] = 'Contas a Receber';
 
+$lang['msg_subject'] = 'Assunto';
+$lang['msg_content'] = 'Conteúdo';
+$lang['submit'] = 'Enviar';
+
+
 ?>
