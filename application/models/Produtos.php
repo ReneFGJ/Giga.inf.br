@@ -255,6 +255,17 @@ class produtos extends CI_model {
 		$line = $rlt[0];
 		return ($line);
 	}
+    
+    function cp_agenda()
+        {
+        $cp = array();
+        $op = '1:locado&2:devolvido&9:cancelado';
+        array_push($cp, array('$H8', 'id_ag', '', False, True));
+        array_push($cp, array('$D8', 'ag_data_reserva', 'Início', False, True));
+        array_push($cp, array('$D8', 'ag_data_reserva_ate', 'Fim', False, True));
+        array_push($cp, array('$O '.$op, 'ag_situacao', 'Fim', True, True));
+        return($cp);
+        }
 
 	function cp_item() {
 		$cp = array();
@@ -880,6 +891,7 @@ class produtos extends CI_model {
 			$sx .= '<th>patrimônio</th>';
 			$sx .= '<th>descrição</th>';
 			$sx .= '<th>serial</th>';
+			$sx .= '<th>situacao</th>';
 			$sx .= '<th style="text-center" width="10%">início</th>';
 			$sx .= '<th style="text-center" width="10%">fim</th>';
 			$sx .= '<th style="text-center" width="3%">#</th>';
@@ -887,7 +899,8 @@ class produtos extends CI_model {
 			for ($r=0;$r < count($rlt);$r++)
 				{
 					$line = $rlt[$r];
-					$link = 'onclick="newxy(\''.base_url('index.php/main/locacao_item_editar/'.$id.'/'.checkpost_link($id)).'\',800,600);" style="cursor: pointer;" ';
+					$idag = $line['id_ag'];
+					$link = 'onclick="newxy(\''.base_url('index.php/main/locacao_item_editar/'.$idag.'/'.checkpost_link($id)).'\',800,600);" style="cursor: pointer;" ';
 					$sx .= '<tr>';
 					
 					
@@ -901,7 +914,11 @@ class produtos extends CI_model {
 
 					$sx .= '<td align="left">';
 					$sx .= $line['pr_serial'];
-					$sx .= '</td>';					
+					$sx .= '</td>';
+                    
+                    $sx .= '<td align="left">';
+                    $sx .= msg('situacao_'.$line['ag_situacao']);
+                    $sx .= '</td>';                    					
 					
 					$sx .= '<td align="center">';
 					$sx .= stodbr($line['ag_data_reserva']);

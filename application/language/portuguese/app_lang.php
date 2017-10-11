@@ -53,5 +53,9 @@ $lang['msg_subject'] = 'Assunto';
 $lang['msg_content'] = 'Conteúdo';
 $lang['submit'] = 'Enviar';
 
+$lang['situacao_1'] = 'Alocado';
+$lang['situacao_2'] = 'Devolvido';
+$lang['situacao_9'] = 'Cancelado';
+
 
 ?>

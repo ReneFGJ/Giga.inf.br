@@ -77,5 +77,5 @@ if (isset($anexo)) {
 // ---------------------------------------------------------
 
 //Close and output PDF document
-$pdf -> Output('example_007.pdf', 'I');
+$pdf -> Output('contrato.pdf', 'I');
 ?>

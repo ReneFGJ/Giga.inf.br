@@ -371,6 +371,7 @@ class pedidos extends CI_model {
 				}
 			$wh .= "  (pp_situacao = $pp_situacao) ";
 		}
+        $wh .= " and  (pp_situacao <> 9) ";
 		if ($pp_tipo_pedido > 0)
 			{
 				$wh .= " AND pp_tipo_pedido = $pp_tipo_pedido ";
@@ -479,6 +480,12 @@ class pedidos extends CI_model {
 		$this -> db -> query($sql);
 		return ('');
 	}
+    
+    function pedido_cancelar($id) {
+        $sql = "update " . $this -> table . " set pp_situacao = 9 where id_pp = " . $id;
+        $this -> db -> query($sql);
+        return ('');
+    }    
 
 	function pedido_acoes($data) {
 		$sit = $data['pp_situacao'];
@@ -488,9 +495,9 @@ class pedidos extends CI_model {
 		switch ($sit) {
 			case '0' :
 				$sx .= '<div class="col-md-12">
-									<span class="btn btn-primary nopr" onclick="confirmar_finalizar();">Finalizar edição</span>																
+									<span class="btn btn-primary nopr" onclick="confirmar_finalizar();">Fechar pedido</span>																
 									&nbsp;
-									<span class="btn btn-default nopr" onclick="confirmar_cancelar();">Cancelar solicitação</span>
+									<span class="btn btn-default nopr" onclick="confirmar_cancelar();">Cancelar pedido/orçamento</span>
 									
 							</div>
 							<script>

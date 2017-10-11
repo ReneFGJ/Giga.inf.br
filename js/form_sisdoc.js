@@ -30,3 +30,7 @@ function wclose() {
 	window.opener.location.reload();
 	close();
 }
+
+function refresh() {
+	window.opener.location.reload();
+}
