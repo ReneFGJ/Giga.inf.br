@@ -53,7 +53,9 @@ $class = '';
 <div class="npr nopr"><br></div>
 <div class="container">
 	<div class="row">
+	    <div class="col-md-12" >
 		<?php echo $dados_condicoes; ?>
+		</div>
 	</div>
 
 </div>
@@ -72,8 +74,10 @@ $class = '';
 
 <div class="npr nopr"><br></div>
 <div class="container">
-	<div class="row" >
+	<div class="col-md-12" >
+	    <div class="row" >
 		<?php echo $dados_acoes; ?>
+		<div class="row" >
 	</div>
 </div>
 

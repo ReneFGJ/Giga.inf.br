@@ -397,6 +397,45 @@ class Main extends CI_Controller {
         $this -> load -> view('pedido/pedido', $data);
     }
 
+    function locacao_item_novo_serie($id, $ped, $cliente) {
+        $editar = 0;
+        if (strlen(get("acao")) == 0) {
+            $_POST['dd2'] = stodbr(sonumero($_SESSION['data_ini']));
+            $_POST['dd3'] = stodbr(sonumero($_SESSION['data_fim']));
+        }
+        /* Load Model */
+        $this -> load -> model('clientes');
+        $this -> load -> model('pedidos');
+        $this -> load -> model('produtos');
+        $this -> load -> model('ics');
+        $data['nocab'] = 0;
+        $this -> cab($data);
+
+        $cp = array();
+        array_push($cp, array('$H8', '', '', false, false));
+        array_push($cp, array('$S50', '', 'N. série', true, true));
+        array_push($cp, array('$D8', '', 'Dt. Início', true, true));
+        array_push($cp, array('$D8', '', 'Dt. Devolução', true, true));
+        array_push($cp, array('$B8', '', 'Inserir >>>', false, true));
+
+        $form = new form;
+        $tela = $form -> editar($cp, '');
+
+        /* */
+        if ($form -> saved > 0) {
+            $serie = get("dd1");
+            $d1 = brtos(get("dd2"));
+            $d2 = brtos(get("dd3"));
+            echo "==>" . $d1 . "==" . $d2;
+
+            $tela .= $this -> produtos -> produto_registra_serie($serie, $ped, $d1, $d2, $cliente);
+        }
+
+        $data['content'] = $tela;
+        $data['title'] = '';
+        $this -> load -> view('content', $data);
+    }
+
     function locacao_item($id, $chk = '') {
         $editar = 0;
         /* Load Model */
@@ -435,10 +474,15 @@ class Main extends CI_Controller {
         }
         $data['dados_proposta'] = '';
         $data['id_pp'] = $id;
+
+        $_SESSION['data_ini'] = $data['pp_dt_ini_evento'];
+        $_SESSION['data_fim'] = $data['pp_dt_fim_evento'];
+
         $data['dados_item'] = $this -> pedidos -> pedido_items($id);
         $data['dados_acoes'] = '<button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo/' . $id) . '\',800,600);" class="btn btn-primary">Incluir equipamentos</button>';
-        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo_serie/' . $id) . '\',800,600);" class="btn btn-primary">Incluie equipamentos pelo n. série</button>';
+        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo_serie/' . $id . '/' . $data['pp_nr'] . '/' . $data['pp_cliente']) . '\',800,600);" class="btn btn-primary">Incluie equipamentos pelo n. série</button>';
         $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/contrato_pdf/' . $id) . '\',800,600);" class="btn btn-primary">Contrato Imprimir</button>';
+        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/romaneio/' . $id) . '\',800,600);" class="btn btn-primary">Romaneio Imprimir</button>';
         $data['contatos'] = '';
 
         //$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
@@ -458,10 +502,9 @@ class Main extends CI_Controller {
         $form -> id = $id;
 
         $tela .= $form -> editar($cp, $tabela);
-        if ($form->saved > 0)
-            {
-                $tela = '<script> wclose(); </script>';
-            }
+        if ($form -> saved > 0) {
+            $tela = '<script> wclose(); </script>';
+        }
 
         $data['content'] = $tela;
         $data['title'] = '';
@@ -473,11 +516,25 @@ class Main extends CI_Controller {
         $data['nocab'] = true;
 
         if (strlen($it) > 0) {
-            $d1 = "2016-11-01";
-            $d2 = "2016-11-10";
-            $cliente = 1;
-            $this -> produtos -> produto_registra($it, $id, $d1, $d2);
+            $d1 = sonumero($_SESSION['data_ini']);
+            $d2 = sonumero($_SESSION['data_fim']);
 
+            $cliente = 1;
+            $err = $this -> produtos -> produto_registra($it, $id, $d1, $d2);
+            $data['title'] = '';
+            if (strlen($err) == 0) {
+                $data['content'] = ' 
+                    <div class="alert alert-success">
+                        <strong>Successo!</strong> Item incorporado na locação.
+                    </div>';
+                $this -> load -> view('content', $data);
+            } else {
+                $data['content'] = ' 
+                    <div class="alert alert-danger">
+                        <strong>Erro!</strong> ' . $err . '
+                    </div>';
+                $this -> load -> view('content', $data);
+            }
         }
         $this -> cab($data);
         $tela = '';
@@ -746,6 +803,43 @@ class Main extends CI_Controller {
             $this -> load -> view('content', $data);
         }
         $this -> footer();
+    }
+
+    function produtos_cadastrar_serial($id = '') {
+        $this -> load -> model('produtos');
+        $this -> cab();
+        if (get("dd99")) {
+            $_POST['dd8'] = get("dd99");
+            $_POST['dd9'] = "1";
+            $_POST['acao'] = "valid";
+        }
+
+        $cp = $this -> produtos -> cp_item_patrimonio($id);
+        $form = new form;
+        $form -> id = $id;
+
+        $tela = $form -> editar($cp, $this -> produtos -> table);
+        //$_POST['dd3'] = get("prod");
+
+        if ($form -> saved > 0) {
+            $quant = round(get("dd8"));
+            /* Multiplas entradas */
+            if (strlen($id) == 0) {
+                $s = get("dd7");
+                for ($z = 2; $z <= $quant; $z++) {
+                    $_POST['dd7'] = $s . '#' . $z;
+                    $tela = $form -> editar($cp, $this -> produtos -> table);
+                }
+            }
+            $this -> produtos -> updatex();
+            $data['title'] = '';
+            $data['content'] = '<script> wclose(); </script>';
+            $this -> load -> view('content', $data);
+        } else {
+            $data['content'] = $tela;
+            $data['title'] = '';
+            $this -> load -> view('content', $data);
+        }
     }
 
     function produtos_categoria_editar() {
@@ -1455,6 +1549,44 @@ class Main extends CI_Controller {
         if ($form -> saved > 0) {
             redirect(base_url('index.php/main/condicoes_pagamento'));
         }
+    }
+
+    function romaneio($id = 0) {
+        $this -> load -> model('clientes');
+        $this -> load -> model('contratos');
+        $this -> load -> model('pedidos');
+        $this -> load -> model('empresas');
+        $this -> load -> model('ics');
+
+        $data = $this -> contratos -> le($id);
+        
+        $data4 = $this -> pedidos -> le($id);
+        $data3 = $this -> empresas -> le(1);
+        $data2 = $this -> clientes -> le($data4['pp_cliente']);
+
+        //$data2 = $this->filiais->le(1);
+        $data = array_merge($data, $data2, $data3);
+        $anexo = $this -> contratos -> anexos($id);
+        $condicoes = '';
+
+        $txt = $this->ics->busca('RECIBO_1');
+        $contrato = $txt['nw_texto'];
+        $contrato = troca($contrato, '$LOCATARIO_DADOS', $this -> load -> view('contrato/contrato_locatario', $data, true));
+        $contrato = troca($contrato, '$LOCADORA_DADOS', $this -> load -> view('contrato/contrato_locador', $data, true));
+        $contrato = troca($contrato, '$EQUIPAMENTOS', $anexo);
+        $contrato = troca($contrato, '$CONDICOES', $condicoes);
+        $contrato = troca($contrato, '$LOCATARIA', $data['f_razao_social']);
+        $contrato = troca($contrato, '$LOCADORA', $data['f_razao_social']);
+
+        //$data['content'] = $contrato;
+        $data['nocab'] = true;
+        $this->cab($data);
+        
+        $tela = $contrato;        
+        $data['content'] = $tela;
+        $data['title'] = 'Recibo de entrega - '.$data4['pp_nr'];
+
+        $this->load->view('content',$data);
     }
 
     function contrato_pdf($id = 0) {

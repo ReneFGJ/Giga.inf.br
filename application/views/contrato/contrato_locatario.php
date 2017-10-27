@@ -4,7 +4,10 @@
 	<tr><td width="20%" align="right">Razão Social </td>
 		<td><b><?php echo $f_razao_social;?></b></td>
 	</tr>
-	<tr><td align="right">CPF/CNPJ </td>
+    <tr><td width="20%" align="right">Nome Fantasia</td>
+        <td><b><?php echo $f_nome_fantasia;?></b></td>
+    </tr>
+  	<tr><td align="right">CPF/CNPJ </td>
 		<td><b><?php echo $f_cnpj;?></b></td>
 	</tr>	
 	<tr><td align="right">Endereço </td>

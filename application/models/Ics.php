@@ -25,8 +25,10 @@ class Ics extends CI_model {
 		$ttt = troca($ttt,'$$',' ');
 		$ttt = ' '.$ttt;
 
-		while ($pos = strpos($ttt,'$'))
+        $lp = 0;
+		while (($pos = strpos($ttt,'$')) and ($lp < 50))
 			{
+			    $lp++;
 				$stt = substr($ttt,$pos,100);
 				$stt = substr($stt,0,strpos($stt,' '));
 				$stt = trim($stt);
@@ -52,7 +54,6 @@ class Ics extends CI_model {
 			}
 
 		$sx['nw_texto'] = $txt;
-
 		return ($sx);
 	}
 

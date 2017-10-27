@@ -49,7 +49,7 @@ function enviaremail($para, $assunto, $texto, $de, $anexos = array()) {
 	$CI -> load -> library('email', $config);
 	$CI -> email -> subject($assunto);
 	$CI -> email -> message($texto);
-
+    
 	for ($r = 0; $r < count($anexos); $r++) {
 		$CI -> email -> attach($anexos[$r]);
 	}
@@ -117,8 +117,13 @@ function enviaremail($para, $assunto, $texto, $de, $anexos = array()) {
 				</script>
 				';
 
-		$CI -> email -> send();
-		return ('ok');
+		;
+          if ($CI -> email -> send()) {
+              return("ok");
+          }
+          else {
+              print_r($CI->email->print_debugger());
+          }        
 	} else {
 		echo('<font color="red">Proprietário do e-mail (' . $de . ') não configurado (veja mensagem_own)</font>');
 		exit ;
@@ -243,6 +248,26 @@ class email {
 	var $email_smtp = '';
 	
 	var $email_sign = '';
+    
+    function method_ufrgs()
+        {
+        $from = $this -> email;
+        $from_name = $this -> email_name;
+        $replay = $this -> email_replay;
+        $email_to = $this -> to;
+        $title = $this -> titulo;
+        $body = $this -> texto;
+                    
+        $to      = $email_to;
+        $subject = $title;
+        $message = $body;
+        
+        $headers = 'From: Comgrad Biblioteconomia <'.$from.'> ' . "\r\n" .
+                   'Reply-To: comgradbib@ufrgs.br' . "\r\n" .
+                   'X-Mailer: PHP/' . phpversion();
+        
+        $real_sender = '-f comgradbib@ufrgs.br';            
+        }
 
 	function method_1_mail() {
 		/* Recupera dados */

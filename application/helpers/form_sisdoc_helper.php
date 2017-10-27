@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.17.07.09
+ * @version     v0.17.10.19
  */
 $dd = array();
 
@@ -1757,12 +1757,9 @@ if (!function_exists('form_edit')) {
         
         $link = '';
         $tela = '';
-        $tela .= '
-            <div class="containter">
+        $tela .= 
+            form_open($link, $attribute) . '
             <table class="form_tabela2 table" width="100%">
-            <tr>
-                <td>' . form_open($link, $attribute) . '</td>
-            </tr>
             ';
     
     
@@ -1793,7 +1790,7 @@ if (!function_exists('form_edit')) {
             }
             $tela .= form_field($cp[$r], $vlr);
         }
-        $tela .= '</table></div>';
+        $tela .= '</table>';
         $tela .= "
         <script>
             $(document).ready(function(){

@@ -149,7 +149,7 @@ class Financeiro extends CI_Controller {
 	function cpagar_edit($id = '', $chk = '') {
 		$this -> load -> model('financeiros');
 		$tabela = $this -> financeiros -> table_pagar;
-		$parcelas = round(get("dd5"));
+		$parcelas = round(get("dd6"));
 		
 		$data = array();
 		$data['nocab'] = true;
@@ -158,10 +158,10 @@ class Financeiro extends CI_Controller {
 		$form = new form;
 		$form -> id = $id;
 		
-		$vlr = get("dd11");
+		$vlr = get("dd12");
 		$vlr = troca($vlr,'.','');
 		$vlr = troca($vlr,',','.');
-		$_POST['dd12'] = $vlr;
+		$_POST['dd13'] = $vlr;
 
 		$data['content'] = $form -> editar($cp, $tabela);		
 		
@@ -182,7 +182,7 @@ class Financeiro extends CI_Controller {
 	function cpagar_edit_multi($id = '', $chk = '') {
 		$this -> load -> model('financeiros');
 		$tabela = $this -> financeiros -> table_pagar;
-		$parcelas = round(get("dd5"));
+		$parcelas = round(get("dd6"));
 		
 		$data = array();
 		$data['nocab'] = true;
@@ -190,10 +190,10 @@ class Financeiro extends CI_Controller {
 		$cp = $this -> financeiros -> cp_cpagar_editar_multi($id);
 		$form = new form;
 		$form -> id = $id;
-		$vlr = get("dd11");
+		$vlr = get("dd12");
 		$vlr = troca($vlr,'.','');
 		$vlr = troca($vlr,',','.');
-		$_POST['dd12'] = $vlr;
+		$_POST['dd13'] = $vlr;
 
 		if ($id==0)
 			{
@@ -207,15 +207,15 @@ class Financeiro extends CI_Controller {
 		$this -> load -> view('content', $data);
 		
 		if ($form -> saved > 0) {
-			$perio = get("dd6");
-			$venc = brtos(get("dd1"));
-			$cp[5][3] = False;
+			$perio = get("dd7");
+			$venc = brtos(get("dd2"));
+			$cp[6][3] = False;
 			
 			if ($parcelas > 1)
 				{
-					$_POST['dd5'] = strzero(1, 2) . '/' . strzero($parcelas, 2);	
+					$_POST['dd6'] = strzero(1, 2) . '/' . strzero($parcelas, 2);	
 				} else {
-					$_POST['dd5'] = 'ÚNICA';					
+					$_POST['dd6'] = 'ÚNICA';					
 				}
 			$form -> editar($cp, $tabela);
 			
@@ -226,7 +226,7 @@ class Financeiro extends CI_Controller {
 				}				
 
 			for ($r = 2; $r <= $parcelas; $r++) {
-				$_POST['dd5'] = strzero($r, 2) . '/' . strzero($parcelas, 2);
+				$_POST['dd6'] = strzero($r, 2) . '/' . strzero($parcelas, 2);
 				$prox_venc = stod(dateadd($perio, ($r - 1), $venc));
 				$wk = date("N", $prox_venc);
 				while ($wk > 5) {
@@ -234,7 +234,7 @@ class Financeiro extends CI_Controller {
 					$wk = date("N", $prox_venc);
 				}
 				$prox_venc = date("Ymd", $prox_venc);
-				$_POST['dd1'] = stodbr($prox_venc);
+				$_POST['dd2'] = stodbr($prox_venc);
 				$data['content'] = $form -> editar($cp, $tabela);
 			}
 
@@ -273,7 +273,7 @@ class Financeiro extends CI_Controller {
 	function creceber_edit($id = '', $chk = '') {
 		$this -> load -> model('financeiros');
 		$tabela = $this -> financeiros -> table_receber;
-		$parcelas = round(get("dd5"));
+		$parcelas = round(get("dd6"));
 		
 		$data = array();
 		$data['nocab'] = true;
@@ -282,10 +282,10 @@ class Financeiro extends CI_Controller {
 		$form = new form;
 		$form -> id = $id;
 		
-		$vlr = get("dd11");
+		$vlr = get("dd12");
 		$vlr = troca($vlr,'.','');
 		$vlr = troca($vlr,',','.');
-		$_POST['dd12'] = $vlr;
+		$_POST['dd13'] = $vlr;
 
 		$data['content'] = $form -> editar($cp, $tabela);		
 
@@ -305,7 +305,7 @@ class Financeiro extends CI_Controller {
 	function creceber_edit_multi($id = '', $chk = '') {
 		$this -> load -> model('financeiros');
 		$tabela = $this -> financeiros -> table_receber;
-		$parcelas = round(get("dd5"));
+		$parcelas = round(get("dd6"));
 		
 		$data = array();
 		$data['nocab'] = true;
@@ -313,10 +313,10 @@ class Financeiro extends CI_Controller {
 		$cp = $this -> financeiros -> cp_creceber_editar_multi($id);
 		$form = new form;
 		$form -> id = $id;
-		$vlr = get("dd11");
+		$vlr = get("dd12");
 		$vlr = troca($vlr,'.','');
 		$vlr = troca($vlr,',','.');
-		$_POST['dd12'] = $vlr;
+		$_POST['dd13'] = $vlr;
 
 		$data['content'] = $form -> editar($cp, '');
 
@@ -325,15 +325,15 @@ class Financeiro extends CI_Controller {
 		$this -> load -> view('content', $data);
 		
 		if ($form -> saved > 0) {
-			$perio = get("dd6");
-			$venc = brtos(get("dd1"));
-			$cp[5][3] = False;
+			$perio = get("dd7");
+			$venc = brtos(get("dd2"));
+			$cp[6][3] = False;
 			
 			if ($parcelas > 1)
 				{
-					$_POST['dd5'] = strzero(1, 2) . '/' . strzero($parcelas, 2);	
+					$_POST['dd6'] = strzero(1, 2) . '/' . strzero($parcelas, 2);	
 				} else {
-					$_POST['dd5'] = 'ÚNICA';					
+					$_POST['dd6'] = 'ÚNICA';					
 				}
 			$form -> editar($cp, $tabela);
 			
@@ -344,7 +344,7 @@ class Financeiro extends CI_Controller {
 				}				
 
 			for ($r = 2; $r <= $parcelas; $r++) {
-				$_POST['dd5'] = strzero($r, 2) . '/' . strzero($parcelas, 2);
+				$_POST['dd6'] = strzero($r, 2) . '/' . strzero($parcelas, 2);
 				$prox_venc = stod(dateadd($perio, ($r - 1), $venc));
 				$wk = date("N", $prox_venc);
 				while ($wk > 5) {
@@ -352,7 +352,7 @@ class Financeiro extends CI_Controller {
 					$wk = date("N", $prox_venc);
 				}
 				$prox_venc = date("Ymd", $prox_venc);
-				$_POST['dd1'] = stodbr($prox_venc);
+				$_POST['dd2'] = stodbr($prox_venc);
 				$data['content'] = $form -> editar($cp, $tabela);
 			}
 

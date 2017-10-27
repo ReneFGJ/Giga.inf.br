@@ -325,7 +325,7 @@ class produtos extends CI_model {
         array_push($cp, array('$M', '', $texto, False, True));		
 		
 		array_push($cp, array('$S40', 'pr_serial', 'Nº de Série', False, True));
-		//array_push($cp, array('$S40', 'pr_patrimonio', 'Nº do patrimonio', False, True));
+	    array_push($cp, array('$S40', 'pr_tag', 'Nº do patrimonio', False, True));
 		//array_push($cp, array('$S40', 'pr_tag', 'Nº do Tag', False, True));
 
 		if (strlen($id) == 0)
@@ -779,16 +779,20 @@ class produtos extends CI_model {
 	}
 
 	function locacao_categorias($id) {
-		$sql = "select * from produtos_categoria where pc_ativo = 1 order by pc_nome";
+		$sql = "select pc_nome, id_pc from produtos_categoria
+		              INNER JOIN produtos ON pr_categoria = id_pc  
+		              where pc_ativo = 1 
+		              GROUP BY pc_nome, id_pc
+		              ORDER BY pc_nome";
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
-		$sx = '<table width="100%" class="table">';
+		$sx = '<table width="100%">';
 		$sx .= '<tr><th>Descrição</th></tr>';
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
 			$link = base_url('index.php/main/locacao_item_novo/' . $id . '/' . $line['id_pc']);
 			$link = '<a href="' . $link . '">';
-			$sx .= '<tr>';
+			$sx .= '<tr class="table">';
 			$sx .= '<td>';
 			$sx .= $link . $line['pc_nome'] . '</a>';
 			$sx .= '</td>';
@@ -805,15 +809,17 @@ class produtos extends CI_model {
 					";
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
-		$sx = '<table width="100%" class="table">';
-		$sx .= '<tr><th>Itens</th><th>Marca</th><th>Serial</th><th>Filial</th></tr>';
+		$sx = '<table width="100%">';
+		$sx .= '<tr><th>Itens</th><th>Marca</th><th>Serial</th>
+		              <th>N. Patrimonio</th>
+		              <th>Filial</th></tr>';
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
 			$link = base_url('index.php/main/locacao_item_novo/' . $id . '/' . $ct . '/' . $line['id_pr']);
 			$link = '<a href="' . $link . '">';
-			$sx .= '<tr>';
+			$sx .= '<tr class="table">';
 			$sx .= '<td>';
-			$sx .= $link . $line['pc_desc_basica'] . '</a>';
+			$sx .= $link . $line['pr_patrimonio'] . '</a>';
 			$sx .= '</td>';
 			$sx .= '<td>';
 			$sx .= $link . $line['ma_nome'] . '</a>';
@@ -821,6 +827,9 @@ class produtos extends CI_model {
 			$sx .= '<td>';
 			$sx .= $link . $line['pr_serial'] . '</a>';
 			$sx .= '</td>';
+            $sx .= '<td>';
+            $sx .= $link . $line['pr_tag'] . '</a>';
+            $sx .= '</td>';            
 			$sx .= '<td>';
 			$sx .= $link . $line['fi_nome_fantasia'] . '</a>';
 			$sx .= '</td>';
@@ -852,6 +861,41 @@ class produtos extends CI_model {
 			$rlt = $this->db->query($sql);
 			return(1);
 		}
+    function produto_registra_serie($serie, $ped, $d1, $d2, $cliente = 1)
+        {
+            $sql = "SELECT * FROM `produtos`where pr_tag = '$serie' ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            if (count($rlt) == 0)
+                {
+                    $sx = '<div class="alert alert-danger">
+                                <strong>Produto não localizado!</strong> Patrimonio não localizado na base.
+                                <div class="col-md-4 text-right">
+                                    <a href="'.base_url('index.php/main/produtos_cadastrar_serial?dd99='.$serie).'" target="_new"  class="btn btn-default">Cadastrar</a>
+                                </div>
+                            </div>'; 
+                    $data['title'] = '';
+                    $data['content'] = $sx;
+                    $this->load->view('content',$data);
+                    $err = '';    
+                    return($err);
+                } else {
+                    $line = $rlt[0];
+                    $prod = $line['id_pr'];
+                    $err = $this->produto_registra($prod, $ped, $d1, $d2, $cliente);
+                    if (strlen($err) == 0)
+                        {
+                            $sx = '<div class="alert alert-success">
+                                        <strong>Item incluído com sucesso!</strong>
+                                    </div>';                            
+                        } else {
+                            $sx = '<div class="alert alert-danger">
+                                        <strong>'.$err.'</strong>
+                                    </div>';                            
+                        }
+                    return($sx);                    
+                }
+        }
 
 	function produto_registra($prod, $ped, $d1, $d2, $cliente = 1) {
 		$data = date("Y-m-d");
@@ -861,7 +905,17 @@ class produtos extends CI_model {
 		$sit = 1;
 		$vend = $_SESSION['id'];
 		$sql = "select * from produto_agenda 
-						WHERE ";
+						WHERE ag_produto = $prod and
+						      ag_cliente = $cliente and
+						      ag_data_reserva = $d1 and
+						      ag_situacao = 1";
+    	$rlt = $this -> db -> query($sql);	
+    	$rlt = $rlt->result_array();
+    	if (count($rlt) > 0)
+    	   {
+    	       $err = "Item já incluído na locação.";
+               return($err);
+    	   }				      
 		$sql = "insert into produto_agenda 
 						(ag_produto, ag_data, ag_cliente, 
 						ag_vendedor, ag_data_reserva, ag_data_reserva_ate, 
@@ -875,6 +929,7 @@ class produtos extends CI_model {
 						)
 			";
 		$rlt = $this -> db -> query($sql);
+        return('');
 	}
 	
 	function produtos_reservados($id)
@@ -883,6 +938,7 @@ class produtos extends CI_model {
 						inner join produtos on id_pr = ag_produto
 						inner join produtos_categoria  ON pr_categoria = id_pc						
 					where ag_pedido = $id
+					order by ag_situacao
 					";
 			$rlt = $this->db->query($sql);
 			$rlt = $rlt->result_array();
@@ -891,6 +947,7 @@ class produtos extends CI_model {
 			$sx .= '<th>patrimônio</th>';
 			$sx .= '<th>descrição</th>';
 			$sx .= '<th>serial</th>';
+            $sx .= '<th>patrimonio</th>';
 			$sx .= '<th>situacao</th>';
 			$sx .= '<th style="text-center" width="10%">início</th>';
 			$sx .= '<th style="text-center" width="10%">fim</th>';
@@ -900,8 +957,25 @@ class produtos extends CI_model {
 				{
 					$line = $rlt[$r];
 					$idag = $line['id_ag'];
+                    $status = $line['ag_situacao'];
+                    
+                    switch($status)
+                        {
+                        case '1':
+                            $bg = ' class="alert alert-success" ';
+                            break;
+                        case '2':
+                            $bg = ' class="alert alert-info" ';
+                            break;                            
+                        case '9':
+                            $bg = ' class="alert alert-danger" ';
+                            break;                            
+                        default:
+                            $bg = '';
+                            break;
+                        }
 					$link = 'onclick="newxy(\''.base_url('index.php/main/locacao_item_editar/'.$idag.'/'.checkpost_link($id)).'\',800,600);" style="cursor: pointer;" ';
-					$sx .= '<tr>';
+					$sx .= '<tr '.$bg.'>';
 					
 					
 					$sx .= '<td align="left">';
@@ -915,6 +989,10 @@ class produtos extends CI_model {
 					$sx .= '<td align="left">';
 					$sx .= $line['pr_serial'];
 					$sx .= '</td>';
+                    
+                    $sx .= '<td align="left">';
+                    $sx .= $line['pr_tag'];
+                    $sx .= '</td>';                    
                     
                     $sx .= '<td align="left">';
                     $sx .= msg('situacao_'.$line['ag_situacao']);

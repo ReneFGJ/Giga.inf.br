@@ -39,8 +39,9 @@ class contratos extends CI_model
 					{
 						$line = $rlt[$r];
 						$sx .= '<tr>';
-						$sx .= '<td>'.$line['pc_nome'].'</td>';
-						$sx .= '<td>'.$line['pr_serial'].'</td>';
+						//$sx .= '<td>'.$line['pc_nome'].'</td>';
+                        $sx .= '<td>'.$line['pr_tag'].'</td>';
+
 						$sx .= '<td>'.stodbr($line['ag_data_reserva']).'</td>';
 						$sx .= '<td>'.stodbr($line['ag_data_reserva_ate']).'</td>';
 						

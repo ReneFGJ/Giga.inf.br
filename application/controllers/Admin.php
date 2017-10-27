@@ -367,8 +367,10 @@ class Admin extends CI_controller {
 		/***********************/
 		if ($form->saved > 0)
 			{
-				$para = array('renefgj@gmail.com');
+			    $email = 'renefgj@gmail.com';
+				$para = array($email);
 				enviaremail($para,'Teste','Teste de e-mail',1);
+                $tela .= '<div>email de teste enviado para '.$email.'</div>';
 			}
 		
 		$data['content'] = $tela;
