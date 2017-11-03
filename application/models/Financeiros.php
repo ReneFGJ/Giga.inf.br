@@ -204,6 +204,15 @@ class financeiros extends CI_model {
     }
 
     function saldo_dia($dt, $tipo = '1') {
+        if ((isset($_SESSION['cia'])) and (strlen($_SESSION['cia']) > 0))
+            {
+                $fi = $_SESSION['cia'];  
+                $wh = " and (cp_filial = $fi ) ";      
+            } else {
+                $fi = '';
+                $wh = '';
+            }
+        
         if ($tipo == '1') {
             $tabela = 'cx_pagar';
         } else {
@@ -214,8 +223,10 @@ class financeiros extends CI_model {
         $cp = '*';
         $sql = "select sum(cp_valor) as total from $tabela 
 							where cp_vencimento = '$dt'
+							$wh
 						order by cp_vencimento, cp_valor desc 
 						";
+
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         return ($rlt[0]['total']);
@@ -269,8 +280,33 @@ class financeiros extends CI_model {
         array_push($cp, array('$B8', '', 'Fechar pagamento', false, true));
         return ($cp);
     }
+    
+    function analise_credito()
+        {
+            $sql = "select * from clientes where f_situacao = 1 order by f_razao_social limit 100";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx = '';
+            $sx .= '<table class="table" width="100%">';
+            $sx .= '<tr><th>Razão Social</th>
+                        <th>Nome fantasia</th>
+                        <th>Cadastro</th>
+                    </tr>';  
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $link = '<a href="'.base_url('index.php/main/cliente/'.$line['id_f'].'/'.checkpost_link($line['id_f'])).'">';
+                    $sx .= '<tr>';
+                    $sx .= '<td>'.$link.$line['f_razao_social'].'</a>'.'</td>';
+                    $sx .= '<td>'.$line['f_nome_fantasia'].'</td>';
+                    $sx .= '<td>'.stodbr($line['f_created']).'</td>';
+                    $sx .= '</tr>';
+                }
+            $sx .= '</table>';
+            return($sx);
+        }
 
-    function creceber_enviar_email($data, $enviar = 0) {
+    function creceber_enviar_email($data, $enviar = 0,$tipo=0) {
         $sql = $this -> sql;
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -285,7 +321,7 @@ class financeiros extends CI_model {
             $contact = $this -> clientes -> le_contatos($idc);
             $line['contatos'] = $this -> clientes -> contatos($idc, 0);
 
-            $tela = $this -> load -> view('financeiro/registro', $line, true);
+            $tela = $this -> load -> view('financeiro/registro_email', $line, true);
             $mensa = troca($msg, '$VENCIMENTO', utf8_decode($tela));
             $emails = array();
             for ($m = 0; $m < count($contact); $m++) {
@@ -296,7 +332,10 @@ class financeiros extends CI_model {
                 $emails = array_merge($emails, $em);
             }
 
-            $emails = array();
+            if ($tipo==2)
+                {
+                    $emails = array($_SESSION['email']);
+                }
 
             array_push($emails, $_SESSION['email']);
             if ($enviar > 0) {
@@ -509,6 +548,15 @@ class financeiros extends CI_model {
     }
 
     function contas_pagar($dt) {
+        if ((isset($_SESSION['cia'])) and (strlen($_SESSION['cia']) > 0))
+            {
+                $fi = $_SESSION['cia'];  
+                $wh = " and (cp_filial = $fi ) ";      
+            } else {
+                $fi = '';
+                $wh = '';
+            }            
+        
         $tipo = '1';
         $dt = sonumero($dt);
         $dt = substr($dt, 0, 4) . '-' . substr($dt, 4, 2) . '-' . substr($dt, 6, 2);
@@ -516,6 +564,7 @@ class financeiros extends CI_model {
         $sql = "select $cp, 1 as tipo from cx_pagar 
 							left join clientes ON id_f = cp_fornecedor
 							where cp_vencimento = '$dt' and cp_situacao <> 9
+							$wh
 						order by cp_vencimento, cp_valor desc 
 						";
         $rlt = $this -> db -> query($sql);
@@ -547,9 +596,19 @@ class financeiros extends CI_model {
     }
 
     function caixa_dia($dt) {
+        if ((isset($_SESSION['cia'])) and (strlen($_SESSION['cia']) > 0))
+            {
+                $fi = $_SESSION['cia'];  
+                $wh = " and (cp_filial = $fi ) ";      
+            } else {
+                $fi = '';
+                $wh = '';
+            }            
+        
         $cp = '*';
         $sql = "select $cp, 1 as tipo from cx_pagar 
 							where cp_vencimento = '$dt'
+							$wh
 						order by cp_valor desc 
 						";
         $rlt = $this -> db -> query($sql);

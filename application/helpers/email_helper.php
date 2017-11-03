@@ -1,21 +1,17 @@
 <?php
-// This file is part of the ProEthos Software.
-//
-// Copyright 2013, PAHO. All rights reserved. You can redistribute it and/or modify
-// ProEthos under the terms of the ProEthos License as published by PAHO, which
-// restricts commercial use of the Software.
-//
-// ProEthos is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-// PARTICULAR PURPOSE. See the ProEthos License for more details.
-//
-// You should have received a copy of the ProEthos License along with the ProEthos
-// Software. If not, see
-// https://raw.githubusercontent.com/bireme/proethos/master/LICENSE.txt
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
- * Sistema de e-mail
+/**
+ * CodeIgniter Form Helpers
+ *
+ * @package     CodeIgniter
+ * @subpackage  Helpers
+ * @category    Send Mail
+ * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
+ * @link        http://www.sisdoc.com.br/CodIgniter
+ * @version     v0.17.11.01
  */
+
 $admin_nome = '';
 $email_adm = '';
 
@@ -47,6 +43,7 @@ function enviaremail($para, $assunto, $texto, $de, $anexos = array()) {
 	$config = Array('protocol' => $line['smtp_protocol'], 'smtp_host' => $line['smtp_host'], 'smtp_port' => $line['smtp_port'], 'smtp_user' => $line['smtp_user'], 'smtp_pass' => $line['smtp_pass'], 'mailtype' => 'html', 'charset' => 'iso-8859-1', 'wordwrap' => TRUE);
 
 	$CI -> load -> library('email', $config);
+    $CI -> email -> initialize($config); 
 	$CI -> email -> subject($assunto);
 	$CI -> email -> message($texto);
     
@@ -79,6 +76,9 @@ function enviaremail($para, $assunto, $texto, $de, $anexos = array()) {
 		$CI -> email -> to($para[0]);
 		$CI -> email -> subject($assunto);
 		$CI -> email -> message($email_header . $texto . $email_footer);
+        $CI -> email->SMTPSecure = 'ssl';
+        $CI -> email->SMTPAuth = true;
+        $CI -> email->set_newline("\r\n"); 
 		
 		if (isset($_SESSION['id']))
 			{
@@ -117,7 +117,7 @@ function enviaremail($para, $assunto, $texto, $de, $anexos = array()) {
 				</script>
 				';
 
-		;
+
           if ($CI -> email -> send()) {
               return("ok");
           }

@@ -1,3 +1,4 @@
+<div>
 <?php
 
 $img = base_url('img/produto/no_picture-640x480.png');
@@ -5,7 +6,7 @@ $img_alterar = '<a href="#" onclick="newwin(\'' . base_url('index.php/main/pictu
 $editar = base_url('index.php/main/produtos_edit/' . $id_pr . '/' . checkpost_link($id_pr));
 $editar = '<a href="' . $editar . '" class="small nopr">editar</a><br>';
 if (count($imgs) > 0) {
-	$img = base_url($imgs[0]['doc_arquivo']);
+    $img = base_url($imgs[0]['doc_arquivo']);
 }
 $linkp = base_url('index.php/main/produtos_view/' . $id_pr . '/' . checkpost_link($id_pr));
 $linkp = '<a href="' . $linkp . '">';
@@ -35,3 +36,4 @@ $linkp = '<a href="' . $linkp . '">';
 			<span class="small">localização</span><br>	
 			<a href="#" class="big"><?php echo mst($fi_nome_fantasia); ?></a>
 			
+</div>

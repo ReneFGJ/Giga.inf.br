@@ -1076,12 +1076,19 @@ class Main extends CI_Controller {
         $this -> footer();
     }
 
-    function produtos_movimentacao($tipo = '') {
+    function produtos_movimentacao($cod='',$tipo = '') {
         /* Load Model */
         $model = 'produtos';
         $this -> load -> model($model);
-        $cod = get("dd1");
-        $acao = get("acao");
+        
+        if (strlen($cod) > 0)
+            {
+                $cod = $cod;
+                $acao = "action";                
+            } else {
+                $cod = get("dd1");
+                $acao = get("acao");                
+            }
         $data = array();
 
         /* Controller */
@@ -1096,14 +1103,10 @@ class Main extends CI_Controller {
             $data2 = $this -> $model -> le_produto_ean($cod);
             if (count($data2) > 0) {
                 $data['dados_produto'] = $this -> load -> view('produto/view_6', $data2, true);
-                switch ($tipo) {
-                    case '1' :
-                        /* Entrada na filial */
+                $data['dados_produto'] .= '<a href="'.base_url('index.php/main/produtos_movimentacao/'.$cod.'/5').'" class="btn btn-default">Ativar reimpressão de etiqueta</a>';
+                if (strlen($tipo) > 0) {
                         $data['title'] = 'Entrada de produto na unidade';
-                        $this -> $model -> movimenta_para_estoque($data2['id_pr']);
-                        break;
-                    default :
-                        break;
+                        $this -> $model -> movimenta_para_estoque($data2['id_pr'],$tipo);
                 }
             } else {
                 $data['erro'] = 'Código Inválido<br>' . $cod;
@@ -1251,13 +1254,72 @@ class Main extends CI_Controller {
         }
     }
 
-    function produtos_etiquetas() {
+    function produtos_etiqueta() {
         $filename = 'etiqueta.prn';
         header("Content-Type: application/force-download");
         header("Content-Disposition: attachment; filename=" . $filename);
         $this -> load -> model('produtos');
         $this -> produtos -> etiquetas();
     }
+    
+    function produtos_etiquetas() {
+        $this -> load -> model('produtos');
+        $this->cab();
+        
+        $data['title'] = 'Etiquetas para imprimir';
+        $data['content'] = '<a href="'.base_url('index.php/main/produtos_etiqueta').'" class="btn btn-primary">Imprimir Etiquetas</a>';
+        $data['content'] .= $this -> produtos -> etiquetas_para_imprimir();
+        $this->load->view('content',$data);
+        
+        $this->footer();
+    }   
+    
+    function produtos_checkin()
+        {
+        /* Load Model */
+        $model = 'produtos';
+        $this -> load -> model($model);
+        $cod = get("dd1");
+        $acao = get("acao");
+        $data = array();
+        $tipo = 2;
+
+        /* Controller */
+        $this -> cab();
+        $data['dados_produto'] = '';
+        $data['title'] = 'Checkin de produtos';
+        $ok = 0;
+        if (strlen($acao) > 0) {
+            $cod = substr($cod, 0, 7);
+            $cod = strzero($cod, 7);
+
+            $data2 = $this -> $model -> le_produto_ean($cod);
+            if (count($data2) > 0) {
+                $data['dados_produto'] = $this -> load -> view('produto/view_6', $data2, true);
+                $data['title'] = 'Checkin do produto';
+                $this -> $model -> movimenta_para_estoque($data2['id_pr'],$tipo);
+                $ok = 1;
+            } else {
+                $data['erro'] = 'Código Inválido<br>' . $cod;
+                $data['dados_produto'] = $this -> load -> view('alert', $data, true);
+            }
+        }
+
+        $data['cod'] = $cod;
+        $data['content'] = $this -> load -> view('produto/leitor_codigo', $data, true);
+        
+        if ($ok==1)
+            {
+                $tela = $data['content'];
+                $data['content'] = 'Checkin realizado com sucesso!';
+                $tela .= $this->load->view('success',$data,true);
+                $data['content'] = $tela;
+            }
+                    
+        $this -> load -> view('content', $data);
+
+        $this -> footer();  
+        } 
 
     function produto_view($id = '') {
         /* Load Model */

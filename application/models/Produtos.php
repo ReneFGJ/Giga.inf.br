@@ -700,6 +700,59 @@ class produtos extends CI_model {
 		echo '<pre>' . $sx . '</pre>';
 	}
 
+    function etiquetas_para_imprimir() {
+        $sql = "select * from produtos 
+                    INNER JOIN produtos_categoria ON id_pc = pr_categoria
+                    INNER JOIN produto_nome ON id_pn = pr_produto
+                        WHERE pr_etiqueta = 1
+                        order by pc_nome, pc_nome, pr_serial
+            ";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $sx = '';
+        $i = 35;
+        $xcat = '';
+        for ($r = 0; $r < count($rlt); $r = $r + 1) {
+            $line = $rlt[$r];
+            $mod = trim($line['pr_modelo']);
+            $cat = $line['pc_nome'];
+            if ($cat != $xcat)
+                {
+                    $xcat = $cat;
+                    $sx .= '<div class="row">';
+                    $sx .= '<div class="col-md-12"><h3>'.$cat.'</h3></div>';
+                    $sx .= '</div>'.cr();
+                }
+            $sx .= '<div class="row">';
+            $sx .= '<div class="col-md-1">';
+            $sx .= '<b>#'.strzero($r+1,3).'</b>';
+            $sx .= '</div>'.cr();
+            
+            $sx .= '<div class="col-md-2">';
+            $sx .= $line['pr_patrimonio'];
+            $sx .= '</div>'.cr();
+            
+            $sx .= '<div class="col-md-4">';
+            $sx .= $line['pn_descricao'];
+            $sx .= '</div>'.cr();
+            
+            $sx .= '<div class="col-md-2">';            
+            $sx .= $line['pr_serial'];
+            $sx .= '</div>'.cr();
+            
+            $sx .= '<div class="col-md-2">';
+            $sx .= $line['pr_modelo'];
+            $sx .= '</div>'.cr();
+            
+            $sx .= '<div class="col-md-1">';
+            $sx .= '</div>'.cr();
+            
+            $sx .= '</div>'.cr();
+            $sx .= cr();
+        }
+        return($sx);
+    }
+
 	function lista_produtos_categoria($id) {
 		$sql = 'select * from ' . $this -> table_produto . ' WHERE id_pc = ' . round($id);
 		$rlt = $this -> db -> query($sql);
@@ -838,11 +891,16 @@ class produtos extends CI_model {
 		return ($sx);
 	}
 	/****************** LOGISTICA *************/
-	function movimenta_para_estoque($id)
+	function movimenta_para_estoque($id,$tipo=0)
 		{
 			$user = $_SESSION['id'];
+            $et = 0;
+            if ($tipo == 5)
+                {
+                    $et = 1;
+                }
 			$sql = "update produtos set
-						pr_etiqueta = 0,
+						pr_etiqueta = $et,
 						pr_ativo = 1,
 						pr_cliente = 0,
 						pr_doc = 0
@@ -855,7 +913,7 @@ class produtos extends CI_model {
 						)
 						values
 						(
-							$id,1,$user,
+							$id,$tipo,$user,
 							0
 						)";
 			$rlt = $this->db->query($sql);

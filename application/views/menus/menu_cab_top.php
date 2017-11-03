@@ -53,6 +53,9 @@ $us_nome = $_SESSION['user'];
 				echo '	<li>' . cr();
 				echo '		<li><a href="' . base_url('index.php/financeiro/creceber') . '">Contas a Receber</a></li>' . cr();
 				echo '	</li>' . cr();
+                echo '  <li>' . cr();
+                echo '      <li><a href="' . base_url('index.php/financeiro/analise') . '">Análise de crédito</a></li>' . cr();
+                echo '  </li>' . cr();
 				echo '	<li>' . cr();
 				echo '		<li><a href="' . base_url('index.php/financeiro/faturar') . '">Faturar</a></li>' . cr();
 				echo '	</li>' . cr();
@@ -90,8 +93,11 @@ $us_nome = $_SESSION['user'];
 						<a href="<?php echo base_url('index.php/main/produtos'); ?>">Busca produtos</a>
 					</li>
 					<li>
-						<a href="<?php echo base_url('index.php/main/produtos_etiquetas'); ?>">Gerar Etiquetas</a>
+						<a href="<?php echo base_url('index.php/main/produtos_etiquetas'); ?>">Etiquetas</a>
 					</li>
+                    <li>
+                        <a href="<?php echo base_url('index.php/main/produtos_checkin'); ?>">Produtos Checkin</a>
+                    </li>
 					<li role="separator" class="divider"></li>
 					<li>
 						<a href="<?php echo base_url('index.php/main/produtos_movimentacao/0'); ?>">Consulta produto</a>

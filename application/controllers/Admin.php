@@ -378,6 +378,19 @@ class Admin extends CI_controller {
 		$this->footer();			
 		}
 
+    function comunicacao_view($id='')
+        {
+        /* Load Models */
+        $this -> load -> model('ics');
+
+        $this -> cab();
+        $data = array();
+
+        $data = $this->ics->le($id);
+        $this->load->view('ics/view',$data);
+        $this->footer();           
+        }
+
 	function comunicacao_1($id = 0, $gr = 0, $tp = 0) {
 		/* Load Models */
 		$this -> load -> model('ics');
@@ -395,7 +408,7 @@ class Admin extends CI_controller {
 		$form = $this -> ics -> row($form);
 
 		$form -> row_edit = base_url('index.php/admin/mensagens_edit');
-		$form -> row_view = '';
+		$form -> row_view = base_url('index.php/admin/comunicacao_view/');
 		$form -> row = base_url('index.php/admin/comunicacao_1/');
 
 		$data['content'] = row($form, $id);
