@@ -760,6 +760,12 @@ class financeiros extends CI_model {
                     break;
             }
         }
+        
+        /* FILIAIS */  
+        if ((isset($data['filial'])) and (strlen($data['filial']) > 0))
+            {
+                $wh .= 'AND (cp_filial = '.$data['filial'].')';
+            }        
 
         $sql = "select * from $table 
 							left join clientes ON id_f = cp_fornecedor

@@ -814,55 +814,56 @@ class Financeiro extends CI_Controller {
 		}
 	}
 
-	function creceber_abertos() {
-		$this -> load -> model('financeiros');
+    function creceber_abertos() {
+        $this -> load -> model('financeiros');
 
-		$this -> cab();
-		$data['title'] = msg('contas_receber_relatorio');
-		$form = new form;
-		$cp = array();
-		array_push($cp, array('$H8', '', '', false, true));
-		array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
-		array_push($cp, array('$D8', '', 'Vencimento final', True, true));
-		array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', True, true));
-        array_push($cp, array('$C', '', '<span class="middle">Somente não recebiveis</font>', False, true));
-		$data['content'] = $form -> editar($cp, '');
-		$this -> load -> view('content', $data);
+        $this -> cab();
+        $data['title'] = msg('contas_receber_relatorio');
+        $form = new form;
+        $cp = array();
+        array_push($cp, array('$H8', '', '', false, true));
+        array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
+        array_push($cp, array('$D8', '', 'Vencimento final', True, true));
+        array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', True, true));
+        $sql = "select * from _filiais where fi_ativo = 1";
+        array_push($cp, array('$Q id_fi:fi_nome_fantasia:'.$sql, '', 'Empresa', False, true));
+        $data['content'] = $form -> editar($cp, '');
+        $this -> load -> view('content', $data);
 
-		if ($form -> saved > 0) {
-		    $pm = array();
-            if (strlen(get("dd4") > 0))
-                {
-                    $pm['recebiveis'] = get("dd4");
-                } 
-			$sx = $this -> financeiros -> financeiro_abertos(2,$pm);
-			$data['content'] = $sx;
-			$this -> load -> view('content', $data);
-		}
-		$this -> footer();
-	}
+        if ($form -> saved > 0) {
+            $dt['filial'] = get("dd4");
+            $sx = $this -> financeiros -> financeiro_abertos(2,$dt);
+            $data['content'] = $sx;
+            $this -> load -> view('content', $data);
+        }
+        $this -> footer();
+    }
 
-	function cpagar_abertos() {
-		$this -> load -> model('financeiros');
+    function cpagar_abertos() {
+        $this -> load -> model('financeiros');
 
-		$this -> cab();
-		$data['title'] = msg('contas_pagar_relatorio');
-		$form = new form;
-		$cp = array();
-		array_push($cp, array('$H8', '', '', false, true));
-		array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
-		array_push($cp, array('$D8', '', 'Vencimento final', True, true));
-		array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', True, true));
-		$data['content'] = $form -> editar($cp, '');
-		$this -> load -> view('content', $data);
+        $this -> cab();
+        $data['title'] = msg('contas_pagar_relatorio');
+        $form = new form;
+        $cp = array();
+        array_push($cp, array('$H8', '', '', false, true));
+        array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
+        array_push($cp, array('$D8', '', 'Vencimento final', True, true));
+        array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', True, true));
+                $sql = "select * from _filiais where fi_ativo = 1";
+        array_push($cp, array('$Q id_fi:fi_nome_fantasia:'.$sql, '', 'Empresa', False, true));
+        
+        $data['content'] = $form -> editar($cp, '');
+        $this -> load -> view('content', $data);
 
-		if ($form -> saved > 0) {
-			$sx = $this -> financeiros -> financeiro_abertos(1);
-			$data['content'] = $sx;
-			$this -> load -> view('content', $data);
-		}
-		$this -> footer();
-	}
+        if ($form -> saved > 0) {
+            $dt['filial'] = get("dd4");
+            $sx = $this -> financeiros -> financeiro_abertos(1,$dt);
+            $data['content'] = $sx;
+            $this -> load -> view('content', $data);
+        }
+        $this -> footer();
+    }
 
 	function resumos_cpagar() {
 
