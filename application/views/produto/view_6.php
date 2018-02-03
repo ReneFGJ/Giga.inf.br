@@ -18,8 +18,8 @@ $linkp = '<a href="' . $linkp . '">';
 			<span class="small">marca</span><br>
 			<span class="big"><?php echo $ma_nome; ?></span><br>
 			
-			<span class="small">patrimônio</span><br>
-			<span class="big"><?php echo $pr_patrimonio; ?></span><br>
+			<span class="small">patrimônio / tombo</span><br>
+			<span class="big"><?php echo $pr_patrimonio .' / '.$pr_tag; ?></span><br>
 
 			<span class="small">modelo</span><br>
 			<span class="big"><?php echo $pr_modelo; ?></span><br>

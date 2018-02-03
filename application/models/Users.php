@@ -125,15 +125,27 @@ class users extends CI_model {
 
     function user_list($id='')
         {
+            $wh = '';
+            if (strlen($id) > 0)
+                {
+                    $wh = " AND (usd_empresa = $id)";
+                }
            $sql = "select * from users
                         LEFT JOIN user_drh on id_us = usd_id_us
                         LEFT JOIN _filiais ON id_fi = usd_empresa
-                        WHERE us_ativo = 1
+                        WHERE us_ativo = 1 $wh
                     ORDER BY fi_nome_fantasia, us_nome  
                     ";
            $rlt = $this->db->query($sql);
            $rlt = $rlt->result_array();
            $sx = '<table width="100%" class="table middle">';
+           $sx .= '<tr>'.cr();
+           $sx .= '     <th width="5%">#</th>'.cr();
+           $sx .= '     <th width="50%">Nome</th>'.cr();
+           $sx .= '     <th width="15%">Dt. Admissão</th>'.cr();
+           $sx .= '     <th width="15%">Dt. Nascimento</th>'.cr();
+           $sx .= '     <th width="15%">CPF</th>'.cr();
+           $sx .= '</tr>'.cr(); 
            $xemp = '';
            $nr = 1;
            for ($r=0;$r < count($rlt);$r++)
@@ -147,10 +159,15 @@ class users extends CI_model {
                             $sx .= '<tr><td colspan=5 class="big">'.$emp.'</td></tr>';
                             $xemp = $emp;                            
                         }
-                    
+                    $link = '<a href="'.base_url('index.php/admin/user/'.$line['id_us'].'/'.checkpost_link($line['id_us'])).'">';
+                    $linka = '</a>';
                     $sx .= '<tr>';
                     $sx .= '<td align="center">'.$nr.'</td>';
-                    $sx .= '<td>'.$line['us_nome'].'</td>';
+                    $sx .= '<td>'.$link.$line['us_nome'].$linka.'</td>';
+                    $sx .= '<td>'.stodbr($line['usd_dt_admissao']).'</td>';
+                    $sx .= '<td>'.stodbr($line['usd_nascimento']).'</td>';
+                    $sx .= '<td>'.$line['usd_cpf'].'</td>';
+                    
                     
                     $nr++;
                 } 

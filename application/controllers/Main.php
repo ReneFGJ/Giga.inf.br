@@ -355,6 +355,7 @@ class Main extends CI_Controller {
         $editar = 0;
         /* Load Model */
         $this -> load -> model('clientes');
+        $this -> load -> model('contratos');
         $this -> load -> model('pedidos');
         $this -> load -> model('ics');
 
@@ -366,15 +367,9 @@ class Main extends CI_Controller {
         $this -> cab();
 
         $client['data'] = data_completa($data['pp_data']);
-
-        $txt = $this -> ics -> busca('PED_' . $data['pp_tipo_pedido'], $client);
-        if (!isset($txt['nw_texto'])) {
-            echo 'Não existe texto para o código PED_' . $data['pp_tipo_pedido'];
-            echo '<br><br>Cadastre primeiro em -> Administrador -> Mensagens do sistema';
-            exit ;
-        }
-        $data['cab'] = $txt['nw_texto'];
-
+        
+        $data['cab'] = '';
+        
         $data['dados_cliente'] = $this -> load -> view('cliente/show', $client, true);
         if ($data['pp_cliente_faturamento'] > 0) {
             $client_f = $this -> clientes -> le($id_cliente_f);
@@ -390,11 +385,24 @@ class Main extends CI_Controller {
         $data['id_pp'] = $id;
         $data['dados_item'] = $this -> pedidos -> pedido_items($id);
         $data['dados_acoes'] = $this -> pedidos -> pedido_acoes($data);
-        $data['contatos'] = $this -> pedidos -> contatos_do_pedido($id, $id_cliente, $editar);
+        $data['contatos'] = $this -> pedidos -> contatos_do_pedido_simples($id, $id_cliente, $editar);
 
         //$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
         $data['dados_condicoes'] = $this -> pedidos -> pedido_condicoes($id, $editar);
-        $this -> load -> view('pedido/pedido', $data);
+        $data['itens_locados'] = $this -> contratos -> anexos_simple($id,1);
+        
+        /* monta pedido */        
+        $this -> load -> view('header/filial_header', $data);
+        $this -> load -> view('pedido/pedido_info', $data);
+        $this -> load -> view('cliente/cliente', $data);
+        $this -> load -> view('cliente/cliente_contato', $data);
+              
+        $this -> load -> view('pedido/pedido_itens', $data);
+        $this -> load -> view('pedido/pedido_condicoes', $data);
+        $this -> load -> view('pedido/pedido_itens_locados', $data);
+        
+        $this -> load -> view('pedido/pedido_acao', $data);
+        //$this -> load -> view('pedido/pedido', $data);
     }
 
     function locacao_item_novo_serie($id, $ped, $cliente) {
@@ -413,7 +421,7 @@ class Main extends CI_Controller {
 
         $cp = array();
         array_push($cp, array('$H8', '', '', false, false));
-        array_push($cp, array('$S50', '', 'N. série', true, true));
+        array_push($cp, array('$S50', '', 'Tombo/Barcode', true, true));
         array_push($cp, array('$D8', '', 'Dt. Início', true, true));
         array_push($cp, array('$D8', '', 'Dt. Devolução', true, true));
         array_push($cp, array('$B8', '', 'Inserir >>>', false, true));
@@ -426,9 +434,67 @@ class Main extends CI_Controller {
             $serie = get("dd1");
             $d1 = brtos(get("dd2"));
             $d2 = brtos(get("dd3"));
-            echo "==>" . $d1 . "==" . $d2;
+            //echo "==>" . $d1 . "==" . $d2;
+            
+            $tela = $this -> produtos -> produto_registra_serie($serie, $ped, $d1, $d2, $cliente);
+            $tela .= '<br><br>';
+            $tela .= '<a href="'.base_url('index.php/main/locacao_item_novo_serie/'.$id.'/'.$ped.'/'.$cliente).'" class="btn btn-default">';
+            $tela .= 'Novo Item';
+            $tela .= '</a>';
+            $tela .=' | ';            
+            $tela .= '<a href="#" class="btn btn-default" onclick="window.opener.location.reload(); window.close();">';
+            $tela .= 'Fechar';
+            $tela .= '</a>';
 
-            $tela .= $this -> produtos -> produto_registra_serie($serie, $ped, $d1, $d2, $cliente);
+            $tela = '<meta http-equiv="refresh" content="0; url='.base_url('index.php/main/locacao_item_novo_serie/'.$id.'/'.$ped.'/'.$cliente).'">';            
+        }
+        $tela .= '<script> $("#dd1").focus(); </script>';
+        $data['content'] = $tela;
+        $data['title'] = '';
+        
+        $data['content'] .= $this->produtos->items_por_pedido($ped);
+        $this -> load -> view('content', $data);
+    }
+
+    function devolucao_item($id, $ped='', $cliente='') {
+        $editar = 0;
+        if (strlen(get("acao")) == 0) {
+            $_POST['dd2'] = stodbr(sonumero($_SESSION['data_fim']));
+        }
+        /* Load Model */
+        $this -> load -> model('clientes');
+        $this -> load -> model('pedidos');
+        $this -> load -> model('produtos');
+        $this -> load -> model('ics');
+        $data['nocab'] = 0;
+        $this -> cab($data);
+
+        $cp = array();
+        array_push($cp, array('$H8', '', '', false, false));
+        array_push($cp, array('$S50', '', 'Tombo/Barcode', true, true));
+        array_push($cp, array('$D8', '', 'Dt. Devolução', true, true));
+        array_push($cp, array('$B8', '', 'Devolver >>>', false, true));
+
+        $form = new form;
+        $tela = $form -> editar($cp, '');
+
+        /* */
+        if ($form -> saved > 0) {
+            $serie = get("dd1");
+            $d1 = brtos(get("dd2"));
+            //echo "==>" . $serie . "==" . $id;
+
+            $tela = $this -> produtos -> produto_devolucao_serie($serie, $id, $d1);
+            $tela .= '<br><br>';
+            $tela .= '<a href="'.base_url('index.php/main/devolucao_item/'.$id).'" class="btn btn-default">';
+            $tela .= 'Devolver outro Item';
+            $tela .= '</a>';
+            $tela .=' | ';            
+            $tela .= '<a href="#" class="btn btn-default" onclick="window.opener.location.reload(); window.close();">';
+            $tela .= 'Fechar';
+            $tela .= '</a>';
+
+            
         }
 
         $data['content'] = $tela;
@@ -480,9 +546,12 @@ class Main extends CI_Controller {
 
         $data['dados_item'] = $this -> pedidos -> pedido_items($id);
         $data['dados_acoes'] = '<button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo/' . $id) . '\',800,600);" class="btn btn-primary">Incluir equipamentos</button>';
-        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo_serie/' . $id . '/' . $data['pp_nr'] . '/' . $data['pp_cliente']) . '\',800,600);" class="btn btn-primary">Incluie equipamentos pelo n. série</button>';
-        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/contrato_pdf/' . $id) . '\',800,600);" class="btn btn-primary">Contrato Imprimir</button>';
-        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/romaneio/' . $id) . '\',800,600);" class="btn btn-primary">Romaneio Imprimir</button>';
+        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo_serie/' . $id . '/' . $data['pp_nr'] . '/' . $data['pp_cliente']) . '\',800,600);" class="btn btn-primary">Incluir equipamentos pelo n. série</button>';
+        //$data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/contrato_pdf/' . $id) . '\',800,600);" class="btn btn-primary">Contrato Imprimir</button>';
+        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/recibo_entrega/' . $id) . '\',1024,800);" class="btn btn-primary">Recibo de Entrega</button>';
+        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/devolucao_item/' . $id) . '\',1024,800);" class="btn btn-success">Devolver Equipamento</button>';
+        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/recibo_devolucao/' . $id) . '\',1024,800);" class="btn btn-success">Recibo de Devolução</button>';
+
         $data['contatos'] = '';
 
         //$data['dados_item'] .= $this -> load -> view('proposta/proposta_item', $data, true);
@@ -678,8 +747,8 @@ class Main extends CI_Controller {
 
         /* resumo */
         $data['resumo'] = $this -> load -> view('cliente/resumo', $data, true);
-        $data['resumo'] .= $contato;
-        $data['resumo'] .= $this -> clientes -> novo_contato($id);
+        //$data['resumo'] .= $contato;
+        //$data['resumo'] .= $this -> clientes -> novo_contato($id);
 
         $this -> load -> view('cliente/show', $data);
         $this -> load -> view('cliente/show_about', $data);
@@ -726,7 +795,12 @@ class Main extends CI_Controller {
     }
 
     /************************************************************************* PRODUTOS CATEGORIA *****************/
-    function locacao() {
+    function locacao($tipo='') {
+        
+        if (strlen($tipo) == 0)
+            {
+                $tipo = '2';
+            }
         /* Load Model */
         $model = 'produtos';
         $this -> load -> model('produtos');
@@ -734,10 +808,22 @@ class Main extends CI_Controller {
         /* Controller */
         $this -> cab();
         $data = array();
-        $data['locacoes_aberto'] = $this -> $model -> contratos_situacao(2);
-        $data['locacoes_em_locacao'] = $this -> $model -> contratos_situacao(3);
+        switch ($tipo)
+            {
+            case '2':
+                $data['title'] = 'Em processo para locação';
+                $data['content'] = $this -> $model -> contratos_situacao(2);
+                $this->load->view('content',$data);
+                break;
+        
+//        $data['title'] = 'Em faturamento';
+//        $data['content'] = $this -> $model -> contratos_situacao(3);
+//        $this->load->view('content',$data);
 
-        $this -> load -> view('locacao/resumo', $data);
+//        $data['title'] = 'No cliente';
+//        $data['content'] = $this -> $model -> contratos_situacao(4);
+//        $this->load->view('content',$data);
+        }
         $this -> footer();
 
     }
@@ -817,7 +903,8 @@ class Main extends CI_Controller {
         $cp = $this -> produtos -> cp_item_patrimonio($id);
         $form = new form;
         $form -> id = $id;
-
+echo "OPS";
+exit;
         $tela = $form -> editar($cp, $this -> produtos -> table);
         //$_POST['dd3'] = get("prod");
 
@@ -842,7 +929,7 @@ class Main extends CI_Controller {
         }
     }
 
-    function produtos_categoria_editar() {
+    function produtos_categoria_editar($pg='') {
         /* Load Model */
         $model = 'produtos';
         $this -> load -> model('produtos');
@@ -851,7 +938,7 @@ class Main extends CI_Controller {
         $this -> cab();
         $data = array();
         $data['title'] = 'Cadastro de produtos';
-        $data['content'] = $this -> $model -> row();
+        $data['content'] = $this -> $model -> row($pg);
         $this -> load -> view('content', $data);
         $this -> footer();
     }
@@ -875,6 +962,33 @@ class Main extends CI_Controller {
 
         $this -> footer();
     }
+    
+    function produto($id) {
+        /* Load Model */
+        $model = 'produtos';
+        $this -> load -> model('produtos');
+
+        /* Controller */
+        $this -> cab();
+        $data = $this -> produtos -> le_produto($id);
+
+
+        $data['imagens'] = '';
+
+        $tela = $this -> load -> view('produto/view_6', $data, true);
+        
+        
+        $tela .= $this -> produtos -> historico_produto($id);
+
+        //$data['row'] = $this -> produtos -> row_produtos($id);
+
+        //$this -> load -> view('produto/produtos_view', $data);
+        $data['content'] = $tela;
+        $data['title'] = $data['pr_modelo'];
+        $this->load->view('content',$data);
+        
+        $this -> footer();
+    }    
 
     function produtos_edit($id = 0, $chk = '') {
         $modal = 'produtos';
@@ -893,7 +1007,7 @@ class Main extends CI_Controller {
     }
 
     /************************************************************************* PRODUTOS NOME *****************/
-    function produtos_nomes() {
+    function produtos_nomes($pg='') {
         /* Load Model */
         $model = 'produtos';
         $this -> load -> model('produtos');
@@ -902,7 +1016,7 @@ class Main extends CI_Controller {
         $this -> cab();
         $data = array();
         $data['title'] = 'Descrição dos produtos';
-        $data['content'] = $this -> $model -> row_descricao();
+        $data['content'] = $this -> $model -> row_descricao($pg);
         $this -> load -> view('content', $data);
         $this -> footer();
     }
@@ -942,7 +1056,7 @@ class Main extends CI_Controller {
     }
 
     /************************************************************************* PRODUTOS CATEGORIA *****************/
-    function produtos_categoria() {
+    function produtos_categoria($pg='') {
         /* Load Model */
         $model = 'produtos';
         $this -> load -> model('produtos');
@@ -951,7 +1065,7 @@ class Main extends CI_Controller {
         $this -> cab();
         $data = array();
         $data['title'] = 'Descrições dos produtos';
-        $data['content'] = $this -> $model -> row_categoria();
+        $data['content'] = $this -> $model -> row_categoria($pg);
         $this -> load -> view('content', $data);
         $this -> footer();
     }
@@ -991,7 +1105,7 @@ class Main extends CI_Controller {
     }
 
     /************************************************************************* PRODUTOS MODELO *****************/
-    function produtos_modelo() {
+    function produtos_modelo($pg='') {
         /* Load Model */
         $model = 'produtos';
         $this -> load -> model('produtos');
@@ -1000,7 +1114,7 @@ class Main extends CI_Controller {
         $this -> cab();
         $data = array();
         $data['title'] = 'Modelo dos produtos';
-        $data['content'] = $this -> $model -> row_modelos();
+        $data['content'] = $this -> $model -> row_modelos($pg);
         $this -> load -> view('content', $data);
         $this -> footer();
     }
@@ -1034,7 +1148,7 @@ class Main extends CI_Controller {
     }
 
     /************************************************************************* PRODUTOS MARC *****************/
-    function produtos_marca() {
+    function produtos_marca($pg='') {
         /* Load Model */
         $model = 'produtos';
         $this -> load -> model('produtos');
@@ -1043,7 +1157,7 @@ class Main extends CI_Controller {
         $this -> cab();
         $data = array();
         $data['title'] = 'Marca dos produtos';
-        $data['content'] = $this -> $model -> row_marcas();
+        $data['content'] = $this -> $model -> row_marcas($pg);
         $this -> load -> view('content', $data);
         $this -> footer();
     }
@@ -1076,6 +1190,30 @@ class Main extends CI_Controller {
         $this -> footer();
     }
 
+    function produtos_relatorio($cod='',$pag='')
+        {
+        /* Load Model */
+        $model = 'produtos';
+        $this -> load -> model($model);
+        
+        /* Controller */
+        $this -> cab();
+        switch($cod)
+            {
+            case '0':
+                /* Relatório Geral */
+                $tela = $this->$model->estoque_geral($pag);
+                $title = "Estoque Geral";
+                break;
+            default:
+                $tela = '';
+                $title = '';
+            }  
+            $data['content'] = $tela;
+            $data['title'] = $title;
+            $this->load->view('content',$data);
+            $this->footer();
+        }
     function produtos_movimentacao($cod='',$tipo = '') {
         /* Load Model */
         $model = 'produtos';
@@ -1234,18 +1372,23 @@ class Main extends CI_Controller {
         //$_POST['dd3'] = get("prod");
 
         if ($form -> saved > 0) {
-            $quant = round(get("dd8"));
+            $quant = round(get("dd9"));
             /* Multiplas entradas */
             if (strlen($id) == 0) {
                 $s = get("dd7");
+                $tb = get("dd8");
                 for ($z = 2; $z <= $quant; $z++) {
                     $_POST['dd7'] = $s . '#' . $z;
+                    $_POST['dd8'] = $tb . '#' . $z;
                     $tela = $form -> editar($cp, $this -> produtos -> table);
                 }
+                $_POST['dd7'] = '';
+                $_POST['dd13'] = '';
+                $tela = $form -> editar($cp, $this -> produtos -> table);
             }
             $this -> produtos -> updatex();
             $data['title'] = '';
-            $data['content'] = '<script> wclose(); </script>';
+            $data['content'] = $tela;
             $this -> load -> view('content', $data);
         } else {
             $data['content'] = $tela;
@@ -1254,12 +1397,12 @@ class Main extends CI_Controller {
         }
     }
 
-    function produtos_etiqueta() {
-        $filename = 'etiqueta.prn';
+    function produtos_etiqueta($tp='') {
+        $filename = 'etiqueta.etq';
         header("Content-Type: application/force-download");
         header("Content-Disposition: attachment; filename=" . $filename);
         $this -> load -> model('produtos');
-        $this -> produtos -> etiquetas();
+        $this -> produtos -> etiquetas($tp);
     }
     
     function produtos_etiquetas() {
@@ -1267,7 +1410,8 @@ class Main extends CI_Controller {
         $this->cab();
         
         $data['title'] = 'Etiquetas para imprimir';
-        $data['content'] = '<a href="'.base_url('index.php/main/produtos_etiqueta').'" class="btn btn-primary">Imprimir Etiquetas</a>';
+        $data['content'] = '<a href="'.base_url('index.php/main/produtos_etiqueta/1').'" class="btn btn-primary">Imprimir Etiquetas Normal</a> | ';
+        $data['content'] .= '<a href="'.base_url('index.php/main/produtos_etiqueta/2').'" class="btn btn-primary">Imprimir Etiquetas Mini</a>';        
         $data['content'] .= $this -> produtos -> etiquetas_para_imprimir();
         $this->load->view('content',$data);
         
@@ -1613,7 +1757,7 @@ class Main extends CI_Controller {
         }
     }
 
-    function romaneio($id = 0) {
+    function recibo_entrega($id = 0) {
         $this -> load -> model('clientes');
         $this -> load -> model('contratos');
         $this -> load -> model('pedidos');
@@ -1623,19 +1767,41 @@ class Main extends CI_Controller {
         $data = $this -> contratos -> le($id);
         
         $data4 = $this -> pedidos -> le($id);
-        $data3 = $this -> empresas -> le(1);
+        $id_emp = $data4['pp_filial'];
+        $data3 = $this -> empresas -> le($id_emp);
+        $cab = $this->load->view('empresa/view_print',$data3,true);
         $data2 = $this -> clientes -> le($data4['pp_cliente']);
 
         //$data2 = $this->filiais->le(1);
         $data = array_merge($data, $data2, $data3);
-        $anexo = $this -> contratos -> anexos($id);
+        $anexo_2 = $this -> contratos -> anexos($id,1);
+        $anexo = $this -> contratos -> anexos_simple($id,1);
         $condicoes = '';
 
         $txt = $this->ics->busca('RECIBO_1');
         $contrato = $txt['nw_texto'];
+        
+        $data['title'] = 'LOCATÁRIO';
         $contrato = troca($contrato, '$LOCATARIO_DADOS', $this -> load -> view('contrato/contrato_locatario', $data, true));
+        
+        $cab .= '<div class="row" style="background-color:#e0e0e0; font-size: 18px;"><div class="col-md-12 text-right">Recibo de Entrega '.$data4['id_pp'].'/'.substr($data4['pp_data'],0,4).'</div></div>'.cr();
+        
+        //print_r($data4);        
+        if (strlen($data4['pp_obs']) > 0)
+            {
+                $contrato .= '<br><br>
+                              <div class="row">
+                                <div class="col-md-12">
+                                    Observação
+                                    <br>'.mst($data4['pp_obs']).'</br>
+                                </div>
+                              </div>'.cr();
+            }
+        
+        
         $contrato = troca($contrato, '$LOCADORA_DADOS', $this -> load -> view('contrato/contrato_locador', $data, true));
         $contrato = troca($contrato, '$EQUIPAMENTOS', $anexo);
+        $contrato = troca($contrato, '$L_EQUIPAMENTOS', $anexo_2);
         $contrato = troca($contrato, '$CONDICOES', $condicoes);
         $contrato = troca($contrato, '$LOCATARIA', $data['f_razao_social']);
         $contrato = troca($contrato, '$LOCADORA', $data['f_razao_social']);
@@ -1644,9 +1810,72 @@ class Main extends CI_Controller {
         $data['nocab'] = true;
         $this->cab($data);
         
-        $tela = $contrato;        
+        $tela = $cab.$contrato;        
         $data['content'] = $tela;
-        $data['title'] = 'Recibo de entrega - '.$data4['pp_nr'];
+        $data['title'] = '';
+
+        $this->load->view('content',$data);
+    }
+
+    function recibo_devolucao($id = 0) {
+        $this -> load -> model('clientes');
+        $this -> load -> model('contratos');
+        $this -> load -> model('pedidos');
+        $this -> load -> model('empresas');
+        $this -> load -> model('ics');
+
+        $data = $this -> contratos -> le($id);
+        
+        $data4 = $this -> pedidos -> le($id);
+        $id_emp = $data4['pp_filial'];
+        $data3 = $this -> empresas -> le($id_emp);
+        $cab = $this->load->view('empresa/view_print',$data3,true);
+        $data2 = $this -> clientes -> le($data4['pp_cliente']);
+
+        //$data2 = $this->filiais->le(1);
+        $data = array_merge($data, $data2, $data3);
+        $anexo_2 = $this -> contratos -> anexos($id,1);
+        $anexo = $this -> contratos -> anexos_simple($id,1,' [ ]');
+        $condicoes = '';
+
+        $txt = $this->ics->busca('RECIBO_2');
+        $contrato = $txt['nw_texto'];
+        
+        $data['title'] = 'LOCATÁRIO';
+        $contrato = troca($contrato, '$LOCATARIO_DADOS', $this -> load -> view('contrato/contrato_locatario', $data, true));
+        
+        $cab .= '<div class="row" style="background-color:#e0e0e0; font-size: 18px;">
+                    <div class="col-md-12 text-right">Recibo de Devolucao '.$data4['id_pp'].'/'.substr($data4['pp_data'],0,4).'
+                    </div>
+                 </div>'.cr();
+        
+        //print_r($data4);        
+        if (strlen($data4['pp_obs']) > 0)
+            {
+                $contrato .= '<br><br>
+                              <div class="row">
+                                <div class="col-md-12">
+                                    Observação
+                                    <br>'.mst($data4['pp_obs']).'</br>
+                                </div>
+                              </div>'.cr();
+            }
+        
+        
+        $contrato = troca($contrato, '$LOCADORA_DADOS', $this -> load -> view('contrato/contrato_locador', $data, true));
+        $contrato = troca($contrato, '$EQUIPAMENTOS', $anexo);
+        $contrato = troca($contrato, '$L_EQUIPAMENTOS', $anexo_2);
+        $contrato = troca($contrato, '$CONDICOES', $condicoes);
+        $contrato = troca($contrato, '$LOCATARIA', $data['f_razao_social']);
+        $contrato = troca($contrato, '$LOCADORA', $data['f_razao_social']);
+
+        //$data['content'] = $contrato;
+        $data['nocab'] = true;
+        $this->cab($data);
+        
+        $tela = $cab.$contrato;        
+        $data['content'] = $tela;
+        $data['title'] = '';
 
         $this->load->view('content',$data);
     }

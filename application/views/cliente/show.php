@@ -10,16 +10,21 @@
 			</button>
 		</div>
 	</div>
-
+	<div class="row nopr">
+        <div class="col-md-12">
+            <a href="<?php echo base_url('index.php/main/clientes_edit/'.$id_f.'/'.checkpost_link($id_f));?>" class="small">editar</a>
+        </div>
+    </div>
 	<!------------------------------------------ CNPJ ------------->
-	<div class="row noscreen" style="margin-top: 10px; display: none;" id="clie01">
+	<div class="row noscreen2" style="margin-top: 10px;" id="clie01">
 		<div class="col-md-4 col-xs-4""><span class="small">CNPJ</span><br><span class="big"><?php echo $f_cnpj; ?>&nbsp;</span></div>
 		<div class="col-md-4 col-xs-4""><span class="small">Insc. Estadual</span><br><span class="big"><?php echo $f_ie; ?>&nbsp;</span></div>
-		<div class="col-md-4 col-xs-4""><span class="small">Insc. Municipal</span><br><span class="big"><?php echo $f_im; ?>&nbsp;</span></div>
+		<div class="col-md-3 col-xs-3""><span class="small">Insc. Municipal</span><br><span class="big"><?php echo $f_im; ?>&nbsp;</span></div>
+		<div class="col-md-1 col-xs-1""><span class="small">N. Cadastr.</span><br><span class="big"><?php echo $id_f; ?>&nbsp;</span></div>
 	</div>
 
 	<!------------------------------------------ Endereco ------------->
-	<div class="row" style="margin-top: 10px; display: none;" id="clie02">
+	<div class="row noscreen2" style="margin-top: 10px;" id="clie02">
 		<div class="col-md-5 col-xs-5"><span class="small">Logradouro</span><br><span class="big"><?php echo $f_logradouro; ?> <?php echo $f_numero; ?> <?php echo $f_complemento; ?></span></div>
 		<div class="col-md-2 col-xs-2""><span class="small">CEP</span><br><span class="big"><?php echo $f_cep; ?></span></div>
 		<div class="col-md-2 col-xs-2""><span class="small">Bairro</span><br><span class="big"><?php echo $f_bairro; ?></span></div>

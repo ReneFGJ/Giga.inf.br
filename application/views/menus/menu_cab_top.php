@@ -104,7 +104,11 @@ $us_nome = $_SESSION['user'];
 					</li>					
 					<li>
 						<a href="<?php echo base_url('index.php/main/produtos_movimentacao/1'); ?>">Entrada na Unidade</a>
-					</li>										
+					</li>
+					<li role="separator" class="divider"></li>										
+                    <li>
+                        <a href="<?php echo base_url('index.php/main/produtos_relatorio/0'); ?>">Relatório de Estoque</a>
+                    </li>                                       
 				</ul>
 			</li>
 
@@ -127,7 +131,7 @@ $us_nome = $_SESSION['user'];
 			<a href="<?php echo base_url('index.php/main/produtos_categoria'); ?>">Produtos - Descrição</a>
 			</li>
 			<li>
-			<a href="<?php echo base_url('index.php/main/produtos_nomes'); ?>">Produtos - Nomes</a>
+			<a href="<?php echo base_url('index.php/main/produtos_nomes'); ?>">Produtos - Tipos</a>
 			</li>
 			<li>
 			<a href="<?php echo base_url('index.php/main/produtos_marca'); ?>">Produtos - Marcas</a>

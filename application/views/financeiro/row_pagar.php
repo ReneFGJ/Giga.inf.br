@@ -49,7 +49,7 @@
 				$dados = $line[$fld1] . '  - ' . $dados . ' ';
 			}
 			if (strlen(trim($line['cp_nossonumero'])) > 0) {
-				$dados .= ' - Boleto '.$line['cp_nossonumero'];
+				$dados .= ' - '.$line['cp_nossonumero'];
 			}
 			$sx .= $dados2 . $link_edit . $dados . '</a>';
 			$sx .= '</td>';

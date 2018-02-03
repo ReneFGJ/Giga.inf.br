@@ -15,17 +15,18 @@ class contratos extends CI_model
 						return(array());
 					}
 			}
-		function anexos($id)
+		function anexos($id,$sit='')
 			{
-				$sql = "select * from produto_agenda
-							INNER JOIN produtos ON ag_produto = id_pr
-							INNER JOIN produtos_tipo ON id_prd = pr_produto
-							WHERE ag_pedido = $id and ag_situacao > 0";
-							
+                $wh = '';
+			    if (strlen($sit) > 0)
+                    {
+                        $wh = " AND (ag_situacao = '$sit' )";
+                    }
 				$sql = "select * from produto_agenda
 						inner join produtos on id_pr = ag_produto
-						inner join produtos_categoria  ON pr_categoria = id_pc						
-					where ag_pedido = $id
+						inner join produto_nome ON pr_produto = id_pn						
+					where ag_pedido = $id $wh
+					order by ag_data_reserva, pr_produto, pr_patrimonio
 					";							
 				$rlt = $this->db->query($sql);
 				$rlt = $rlt->result_array();
@@ -33,14 +34,19 @@ class contratos extends CI_model
 				//$sx .= '<tr><th>ITEM 02</th></tr>'.cr()
 				$sx .= '<table width="100%" class="table" style="border: 1px solid #000000;">';
 				//$sx .= '<tr><td><b>ITEM 02</b></td></tr>';
-				$sx .= '<tr><th>Equipamento</th><th>Nº série</th><th>Período de</th><th>Até</th></tr>'.cr();
+				$sx .= '<tr><th width="10%">Patrimonio</th>
+				            <th>Descricao</th>
+				            <th width="10%">Período</th>
+				            <th width="10%">Até</th>
+				            </tr>'.cr();
 				
 				for ($r=0;$r < count($rlt);$r++)
 					{
 						$line = $rlt[$r];
 						$sx .= '<tr>';
-						//$sx .= '<td>'.$line['pc_nome'].'</td>';
-                        $sx .= '<td>'.$line['pr_tag'].'</td>';
+                        $sx .= '<td>'.UpperCase($line['pr_patrimonio']).'</td>';
+                        
+                        $sx .= '<td>'.$line['pn_descricao'].'</td>';
 
 						$sx .= '<td>'.stodbr($line['ag_data_reserva']).'</td>';
 						$sx .= '<td>'.stodbr($line['ag_data_reserva_ate']).'</td>';
@@ -52,6 +58,67 @@ class contratos extends CI_model
 				//exit;
 				return($sx);
 			}
+        function anexos_simple($id,$sit='',$cp='')
+            {
+                $wh = '';
+                if (strlen($sit) > 0)
+                    {
+                        $wh = " AND (ag_situacao = '$sit' )";
+                    }
+                $sql = "select * from produto_agenda
+                        inner join produtos on id_pr = ag_produto
+                        inner join produto_nome ON pr_produto = id_pn                       
+                    where ag_pedido = $id $wh
+                    order by ag_data_reserva, pr_produto, pr_patrimonio
+                    ";                          
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+                $sx = '<br>';
+
+                $xd1 = '';
+                $xd2 = '';
+                $xds = '';
+                $x = 0;
+                $tot = 0;
+                for ($r=0;$r < count($rlt);$r++)
+                    {
+                        $line = $rlt[$r];
+                        $d1 = $line['ag_data_reserva'];
+                        $d2 = $line['ag_data_reserva_ate'];
+                        $ds = $line['pn_descricao'];
+                        if (($d1 != $xd1) or ($d2 != $xd2))
+                            {
+                                if ($tot > 0)
+                                    { $sx .= ' <b>Total:'.$tot.' item(ns)</b>'; }
+                                $xd1 = $d1;
+                                $xd2 = $d2;
+                                $sx .= '<h5><b>Perídodo: '.stodbr($xd1).' - '.stodbr($xd2).'</b></h5>';                                
+                                $sx .= $ds.':';
+                                $xds = $ds;
+                                $x = 0;
+                                $tot = 0;
+                            }
+                        if ($ds != $xds)
+                            {
+                                if ($tot > 0)
+                                    { $sx .= ' <b>Total:'.$tot.' item(ns)</b>'; }
+                                $sx .= '<br>'.$ds.':';
+                                $xds = $ds;
+                                $x = 0;
+                                $tot = 0;
+                            }
+                        if ($x > 0) { $sx .= ', '; }
+                        $tot++;
+                        $sx .= ' '.$cp.UpperCase($line['pr_patrimonio']);
+                        //$sx .= '('.$line['pr_serial'].')';
+                        $x++;
+                    }
+                if ($tot > 0)
+                    { $sx .= ' <b>Total:'.$tot.' item(ns)</b>'; }
+                $sx .= '<br><br>'.cr();
+                //exit;
+                return($sx);
+            }
 		
 	}
 ?>

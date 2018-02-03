@@ -823,8 +823,9 @@ class Financeiro extends CI_Controller {
         $cp = array();
         array_push($cp, array('$H8', '', '', false, true));
         array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
-        array_push($cp, array('$D8', '', 'Vencimento final', True, true));
-        array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', True, true));
+        array_push($cp, array('$D8', '', 'Vencimento final', False, true));
+        array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', False, true));
+        
         $sql = "select * from _filiais where fi_ativo = 1";
         array_push($cp, array('$Q id_fi:fi_nome_fantasia:'.$sql, '', 'Empresa', False, true));
         $data['content'] = $form -> editar($cp, '');
@@ -966,6 +967,13 @@ class Financeiro extends CI_Controller {
 		$this -> load -> view('content', $data);
 		$this -> footer();
 	}
+    
+    function faturar()
+        {
+            $this->load->model('pedidos');
+            $this->cab();
+            
+        }
 
 }
 ?>

@@ -52,7 +52,10 @@ class propostas extends CI_model {
 		$sql = "select * from prazo_montagem where pm_ativo = 1 order by pm_seq ";
 		array_push($cp, array('$Q id_pm:pm_nome:'.$sql, 'pp_montagem', 'Montagem', False, True));
 		
+        /* BV */
+        array_push($cp, array('$N8', 'pp_bv', 'BV', True, True));
 		
+				
 		/* SOBRE O EVENTO */
 		array_push($cp, array('$[0-800]', 'pp_periodo_locacao', 'Período de locação (dias)', False, True));
 		array_push($cp, array('$D8', 'pp_dt_ini_evento', 'Dt. início evento', False, True));

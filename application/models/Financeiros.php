@@ -450,7 +450,7 @@ class financeiros extends CI_model {
         array_push($cp, array('$Q id_cd:cd_descricao:select * from cx_conta_codigo where cd_cpage = 2', 'cp_conta', 'Conta', False, true));
         //array_push($cp, array('$Q id_f:f_nome:select id_f, concat(f_nome_fantasia,\' - \',f_razao_social) as f_nome from clientes where f_ativo = 1', 'cp_fornecedor', 'Sacado', False, true));
         //array_push($cp, array('$Q id_f:f_nome_fantasia:select * from clientes where f_ativo = 1', 'cp_fornecedor', 'Sacado', False, true));
-        array_push($cp, array('$Q id_f:f_nome:select id_f,concat(f_razao_social,\' / \',f_nome_fantasia) as f_nome from clientes where f_ativo = 1 order by f_nome', 'cp_fornecedor', 'Sacado', False, true));
+        array_push($cp, array('$Q id_f:f_nome:select id_f,concat(f_razao_social,\' / \',f_nome_fantasia,\' / \',id_f) as f_nome from clientes where f_ativo = 1 order by f_nome', 'cp_fornecedor', 'Sacado', False, true));
 
         array_push($cp, array('$Q id_cpa:cpa_descricao:select * from cx_pagar_situacao where cpa_ativo = 1', 'cp_situacao', 'Situação', true, true));
         //array_push($cp, array('$HV', 'cp_situacao', '1', true, true));

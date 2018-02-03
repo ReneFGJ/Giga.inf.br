@@ -43,7 +43,7 @@ class user_drh extends CI_Model {
         array_push($cp, array('$S80', 'usd_rg_emissor', 'RG emissor', False, True));
         array_push($cp, array('$S80', 'usd_rg_dt_emissao', 'Dt. emissão RG', False, True));
         array_push($cp, array('$S80', 'usd_pis', 'Número do PIS', False, True));
-        array_push($cp, array('$S80', 'usd_dt_nasc', 'Data de nascimento', False, True));
+        //array_push($cp, array('$S80', 'usd_dt_nasc', 'Data de nascimento', False, True));
         array_push($cp, array('$S80', 'usd_ct', 'Carteira de trabalho Nº', False, True));
         array_push($cp, array('$S80', 'usd_ct_serie', 'Carteira/Série', False, True));
 
@@ -71,7 +71,8 @@ class user_drh extends CI_Model {
             $sql = "select * from user_drh
                         INNER JOIN users ON id_us = usd_id_us  
                         where EXTRACT(MONTH FROM usd_nascimento) = '".date("m")."' 
-                        order by usd_nascimento";
+                                and us_ativo = 1
+                        order by EXTRACT(DAY FROM usd_nascimento)";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
             $sx = '<div class="col-md-12"><h2>Aniversariantes do mês</h2></div>'.cr();
@@ -87,7 +88,7 @@ class user_drh extends CI_Model {
                             $img = 'img-no-picture.png';        
                         }
                     $sx .= '<div class="col-md-2 text-center">';
-                    $sx .= '<img src="'.base_url('img/picture/'.$img).'" class="img-responsive">'.cr();
+                    $sx .= '<img src="'.base_url('img/picture/'.$img).'" class="img-responsive" style="border-radius: 15%;">'.cr();
                     $sx .= '<h4>'.$line['us_nome'].'</h4>'.cr();
                     $sx .= substr(stodbr($line['usd_nascimento']),0,5).cr();
                     $sx .= '</div>';

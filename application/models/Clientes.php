@@ -106,8 +106,8 @@ class clientes extends CI_Model {
 	function row($id = '', $param = array()) {
 		$form = new form;
 
-		$form -> fd = array('id_f', 'f_nome_fantasia', 'f_razao_social', 'f_estado');
-		$form -> lb = array('id', msg('f_nome_fantasia'), msg('f_razao_social'), msg('f_estado'));
+		$form -> fd = array('id_f','id_f', 'f_nome_fantasia', 'f_razao_social', 'f_estado');
+		$form -> lb = array('id','Cod', msg('f_nome_fantasia'), msg('f_razao_social'), msg('f_estado'));
 		$form -> mk = array('', 'L', 'L', 'L');
 		$form -> pre_where = ' f_ativo = 1 ';
 
