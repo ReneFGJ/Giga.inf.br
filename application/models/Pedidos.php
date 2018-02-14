@@ -10,8 +10,21 @@ class pedidos extends CI_model {
         array_push($cp, array('$HV', '', 'ITEM', True, True));
         array_push($cp, array('$S80', 'pi_produto', 'Produto', True, True));
         array_push($cp, array('$T80:3', 'pi_descricao', 'Descrição', False, True));
-        array_push($cp, array('$N8', 'pi_quant', 'Quantidade', False, True));
-        array_push($cp, array('$N8', 'pi_valor_unit', 'Vlr. Unitário', False, True));
+        array_push($cp, array('$N8', 'pi_quant', 'Quantidade', True, True));
+        array_push($cp, array('$M', '', 'Informando o valor total, o sistema calcula o unitário', False, True));
+        array_push($cp, array('$N8', 'pi_valor_unit', 'Vlr. Unitário', True, True));
+
+        if ((get("dd6") == '') and (strlen(get("dd7") > 0)) and (strlen(get("dd4") > 0)))
+            {
+                echo "OK";
+                $vlr_total = troca(get("dd7"),'.','');
+                $vlr_total = troca($vlr_total,',','.');
+                $quantidade = get("dd4");
+                $dias = round(get("dd8"));
+                $vlr = round($vlr_total / $quantidade / $dias * 100)/100;
+                $_POST['dd6'] = number_format($vlr,2,',','.');
+            }        
+        array_push($cp, array('$N8', '', 'Vlr. Total', False, True));
         array_push($cp, array('$[0-800]', 'pi_qt_diarias', 'Período de locação', False, True));
 
         if ($id == 0) {
@@ -28,6 +41,18 @@ class pedidos extends CI_model {
 
     function cp_condicoes($id = 0) {
         global $ddi;
+        /* horas */
+        $oph = '';
+        for ($r = 0; $r < 24; $r++) {
+            for ($y = 0; $y < 60; $y = $y + 30) {
+                $oph .= '&';
+                $oph .= strzero($r, 2) . 'h' . strzero($y, 2);
+                $oph .= ':';
+                $oph .= strzero($r, 2) . 'h' . strzero($y, 2);
+            }
+        }
+
+        /* variaveis */        
         $ddi = 0;
         $cp = array();
         array_push($cp, array('$H8', 'id_pp', '', False, True));
@@ -67,17 +92,10 @@ class pedidos extends CI_model {
         /* SOBRE O EVENTO */
         //array_push($cp, array('$[0-800]', 'pp_periodo_locacao', 'Período de locação (dias)', False, True));
         array_push($cp, array('$D8', 'pp_dt_ini_evento', 'Dt. de entrega', False, True));
+        array_push($cp, array('$O ' . $oph, 'pp_entrega_hora', 'Prev. da Hora de entrega', False, True));
+        
         array_push($cp, array('$D8', 'pp_dt_fim_evento', 'Dt. de devolução', False, True));
-        $op = '';
-        for ($r = 0; $r < 24; $r++) {
-            for ($y = 0; $y < 60; $y = $y + 30) {
-                $op .= '&';
-                $op .= strzero($r, 2) . 'h' . strzero($y, 2);
-                $op .= ':';
-                $op .= strzero($r, 2) . 'h' . strzero($y, 2);
-            }
-        }
-        array_push($cp, array('$O ' . $op, 'pp_dt_fim_evento_hora', 'Prev. da Hora de devolução', False, True));
+        array_push($cp, array('$O ' . $oph, 'pp_dt_fim_evento_hora', 'Prev. da Hora de devolução', False, True));
 
         array_push($cp, array('$T80:5', 'pp_obs', 'Observações', False, True));
 
@@ -482,6 +500,12 @@ class pedidos extends CI_model {
         $this -> db -> query($sql);
         return ('');
     }
+    
+    function pedido_altera_status($id,$de,$para) {
+        $sql = "update " . $this -> table . " set pp_situacao = $para where pp_situacao = $de AND id_pp = " . $id;
+        $this -> db -> query($sql);
+        return ('');
+    }    
 
     function pedido_cancelar($id) {
         $sql = "update " . $this -> table . " set pp_situacao = 9 where id_pp = " . $id;
@@ -500,16 +524,22 @@ class pedidos extends CI_model {
 									<span class="btn btn-primary nopr" onclick="confirmar_finalizar();">Fechar pedido</span>																
 									&nbsp;
 									<span class="btn btn-default nopr" onclick="confirmar_cancelar();">Cancelar pedido/orçamento</span>
+                                    &nbsp;
+                                    <span class="btn btn-default nopr" onclick="confirmar_alterar();">Alterar tipo</span>
 									
 							</div>
 							<script>
-							function confirmar_cancelar()
+							function confirmar_alterar()
 								{
-								if (confirmar() > 0)
-									{
-										window.location= "' . base_url('index.php/main/pedido_cancelar/' . $id . '/' . checkpost_link($id)) . '";
-									}
+    								newwin("' . base_url('index.php/main/pedido_alterar_tipo/' . $id . '/' . checkpost_link($id)) . '",800,600);
 								}
+                            function confirmar_cancelar()
+                                {
+                                if (confirmar() > 0)
+                                    {
+                                        window.location= "' . base_url('index.php/main/pedido_cancelar/' . $id . '/' . checkpost_link($id)) . '";
+                                    }
+                                }
 							function confirmar_finalizar()
 								{
 								if (confirmar("Finalizar Pedido?") > 0)

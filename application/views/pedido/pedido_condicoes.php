@@ -25,6 +25,9 @@
         /****************** DADOS DO EVENTO *****************************/
         if (round(substr($pp_dt_ini_evento, 0, 4)) > 2010) {
             echo '<div class="row"><div class="col-md-12">Data de entrega: <b>' . stodbr($pp_dt_ini_evento) . '</b>' . ' ';
+            if (isset($pp_entrega_hora)) {
+                echo '<br>Horário de entrega: <b>' . ($pp_entrega_hora) . '</b>';
+            }            
             if (round(substr($pp_dt_fim_evento, 0, 4)) > 2010) {
                 echo '<br>Data da retirada: <b>' . stodbr($pp_dt_fim_evento) . '</b>';
             }

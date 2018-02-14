@@ -231,12 +231,21 @@ class produtos extends CI_model {
     }
 
     function contratos_situacao($sit) {
+        $order = 'pp_dt_ini_evento, pp_entrega_hora';
+        $hora = 'pp_entrega_hora';
+        switch($sit)
+            {
+            case '7':
+                $order = 'pp_dt_fim_evento, pp_dt_fim_evento_hora';
+                $hora = 'pp_dt_fim_evento_hora';
+                break;
+            }
         $sql = "select * from pedido
 						INNER JOIN clientes ON pp_cliente = id_f 
 						INNER JOIN users ON id_us = pp_vendor
 						INNER JOIN _filiais ON pp_filial = id_fi
 						WHERE pp_tipo_pedido = 3 and pp_situacao = " . $sit . "
-					ORDER BY pp_dt_ini_evento
+					ORDER BY $order
 					";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -263,11 +272,12 @@ class produtos extends CI_model {
             $sx .= '<br><span class="small">Filial: <i>' . $line['fi_nome_fantasia'] . '</i></span>';
             $sx .= '</td>';
 
-            $sx .= '<td>';
+            $sx .= '<td align="center">';
             $sx .= stodbr($line['pp_dt_ini_evento']);
+            $sx .= '<br>'.$line[$hora];
             $sx .= '</td>';
 
-            $sx .= '<td>';
+            $sx .= '<td align="center">';
             $sx .= stodbr($line['pp_dt_fim_evento']);
             $sx .= '</td>';
             $sx .= '</tr>';
@@ -291,9 +301,34 @@ class produtos extends CI_model {
         array_push($cp, array('$H8', 'id_ag', '', False, True));
         array_push($cp, array('$D8', 'ag_data_reserva', 'Início', False, True));
         array_push($cp, array('$D8', 'ag_data_reserva_ate', 'Fim', False, True));
-        array_push($cp, array('$O ' . $op, 'ag_situacao', 'Fim', True, True));
+        $sql = "select * from produto_agenda_status";
+        array_push($cp, array('$Q id_pas:pas_descricao:' . $sql, 'ag_situacao', 'Status', True, True));
         return ($cp);
     }
+    
+    function cp_etiqueta() {
+        $cp = array();
+        $op = '1:Alocado&9:cancelado';
+        array_push($cp, array('$H8', 'id_et', '', False, True));
+        array_push($cp, array('$S100', 'st_nome', 'Nome da etiqueta', True, True));
+        array_push($cp, array('$O ' . $op, 'st_ativo', 'Ativo', True, True));
+        
+        array_push($cp, array('$A', '', 'Etiqueta #1', False, True));
+        array_push($cp, array('$I8', 'st_p1', 'Codigo de Barras #1 - Direita', True, True));
+        array_push($cp, array('$I8', 'st_p2', 'Codigo de Barras #1 - Altura', True, True));
+        array_push($cp, array('$I8', 'st_p3', 'Texto #1 - Direita', True, True));
+        array_push($cp, array('$I8', 'st_p4', 'Texto #1 - Altura', True, True));
+        array_push($cp, array('$I8', 'st_p5', 'Reservado', True, True));
+
+        array_push($cp, array('$A', '', 'Etiqueta #2', False, True));
+        array_push($cp, array('$I8', 'st_o1', 'Codigo de Barras #2 - Direita', True, True));
+        array_push($cp, array('$I8', 'st_o2', 'Codigo de Barras #2 - Altura', True, True));
+        array_push($cp, array('$I8', 'st_o3', 'Texto #2 - Direita', True, True));
+        array_push($cp, array('$I8', 'st_o4', 'Texto #2 - Altura', True, True));
+        array_push($cp, array('$I8', 'st_o5', 'Reservado', True, True));
+
+        return ($cp);
+    }    
 
     function cp_item() {
         $cp = array();
@@ -323,8 +358,7 @@ class produtos extends CI_model {
         array_push($cp, array('$S10', 'pr_nf', 'Nota fiscal', False, True));
         array_push($cp, array('$D8', 'pr_nf_data', 'Data NF', False, True));
         array_push($cp, array('$N8', 'pr_vlr_custo', 'Valor de custo', False, True));
-
-        array_push($cp, array('$B8', '', 'Gravar', False, True));       
+    
         return ($cp);
     }
 
@@ -360,7 +394,7 @@ class produtos extends CI_model {
         //array_push($cp, array('$S40', 'pr_tag', 'Nº do Tag', False, True));
 
         if (strlen($id) == 0) {
-            array_push($cp, array('$[1-999]', '', 'Quantidade de itens', True, True));
+            array_push($cp, array('$HV', '', '1', True, True));
         } else {
             array_push($cp, array('$HV', '', '0', True, True));
         }
@@ -372,7 +406,7 @@ class produtos extends CI_model {
 
         array_push($cp, array('$HV', 'pr_ativo', '1', True, True));
 
-        array_push($cp, array('$O 1:SIM', '', 'Confirma', True, True));
+        array_push($cp, array('$HV', '', '1', True, True));
         array_push($cp, array('$B8', '', 'Gravar', False, True));
 
         array_push($cp, array('$A', '', 'Fornecedor', False, True));
@@ -531,6 +565,25 @@ class produtos extends CI_model {
 
         return (row($form, $id));
     }
+    
+    function row_etiquetas($id = '') {
+        $form = new form;
+
+        $form -> fd = array('id_et', 'st_nome', 'st_p1', 'st_p2', 'st_p3', 'st_p4', 'st_p5', 'st_o1', 'st_o2', 'st_o3', 'st_o4', 'st_o5');
+        $form -> lb = array('id', msg('pc_nome'), 'pos','pos','pos','pos','pos','pos','pos','pos','pos','pos','pos');
+        $form -> mk = array('', 'L', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C');
+
+        $form -> tabela = "etiqueta";
+        $form -> see = false;
+        $form -> novo = true;
+        $form -> edit = true;
+
+        $form -> row_edit = base_url('index.php/main/etiqueta_edit');
+        $form -> row_view = base_url('index.php/main/etiqueta_config');
+        $form -> row = base_url('index.php/main/produtos_modelo');
+
+        return (row($form, $id));
+    }    
 
     function row_categoria($id = '') {
         $form = new form;
@@ -668,6 +721,16 @@ class produtos extends CI_model {
         return ($form -> saved);
     }
 
+    function editar_etiqueta($id, $chk) {
+        $form = new form;
+        $form -> id = $id;
+        $cp = $this -> cp_etiqueta();
+        $data['title'] = '';
+        $data['content'] = $form -> editar($cp, "etiqueta");
+        $this -> load -> view('content', $data);
+        return ($form -> saved);
+    }
+
     function editar_modelos($id, $chk) {
         $form = new form;
         $form -> id = $id;
@@ -688,6 +751,35 @@ class produtos extends CI_model {
     function etiquetas($tp='') {
         $sz = '80'; $sy = '';
         if ($tp==2) { $sz = 50; }
+        
+        $sql = "select * from etiqueta where id_et = ".round('0'.$tp);
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        if (count($rlt) > 0)
+            {
+                $line = $rlt[0];
+                $p1 = $line['st_p1'];
+                $p2 = $line['st_p2'];
+                $p3 = $line['st_p3'];
+                $p4 = $line['st_p4'];
+                $p5 = $line['st_p5'];
+                $o1 = $line['st_o1'];
+                $o2 = $line['st_o2'];
+                $o3 = $line['st_o3'];
+                $o4 = $line['st_o4'];
+                $o5 = $line['st_o5'];                
+            } else {
+                $p1 = 60;
+                $p2 = 30;
+                $p3 = 90;
+                $p4 = 140;
+                $p5 = 0;
+                $o1 = 480;
+                $o2 = 30;
+                $o3 = 510;
+                $o4 = 90;
+                $o5 = 0;
+            }
         $sql = "select * from produtos 
 						WHERE pr_etiqueta = 1
 			";
@@ -695,7 +787,8 @@ class produtos extends CI_model {
         $rlt = $rlt -> result_array();
         $sx = '';
         $i = 35;
-        for ($r = 0; $r < count($rlt); $r = $r + 1) {
+
+        for ($r = 0; $r < count($rlt); $r = $r + 2) {
             $line = $rlt[$r];
             $mod = trim($line['pr_modelo']);
             $mod2 = '';
@@ -706,13 +799,8 @@ class produtos extends CI_model {
             $sx .= 'N' . cr();
             $sx .= 'q816' . cr();
             $sx .= 'Q200,24' . cr();
-            //$sx .= 'A270,10,0,1,2,2,N,"GiGa"' . cr();
-            //$sx .= 'A250,40,0,1,1,2,N,"INFORMATICA"' . cr();
-            $sx .= 'A90,140,0,1,1,2,N,"' . $mod . '"' . cr();
-            //$sx .= 'A10,140,0,1,1,2,N,"' . $mod2 . '"' . cr();
-            //$sx .= 'A10,170,0,1,1,1,N,"' . $line['pr_serial'] . '"' . cr();
-            //$sx .= 'B0,0,0,E80,3,7,80,B,"' . $line['pr_patrimonio'] . '"' . cr();
-            $sx .= 'B60,30,0,E80,3,7,'.$sz.',B,"' . $line['pr_patrimonio'] . '"' . cr();            
+            $sx .= 'A'.$p3.','.$p4.',0,1,1,2,N,"' . $mod . '"' . cr();
+            $sx .= 'B'.$p1.','.$p2.',0,E80,3,7,'.$sz.',B,"' . $line['pr_patrimonio'] . '"' . cr();            
 
             if (isset($rlt[$r + 1])) {
                 $line = $rlt[$r + 1];
@@ -723,17 +811,13 @@ class produtos extends CI_model {
                     $mod = substr($mod, 0, $i);
                 }
                 $sx .= '' . cr();
-                //$sx .= 'A690,10,0,1,2,2,N,"GiGa"' . cr();
-                //$sx .= 'A670,40,0,1,1,2,N,"INFORMATICA"' . cr();
-                $sx .= 'A510,140,0,1,1,2,N,"' . $mod . '"' . cr();
-                //$sx .= 'A440,140,0,1,1,2,N,"' . $mod2 . '"' . cr();
-                //$sx .= 'A440,170,0,1,1,1,N,"' . $line['pr_serial'] . '"' . cr();
-                $sx .= 'B480,30,0,E80,3,7,'.$sz.',B,"' . $line['pr_patrimonio'] . '"' . cr();
+                $sx .= 'A'.$o3.','.$o4.',0,1,1,2,N,"' . $mod . '"' . cr();
+                $sx .= 'B'.$o1.','.$o2.',0,E80,3,7,'.$sz.',B,"' . $line['pr_patrimonio'] . '"' . cr();
             }
             $sx .= '' . cr();
             $sx .= 'P1' . cr();
         }
-        echo '<pre>' . $sx . '</pre>';
+        echo $sx;
     }
 
     function etiquetas_para_imprimir() {
@@ -1365,6 +1449,59 @@ class produtos extends CI_model {
         $sx .= '';
         return ($sx);
     }
+    function itens_status($pd,$st)
+        {
+            $sql = "select * from produto_agenda
+                        INNER JOIN produtos ON ag_produto = id_pr
+                        where ag_pedido = ".$pd;
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx = '<table width="100%" class="table">';
+            $sx .= '<tr>
+                        <th>#</th>
+                        <th>Barcode</th>
+                        <th>Serial</th>
+                        <th>Modelo</th>
+                        <th>Entrega</th>
+                        <th>Devolução</th>
+                    </tr>';
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                   $line = $rlt[$r];
+                   
+                   $sx .= '<tr>';
+                   $sx .= '<td>';
+                   $sx .= $line['pr_patrimonio'];
+                   $sx .= '</td>';
 
+                   $sx .= '<td>';
+                   $sx .= $line['pr_serial'];
+                   $sx .= '</td>';
+                    
+
+                   $sx .= '<td>';
+                   $sx .= $line['pr_modelo'];
+                   $sx .= '</td>';
+                                        
+                   $sx .= '<td>';
+                   $sx .= stodbr($line['ag_data_reserva']);
+                   $sx .= '</td>';
+                   
+                   $sx .= '<td>';
+                   $sx .= stodbr($line['ag_data_reserva_ate']);
+                   $sx .= '</td>';
+                   
+                   $sx .= '</tr>';
+                }
+            return($sx);
+        }
+
+    function itens_atualiza_status($pd,$st1,$st2)
+        {
+            
+            $sql = "update produto_agenda set ag_situacao = ".$st2." where ag_situacao = ".$st1." and ag_pedido = ".$pd;
+            $rlt = $this->db->query($sql);
+            return(1);
+        }
 }
 ?>

@@ -540,17 +540,33 @@ class Main extends CI_Controller {
         }
         $data['dados_proposta'] = '';
         $data['id_pp'] = $id;
-
+        $data['dados_acoes'] = '';
+        
         $_SESSION['data_ini'] = $data['pp_dt_ini_evento'];
         $_SESSION['data_fim'] = $data['pp_dt_fim_evento'];
 
         $data['dados_item'] = $this -> pedidos -> pedido_items($id);
-        $data['dados_acoes'] = '<button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo/' . $id) . '\',800,600);" class="btn btn-primary">Incluir equipamentos</button>';
-        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo_serie/' . $id . '/' . $data['pp_nr'] . '/' . $data['pp_cliente']) . '\',800,600);" class="btn btn-primary">Incluir equipamentos pelo n. série</button>';
         //$data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/contrato_pdf/' . $id) . '\',800,600);" class="btn btn-primary">Contrato Imprimir</button>';
-        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/recibo_entrega/' . $id) . '\',1024,800);" class="btn btn-primary">Recibo de Entrega</button>';
-        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/devolucao_item/' . $id) . '\',1024,800);" class="btn btn-success">Devolver Equipamento</button>';
-        $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/recibo_devolucao/' . $id) . '\',1024,800);" class="btn btn-success">Recibo de Devolução</button>';
+        switch($data['pp_situacao'])
+            {
+            case '2':
+                //$data['dados_acoes'] = '<button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo/' . $id) . '\',800,600);" class="btn btn-primary">Incluir equipamentos</button>';
+                $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo_serie/' . $id . '/' . $data['pp_nr'] . '/' . $data['pp_cliente']) . '\',800,600);" class="btn btn-primary">Incluir equipamentos pelo n. série</button>';
+                
+                $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/recibo_entrega/' . $id) . '\',1024,800);" class="btn btn-primary">Recibo de Entrega</button>';
+                $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/devolucao_item/' . $id) . '\',1024,800);" class="btn btn-success">Devolver Equipamento</button>';
+                $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/finaliza_entrega/' . $id) . '\',1024,800);" class="btn btn-warning">Finalizar Entrega</button>';
+                break;
+            case '7':
+                $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/locacao_item_novo_serie/' . $id . '/' . $data['pp_nr'] . '/' . $data['pp_cliente']) . '\',800,600);" class="btn btn-primary">Incluir equipamentos pelo n. série</button>';
+                $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/recibo_entrega/' . $id) . '\',1024,800);" class="btn btn-primary">Recibo de Entrega</button>';
+                
+                $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/devolucao_item/' . $id) . '\',1024,800);" class="btn btn-success">Devolver Equipamento</button>';
+                $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/recibo_devolucao/' . $id) . '\',1024,800);" class="btn btn-success">Recibo de Devolução</button>';                
+                $data['dados_acoes'] .= ' | <button onclick="newwin(\'' . base_url('index.php/main/finaliza_devolucao/' . $id) . '\',1024,800);" class="btn btn-warning">Finalizar Devolução</button>';
+                break;
+            }
+        
 
         $data['contatos'] = '';
 
@@ -815,6 +831,11 @@ class Main extends CI_Controller {
                 $data['content'] = $this -> $model -> contratos_situacao(2);
                 $this->load->view('content',$data);
                 break;
+            case '7':
+                $data['title'] = 'Contratos em locação';
+                $data['content'] = $this -> $model -> contratos_situacao(7);
+                $this->load->view('content',$data);
+                break;                
         
 //        $data['title'] = 'Em faturamento';
 //        $data['content'] = $this -> $model -> contratos_situacao(3);
@@ -1103,6 +1124,38 @@ exit;
         $this -> load -> view('content', $data);
         $this -> footer();
     }
+    
+    /************************************************************************* PRODUTOS MODELO *****************/
+    function etiqueta_config($pg='') {
+        /* Load Model */
+        $model = 'produtos';
+        $this -> load -> model('produtos');
+
+        /* Controller */
+        $this -> cab();
+        $data = array();
+        $data['title'] = 'Etiquetas para impressão';
+        $data['content'] = $this -> $model -> row_etiquetas($pg);
+        $this -> load -> view('content', $data);
+        $this -> footer();
+    }   
+    
+    function etiqueta_edit($id='',$chk='')
+        {
+        $modal = 'produtos';
+        /* Load Model */
+        $this -> load -> model($modal);
+
+        /* Controller */
+        $this -> cab();
+        $saved = $this -> $modal -> editar_etiqueta($id, $chk);
+        $this -> footer();
+
+        /****************/
+        if ($saved > 0) {
+            redirect(base_url('index.php/main/etiqueta_config'));
+        } 
+        } 
 
     /************************************************************************* PRODUTOS MODELO *****************/
     function produtos_modelo($pg='') {
@@ -1367,25 +1420,45 @@ exit;
         $cp = $this -> produtos -> cp_item_patrimonio($id);
         $form = new form;
         $form -> id = $id;
+        $tela = '';
 
-        $tela = $form -> editar($cp, $this -> produtos -> table);
+        if (strlen(get("acao")) > 0)
+            {
+                $dd2 = get("dd2"); // pr_produto
+                $dd7 = get("dd7"); // pr_serial
+                $dd8 = get("dd8"); // pr_tag
+                $sql = "select * from ".$this -> produtos -> table." where pr_produto = $dd2 AND pr_serial = '$dd7' ";
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+                if (count($rlt) > 0)
+                    {
+                        $_POST['acao'] = '';
+                        $tela = '
+                                <div class="alert alert-danger">
+                                  <strong>Alerta!</strong> Número de série já cadastrado '.$dd7.' - '.$dd8.' para esse produto!
+                                </div>';
+                        $data = $_POST;
+                        $data['ok'] = 0;
+                        $tela .= $this->load->view('produto/produto_novo_serie',$data, true);
+                        $data['content'] = $tela;
+                        $data['title'] = '';                        
+                        $this -> load -> view('content', $data);
+                        return('');                                
+                    }                
+            }
+
+        $tela .= $form -> editar($cp, $this -> produtos -> table);
         //$_POST['dd3'] = get("prod");
 
         if ($form -> saved > 0) {
-            $quant = round(get("dd9"));
-            /* Multiplas entradas */
-            if (strlen($id) == 0) {
-                $s = get("dd7");
-                $tb = get("dd8");
-                for ($z = 2; $z <= $quant; $z++) {
-                    $_POST['dd7'] = $s . '#' . $z;
-                    $_POST['dd8'] = $tb . '#' . $z;
-                    $tela = $form -> editar($cp, $this -> produtos -> table);
+            if ($id == '')
+                {
+                $data = $_POST;
+                $data['ok'] = 1;
+                $tela = $this->load->view('produto/produto_novo_serie',$data, true);
+                } else {
+                    $tela = '<script> wclose(); </script>';
                 }
-                $_POST['dd7'] = '';
-                $_POST['dd13'] = '';
-                $tela = $form -> editar($cp, $this -> produtos -> table);
-            }
             $this -> produtos -> updatex();
             $data['title'] = '';
             $data['content'] = $tela;
@@ -1908,5 +1981,102 @@ exit;
         $this -> load -> view('contrato/contrato_pdf', $data);
     }
 
+    function finaliza_devolucao($pd='',$conf='')
+        {
+        $this -> load -> model('produtos');
+        $this -> load -> model('pedidos');
+        /* Load Model */
+        $this -> cab(array('nocab'=>true));
+        
+        $data = $this->load->pedidos->le($pd);
+        $this->load->view('pedido/pedido_header',$data);
+        
+        if (strlen($conf) == 0)
+            {
+                $sx = '';
+                $sx .= '<span class="btn btn-danger">Cancelar</span>';
+                $sx .= ' | ';
+                $sx .= '<a href="'.base_url('index.php/main/finaliza_devolucao/'.$pd.'/1').'" class="btn btn-success">Confirmar Devolução</a>';             
+                
+                $data['content'] = $sx;
+                $data['title'] = '';
+                $this->load->view('content',$data);
+                
+                $sx = $this->produtos->itens_status($pd,2);
+                $data['content'] = $sx;
+                $data['title'] = 'Itens';
+                $this->load->view('content',$data);
+                
+                
+            } else {
+                $this->pedidos->pedido_altera_status($pd,7,900);
+                
+                $this->produtos->itens_atualiza_status($pd,2,3);
+                $sx = '<script> wclose(); </script>';
+                $data['content'] = $sx;
+                $data['title'] = 'Itens';
+                $this->load->view('content',$data);                
+            }
+            
+        }
+    function finaliza_entrega($pd='',$conf='')
+        {
+        $this -> load -> model('produtos');
+        $this -> load -> model('pedidos');
+        /* Load Model */
+        $this -> cab(array('nocab'=>true));
+        
+        $data = $this->load->pedidos->le($pd);
+        $this->load->view('pedido/pedido_header',$data);
+        
+        if (strlen($conf) == 0)
+            {
+                $sx = '';
+                $sx .= '<span class="btn btn-danger">Cancelar</span>';
+                $sx .= ' | ';
+                $sx .= '<a href="'.base_url('index.php/main/finaliza_entrega/'.$pd.'/1').'" class="btn btn-success">Confirmar Entrega</a>';             
+                
+                $data['content'] = $sx;
+                $data['title'] = '';
+                $this->load->view('content',$data);
+                
+                $sx = $this->produtos->itens_status($pd,1);
+                $data['content'] = $sx;
+                $data['title'] = 'Itens';
+                $this->load->view('content',$data);
+                
+                
+            } else {
+                $this->pedidos->pedido_altera_status($pd,2,7);
+                
+                $this->produtos->itens_atualiza_status($pd,1,2);
+                $sx = '<script> wclose(); </script>';
+                $data['content'] = $sx;
+                $data['title'] = 'Itens';
+                $this->load->view('content',$data);                
+            }
+                 
+        }
+    function pedido_alterar_tipo($id)
+        {
+            $data['nocab'] = true;
+            $this->cab($data);
+            $cp = array();
+            array_push($cp,array('$H8','id_pp','',false,false));
+            $sql = "select * from pedido_tipo ";
+            array_push($cp,array('$Q id_t:t_descricao:'.$sql,'pp_tipo_pedido','Tipo',True,True));
+            
+            $form = new form;
+            $form->id = $id;
+            $tela = $form->editar($cp,'pedido');
+            if ($form->saved > 0)
+                {
+                    $tela .= '<script> wclose(); </script>';
+                }
+            $data['content'] = $tela;
+            $data['title'] = '';
+            $this->load->view('content',$data);
+            
+        }
 }
 ?>

@@ -116,8 +116,11 @@ $us_nome = $_SESSION['user'];
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Locação <span class="caret"></span></a>
 				<ul class="dropdown-menu">
 					<li>
-						<a href="<?php echo base_url('index.php/main/locacao'); ?>">Locação</a>
+						<a href="<?php echo base_url('index.php/main/locacao'); ?>">Separação de Produtos</a>
 					</li>
+                    <li>
+                        <a href="<?php echo base_url('index.php/main/locacao/7'); ?>">Produtos no cliente</a>
+                    </li>					
 				</ul>
 			</li>
 
@@ -142,6 +145,9 @@ $us_nome = $_SESSION['user'];
 			<li>
 			<a href="<?php echo base_url('index.php/main/produtos_cadastrar'); ?>">Produtos - Equipamento (itens)</a>
 			</li>
+            <li>
+            <a href="<?php echo base_url('index.php/main/etiqueta_config'); ?>">Etiquetas - Configurar</a>
+            </li>
 			<li role="separator" class="divider"></li>
 			<li>
 			<a href="<?php echo base_url('index.php/main/prazo_entrega'); ?>">Condições - Prazo de entrega</a>
