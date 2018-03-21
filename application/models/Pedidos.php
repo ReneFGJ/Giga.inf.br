@@ -21,7 +21,7 @@ class pedidos extends CI_model {
                 $vlr_total = troca($vlr_total,',','.');
                 $quantidade = get("dd4");
                 $dias = round(get("dd8"));
-                $vlr = round($vlr_total / $quantidade / $dias * 100)/100;
+                $vlr = round($vlr_total / $quantidade * 100)/100;
                 $_POST['dd6'] = number_format($vlr,2,',','.');
             }        
         array_push($cp, array('$N8', '', 'Vlr. Total', False, True));

@@ -79,6 +79,22 @@ if (!file_exists($pict)) {
 			if (strlen($usd_ct_serie)) { echo ', Série: ' . $usd_ct_serie;
 			}
 			?>&nbsp;</font>
+            <br>            
+            <font class="small">Carteira de Motorista</font><br>
+            <font class="middle"><?php
+            echo $usd_cnh;
+            if (strlen($usd_cnh_cat)) { echo ', Categoria: ' . $usd_cnh_cat;
+            }
+            ?>&nbsp;</font>
+            <br><br>
+            <font class="small">Título de eleitor</font><br>
+            <font class="middle"><?php
+            echo $usd_te;
+            if (strlen($usd_te_zona)) { echo ', Zona: ' . $usd_te_zona; }
+            if (strlen($usd_te_secao)) { echo ', Seção: ' . $usd_te_secao; }
+            
+            ?>&nbsp;</font>
+
 		</div>
 		<div class="col-md-4">
 			<br>
@@ -86,6 +102,12 @@ if (!file_exists($pict)) {
 			<font class="middle"><?php echo $usd_nome_pai; ?>&nbsp;</font><br>
 			<font class="small">Nome da Mãe</font><br>
 			<font class="middle"><?php echo $usd_nome_mae; ?>&nbsp;</font><br>
+            <font class="small">Estado cívil</font><br>
+            <font class="middle"><?php echo $usd_estado_civel; ?>&nbsp;</font><br>
+            <font class="small">Filhos</font><br>
+            <font class="middle"><?php echo $usd_filhos; ?>&nbsp;</font><br>
+            <font class="small">Escolaridade</font><br>
+            <font class="middle"><?php echo $usd_escolaridade; ?>&nbsp;</font><br>
 						
 			<hr>
 			<font class="small">Empresa</font><br>
@@ -95,7 +117,16 @@ if (!file_exists($pict)) {
 			<font class="small">Dt. adminssão / demissão</font><br>
 			<font class="middle"><?php echo stodbr($usd_dt_admissao); ?>&nbsp;</font> - <?php echo stodbr($usd_dt_demissao); ?>&nbsp;</font><br>
 			<font class="small">Crachá</font><br>
-			<font class="middle"><?php echo($us_badge); ?>&nbsp;</font><br>			
+			<font class="middle"><?php echo($us_badge); ?>&nbsp;</font><br>		
+			
+			<h4>Dados bancários</h4>
+            <font class="small">Banco</font><br>
+            <font class="middle"><?php echo $usd_banco; ?>&nbsp;</font><br>
+            <font class="small">Agência</font><br>
+            <font class="middle"><?php echo $usd_ag; ?>&nbsp;</font><br>
+            <font class="small">Conta Corrente</font><br>
+            <font class="middle"><?php echo $usd_cc.' - '.msg('cc_tipo_'.$usd_cc_tipo); ?></font><br>
+				
 		</div>
 	</div>
 

@@ -12,6 +12,18 @@ class Main extends CI_Controller {
 
         date_default_timezone_set('America/Sao_Paulo');
     }
+    
+    function update($v)
+        {
+            switch($v)
+                {
+                case '0':
+                    $sql = "ALTER TABLE `pedido_itens` CHANGE `pi_valor_unit` `pi_valor_unit` FLOAT(11) NOT NULL;";
+                    $rlt = $this->db->query($sql);
+                    $sql = "ALTER TABLE `produto_agenda` ADD `ag_devolucao_hora` CHAR(8) NOT NULL ;";
+                    $rlt = $this->db->query($sql);
+                }
+        }
 
     function cab($data = array()) {
         $js = array();
@@ -44,6 +56,8 @@ class Main extends CI_Controller {
 
         $this -> cab();
         $this -> load -> view('home', null);
+        
+        $this -> load -> view('search/search', null);
 
         $data['content'] = $this -> user_drh -> aniversariantes();
         $data['title'] = '';
@@ -220,7 +234,7 @@ class Main extends CI_Controller {
         if (strlen($acao) > 0) {
             switch (get("dd1")) {
                 case 'CONDICOES' :
-                    print_r($_POST);
+                    //print_r($_POST);
                     $dd0 = get("dd0");
                     $cp = $this -> pedidos -> cp_condicoes($dd0, $id);
                     $form = new form;
@@ -437,15 +451,6 @@ class Main extends CI_Controller {
             //echo "==>" . $d1 . "==" . $d2;
             
             $tela = $this -> produtos -> produto_registra_serie($serie, $ped, $d1, $d2, $cliente);
-            $tela .= '<br><br>';
-            $tela .= '<a href="'.base_url('index.php/main/locacao_item_novo_serie/'.$id.'/'.$ped.'/'.$cliente).'" class="btn btn-default">';
-            $tela .= 'Novo Item';
-            $tela .= '</a>';
-            $tela .=' | ';            
-            $tela .= '<a href="#" class="btn btn-default" onclick="window.opener.location.reload(); window.close();">';
-            $tela .= 'Fechar';
-            $tela .= '</a>';
-
             $tela = '<meta http-equiv="refresh" content="0; url='.base_url('index.php/main/locacao_item_novo_serie/'.$id.'/'.$ped.'/'.$cliente).'">';            
         }
         $tela .= '<script> $("#dd1").focus(); </script>';
@@ -484,18 +489,14 @@ class Main extends CI_Controller {
             $d1 = brtos(get("dd2"));
             //echo "==>" . $serie . "==" . $id;
 
-            $tela = $this -> produtos -> produto_devolucao_serie($serie, $id, $d1);
-            $tela .= '<br><br>';
-            $tela .= '<a href="'.base_url('index.php/main/devolucao_item/'.$id).'" class="btn btn-default">';
-            $tela .= 'Devolver outro Item';
-            $tela .= '</a>';
-            $tela .=' | ';            
-            $tela .= '<a href="#" class="btn btn-default" onclick="window.opener.location.reload(); window.close();">';
-            $tela .= 'Fechar';
-            $tela .= '</a>';
-
-            
+            $tela .= $this -> produtos -> produto_devolucao_serie($serie, $id, $d1);
+            $tela = '<meta http-equiv="refresh" content="0; url='.base_url('index.php/main/devolucao_item/'.$id.'/'.$ped.'/'.$cliente).'">';
+           
         }
+
+        $tela .= '<script> $("#dd1").focus(); </script>';
+        
+        $tela .= $this->produtos->items_por_pedido_devolvido($id);
 
         $data['content'] = $tela;
         $data['title'] = '';
@@ -712,6 +713,7 @@ class Main extends CI_Controller {
         $this -> load -> model('mensagens');
         $this -> load -> model('pedidos');
         $this -> load -> model('financeiros');
+        $this -> load -> model('clientes_contacorrente');
 
         /* Controller */
         $this -> cab();
@@ -721,9 +723,10 @@ class Main extends CI_Controller {
 
         /* financeiro */
         $fin = $this -> financeiros -> resumo($id, 1);
-        $data['finan_total'] = $fin['titulos'];
+        $data['finan_total'] = $fin['titulos'].'/'.$fin['pagamentos'];
         $data['finan_valor'] = number_format($fin['total'], 2, ',', '.');
-        $data['financeiro'] = $this -> financeiros -> lista_por_cliente($id, 1);
+        $data['financeiro'] =   $this -> clientes_contacorrente->cc_novo($id).
+                                $this -> financeiros -> lista_por_cliente($id, 1);
         //$data['financeiro_resumo'] = $this -> financeiros -> resumo_cliente($id, 1);
 
         /* orcamento / proposta */
@@ -765,6 +768,9 @@ class Main extends CI_Controller {
         $data['resumo'] = $this -> load -> view('cliente/resumo', $data, true);
         //$data['resumo'] .= $contato;
         //$data['resumo'] .= $this -> clientes -> novo_contato($id);
+        
+        /* Conta corrente */
+        $data['cc'] = $this->clientes_contacorrente->listcc($id);
 
         $this -> load -> view('cliente/show', $data);
         $this -> load -> view('cliente/show_about', $data);
@@ -1484,7 +1490,8 @@ exit;
         
         $data['title'] = 'Etiquetas para imprimir';
         $data['content'] = '<a href="'.base_url('index.php/main/produtos_etiqueta/1').'" class="btn btn-primary">Imprimir Etiquetas Normal</a> | ';
-        $data['content'] .= '<a href="'.base_url('index.php/main/produtos_etiqueta/2').'" class="btn btn-primary">Imprimir Etiquetas Mini</a>';        
+        $data['content'] .= '<a href="'.base_url('index.php/main/produtos_etiqueta/2').'" class="btn btn-primary">Imprimir Etiquetas Mini</a> | ';
+        $data['content'] .= '<a href="'.base_url('index.php/main/produtos_checkin').'" class="btn btn-default">Checkin</a>';                
         $data['content'] .= $this -> produtos -> etiquetas_para_imprimir();
         $this->load->view('content',$data);
         
@@ -1524,6 +1531,7 @@ exit;
 
         $data['cod'] = $cod;
         $data['content'] = $this -> load -> view('produto/leitor_codigo', $data, true);
+        $data['content'] .= ' <a href="'.base_url('index.php/main/produtos_etiquetas').'" class="btn btn-default">Voltar para etiquetas</a>';
         
         if ($ok==1)
             {
@@ -1853,13 +1861,12 @@ exit;
 
         $txt = $this->ics->busca('RECIBO_1');
         $contrato = $txt['nw_texto'];
-        
+               
         $data['title'] = 'LOCATÁRIO';
         $contrato = troca($contrato, '$LOCATARIO_DADOS', $this -> load -> view('contrato/contrato_locatario', $data, true));
         
         $cab .= '<div class="row" style="background-color:#e0e0e0; font-size: 18px;"><div class="col-md-12 text-right">Recibo de Entrega '.$data4['id_pp'].'/'.substr($data4['pp_data'],0,4).'</div></div>'.cr();
-        
-        //print_r($data4);        
+               
         if (strlen($data4['pp_obs']) > 0)
             {
                 $contrato .= '<br><br>
@@ -1878,6 +1885,12 @@ exit;
         $contrato = troca($contrato, '$CONDICOES', $condicoes);
         $contrato = troca($contrato, '$LOCATARIA', $data['f_razao_social']);
         $contrato = troca($contrato, '$LOCADORA', $data['f_razao_social']);
+        $contrato = troca($contrato, '$VENDEDOR', $data4['us_nome']);
+        $contrato = troca($contrato, '$DATA_ENTREGA', stodbr($data4['pp_dt_ini_evento'])).' '.$data4['pp_entrega_hora'];
+        $contrato = troca($contrato, '$DATA_DEVOLUCAO', stodbr($data4['pp_dt_fim_evento'])).' '.$data4['pp_dt_fim_evento_hora'];
+        $contrato = troca($contrato, '$LOCAL', $data4['pp_local_entrega']);
+        $contrato = troca($contrato, '$TIPO_ENTREGA', $data4['pz_nome']);
+        
 
         //$data['content'] = $contrato;
         $data['nocab'] = true;
@@ -1941,6 +1954,11 @@ exit;
         $contrato = troca($contrato, '$CONDICOES', $condicoes);
         $contrato = troca($contrato, '$LOCATARIA', $data['f_razao_social']);
         $contrato = troca($contrato, '$LOCADORA', $data['f_razao_social']);
+        $contrato = troca($contrato, '$VENDEDOR', $data4['us_nome']);
+        $contrato = troca($contrato, '$DATA_ENTREGA', stodbr($data4['pp_dt_ini_evento'])).' '.$data4['pp_entrega_hora'];
+        $contrato = troca($contrato, '$DATA_DEVOLUCAO', stodbr($data4['pp_dt_fim_evento'])).' '.$data4['pp_dt_fim_evento_hora'];
+        $contrato = troca($contrato, '$LOCAL', $data4['pp_local_entrega']);
+        $contrato = troca($contrato, '$TIPO_ENTREGA', $data4['pz_nome']);        
 
         //$data['content'] = $contrato;
         $data['nocab'] = true;
@@ -2078,5 +2096,50 @@ exit;
             $this->load->view('content',$data);
             
         }
+    function transfer($acao = '',$id='')
+        {
+            $this->load->model('tranfers');
+            $data = array();
+            $this->cab($data); 
+            
+            $tela = '';
+            if (perfil("#TR1"))
+                {
+                    $tela .= $this->tranfers->acoes();
+                    
+                    
+                } 
+            switch($acao)
+                {
+                case 'ed':
+                    $tela .= $this->tranfers->editar($id);
+                    break;
+                default:
+                    $tela .= $this->tranfers->listrq();
+                    break;
+                }
+             
+            
+            $data['content'] = $tela;
+            $data['title'] = 'Ordem de transferência';
+            $this->load->view('content',$data);                      
+        }
+        function cc($idc=0,$id)
+            {
+                $this->load->model('clientes_contacorrente');
+                $data['nocab'] = true;
+                $this->cab($data);
+                $cp = $this->clientes_contacorrente->cp($idc,$id);
+                $form = new form;
+                $form->id = $id;
+                $tela = $form->editar($cp,'cliente_conta_corrente');
+                $data['content'] = $tela;
+                $data['title'] = 'Conta corrente';
+                if ($form->saved > 0)
+                    {
+                        $data['content'] = '<script> wclose(); </script>';
+                    }
+                $this->load->view('content',$data);                    
+            }
 }
 ?>

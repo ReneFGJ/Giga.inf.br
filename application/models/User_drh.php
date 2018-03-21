@@ -28,7 +28,21 @@ class user_drh extends CI_Model {
         array_push($cp, array('$S80', 'usd_nome_pai', 'Nome do pai', False, True));
         array_push($cp, array('$S80', 'usd_nome_mae', 'Nome da mãe', False, True));
         array_push($cp, array('$D80', 'usd_nascimento', 'Data nascimento', False, True));
+        array_push($cp, array('$O Solteiro:Solteiro&Casado:Casado', 'usd_estado_civel', 'Estado civíl', False, True));
+        array_push($cp, array('$S8', 'usd_filhos', 'N. de filhos', False, True));
         
+        array_push($cp, array('$A', '', 'Escolaridade', False, True));
+        $ope = 'Ensino básico (incompleto):Ensino básico (incompleto)';
+        $ope .= '&Ensino básico (completo):Ensino básico (completo)';
+        $ope .= '&Ensino médio (incompleto):Ensino médio (incompleto)';
+        $ope .= '&Ensino médio (completo):Ensino médio (completo)';
+        $ope .= '&Ensino superior (incompleto):Ensino superior (incompleto)';
+        $ope .= '&Ensino superior (completo):Ensino superior (completo)';
+        $ope .= '&Mestrado:Mestrado';
+        $ope .= '&Doutorado:Doutorado';
+        
+        array_push($cp, array('$O '.$ope, 'usd_escolaridade', 'Escolaridade', False, True));
+
         array_push($cp, array('$A', '', 'Dados na empresa', False, True));
         $sql = "SELECT * FROM _filiais where fi_ativo = 1";
         array_push($cp, array('$Q id_fi:fi_nome_fantasia:'.$sql, 'usd_empresa', 'Empresa', False, True));
@@ -45,7 +59,18 @@ class user_drh extends CI_Model {
         array_push($cp, array('$S80', 'usd_pis', 'Número do PIS', False, True));
         //array_push($cp, array('$S80', 'usd_dt_nasc', 'Data de nascimento', False, True));
         array_push($cp, array('$S80', 'usd_ct', 'Carteira de trabalho Nº', False, True));
+        array_push($cp, array('$S80', 'usd_cnh', 'Carteira de habilitação  Nº', False, True));
+        array_push($cp, array('$S5',  'usd_cnh_cat', 'Carteira de habilitação (categoria)', False, True));
         array_push($cp, array('$S80', 'usd_ct_serie', 'Carteira/Série', False, True));
+        array_push($cp, array('$S80', 'usd_te', 'Título de eleitor', False, True));
+        array_push($cp, array('$S80', 'usd_te_secao', 'Título de eleitor (Seção)', False, True));
+        array_push($cp, array('$S80', 'usd_te_zona', 'Título de eleitor (Zona)', False, True));
+        
+        array_push($cp, array('$A', '', 'Dados Bancários', False, True));
+        array_push($cp, array('$S80', 'usd_banco', 'Banco', False, True));
+        array_push($cp, array('$S80', 'usd_ag', 'Agência', False, True));
+        array_push($cp, array('$S80', 'usd_cc', 'Conta Corrente', False, True));
+        array_push($cp, array('$O 0:Sem conta corrente&1:Conta Corrente&2:Poupança', 'usd_cc_tipo', 'Tipo de conta', False, True));        
 
         array_push($cp, array('$A', '', 'Endereço pessoal', False, True));
         array_push($cp, array('$S80', 'usd_logradouro', 'Endereço', False, True));

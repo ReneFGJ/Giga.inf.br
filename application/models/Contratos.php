@@ -67,7 +67,8 @@ class contratos extends CI_model
                     }
                 $sql = "select * from produto_agenda
                         inner join produtos on id_pr = ag_produto
-                        inner join produto_nome ON pr_produto = id_pn                       
+                        inner join produto_nome ON pr_produto = id_pn
+                        inner join produtos_marca ON pr_marca = id_ma                       
                     where ag_pedido = $id $wh
                     order by ag_data_reserva, pr_produto, pr_patrimonio
                     ";                          
@@ -85,7 +86,7 @@ class contratos extends CI_model
                         $line = $rlt[$r];
                         $d1 = $line['ag_data_reserva'];
                         $d2 = $line['ag_data_reserva_ate'];
-                        $ds = $line['pn_descricao'];
+                        $ds = $line['pn_descricao'].' '.$line['pr_modelo'].' '.$line['ma_nome'];
                         if (($d1 != $xd1) or ($d2 != $xd2))
                             {
                                 if ($tot > 0)
@@ -101,8 +102,8 @@ class contratos extends CI_model
                         if ($ds != $xds)
                             {
                                 if ($tot > 0)
-                                    { $sx .= ' <b>Total:'.$tot.' item(ns)</b>'; }
-                                $sx .= '<br>'.$ds.':';
+                                    { $sx .= ' <b>Total:'.$tot.' item(ns)</b><br>'; }
+                                $sx .= '<br>'.$ds.':<br>';
                                 $xds = $ds;
                                 $x = 0;
                                 $tot = 0;

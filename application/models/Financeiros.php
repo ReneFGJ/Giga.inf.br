@@ -96,16 +96,23 @@ class financeiros extends CI_model {
     }
 
     function resumo($id = 0) {
-        $sql = "select sum(cp_valor) as total, count(*) as titulos 
+        $sql = "select sum(total) as total, sum(titulos) as titulos, 
+                        sum(pagar) as pagar, sum(pagamentos) as pagamentos from (
+                select sum(cp_valor) as total, count(*) as titulos, 0 as pagar, 0 as pagamentos 
 						FROM " . $this -> table_receber . " 
-						WHERE cp_fornecedor = $id and cp_situacao = 1";
+						WHERE cp_fornecedor = $id and cp_situacao = 1
+				UNION 
+                select 0, 0, sum(cp_valor) as total, count(*) as titulos              
+                        FROM " . $this -> table_pagar . " 
+                        WHERE cp_fornecedor = $id and cp_situacao = 1						
+			    ) as tabela";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             return ($line);
         }
-        return ( array('total' => 0, 'titulus' => 0));
+        return ( array('total' => 0, 'titulos' => 0, 'pagar'=> 0,'pagamentos'=>0));
     }
 
     function lista_por_cliente($id = 0) {
@@ -204,15 +211,14 @@ class financeiros extends CI_model {
     }
 
     function saldo_dia($dt, $tipo = '1') {
-        if ((isset($_SESSION['cia'])) and (strlen($_SESSION['cia']) > 0))
-            {
-                $fi = $_SESSION['cia'];  
-                $wh = " and (cp_filial = $fi ) ";      
-            } else {
-                $fi = '';
-                $wh = '';
-            }
-        
+        if ((isset($_SESSION['cia'])) and (strlen($_SESSION['cia']) > 0)) {
+            $fi = $_SESSION['cia'];
+            $wh = " and (cp_filial = $fi ) ";
+        } else {
+            $fi = '';
+            $wh = '';
+        }
+
         if ($tipo == '1') {
             $tabela = 'cx_pagar';
         } else {
@@ -280,33 +286,31 @@ class financeiros extends CI_model {
         array_push($cp, array('$B8', '', 'Fechar pagamento', false, true));
         return ($cp);
     }
-    
-    function analise_credito()
-        {
-            $sql = "select * from clientes where f_situacao = 1 order by f_razao_social limit 100";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $sx = '';
-            $sx .= '<table class="table" width="100%">';
-            $sx .= '<tr><th>Razão Social</th>
+
+    function analise_credito() {
+        $sql = "select * from clientes where f_situacao = 1 order by f_razao_social limit 100";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $sx = '';
+        $sx .= '<table class="table" width="100%">';
+        $sx .= '<tr><th>Razão Social</th>
                         <th>Nome fantasia</th>
                         <th>Cadastro</th>
-                    </tr>';  
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                    $line = $rlt[$r];
-                    $link = '<a href="'.base_url('index.php/main/cliente/'.$line['id_f'].'/'.checkpost_link($line['id_f'])).'">';
-                    $sx .= '<tr>';
-                    $sx .= '<td>'.$link.$line['f_razao_social'].'</a>'.'</td>';
-                    $sx .= '<td>'.$line['f_nome_fantasia'].'</td>';
-                    $sx .= '<td>'.stodbr($line['f_created']).'</td>';
-                    $sx .= '</tr>';
-                }
-            $sx .= '</table>';
-            return($sx);
+                    </tr>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $link = '<a href="' . base_url('index.php/main/cliente/' . $line['id_f'] . '/' . checkpost_link($line['id_f'])) . '">';
+            $sx .= '<tr>';
+            $sx .= '<td>' . $link . $line['f_razao_social'] . '</a>' . '</td>';
+            $sx .= '<td>' . $line['f_nome_fantasia'] . '</td>';
+            $sx .= '<td>' . stodbr($line['f_created']) . '</td>';
+            $sx .= '</tr>';
         }
+        $sx .= '</table>';
+        return ($sx);
+    }
 
-    function creceber_enviar_email($data, $enviar = 0,$tipo=0) {
+    function creceber_enviar_email($data, $enviar = 0, $tipo = 0) {
         $sql = $this -> sql;
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -332,10 +336,9 @@ class financeiros extends CI_model {
                 $emails = array_merge($emails, $em);
             }
 
-            if ($tipo==2)
-                {
-                    $emails = array($_SESSION['email']);
-                }
+            if ($tipo == 2) {
+                $emails = array($_SESSION['email']);
+            }
 
             array_push($emails, $_SESSION['email']);
             if ($enviar > 0) {
@@ -368,7 +371,7 @@ class financeiros extends CI_model {
         $cp = array();
         array_push($cp, array('$H8', 'id_cp', '', false, true));
         $sql = "select * from _filiais where fi_ativo";
-        array_push($cp, array('$Q id_fi:fi_nome_fantasia:' . $sql, 'cp_filial', 'Filial',true, true));
+        array_push($cp, array('$Q id_fi:fi_nome_fantasia:' . $sql, 'cp_filial', 'Filial', true, true));
         array_push($cp, array('$D8', 'cp_vencimento', 'Vencimento', True, true));
         array_push($cp, array('$S80', 'cp_historico', 'Historico', true, true));
         array_push($cp, array('$S80', 'cp_pedido', 'Pedido/NF', False, true));
@@ -404,7 +407,7 @@ class financeiros extends CI_model {
         array_push($cp, array('$H8', 'id_cp', '', false, true));
         $sql = "select * from _filiais where fi_ativo";
         array_push($cp, array('$Q id_fi:fi_nome_fantasia:' . $sql, 'cp_filial', 'Filial', true, true));
-        
+
         array_push($cp, array('$D8', 'cp_vencimento', 'Vencimento', True, true));
         array_push($cp, array('$S80', 'cp_historico', 'Historico', true, true));
         array_push($cp, array('$S80', 'cp_pedido', 'Pedido/NF', False, true));
@@ -476,7 +479,7 @@ class financeiros extends CI_model {
         array_push($cp, array('$H8', 'id_cp', '', false, true));
         $sql = "select * from _filiais where fi_ativo";
         array_push($cp, array('$Q id_fi:fi_nome_fantasia:' . $sql, 'cp_filial', 'Filial', true, true));
-        
+
         array_push($cp, array('$D8', 'cp_vencimento', 'Vencimento', True, true));
         array_push($cp, array('$S80', 'cp_historico', 'Historico', True, true));
         array_push($cp, array('$S80', 'cp_pedido', 'Pedido', True, true));
@@ -548,15 +551,14 @@ class financeiros extends CI_model {
     }
 
     function contas_pagar($dt) {
-        if ((isset($_SESSION['cia'])) and (strlen($_SESSION['cia']) > 0))
-            {
-                $fi = $_SESSION['cia'];  
-                $wh = " and (cp_filial = $fi ) ";      
-            } else {
-                $fi = '';
-                $wh = '';
-            }            
-        
+        if ((isset($_SESSION['cia'])) and (strlen($_SESSION['cia']) > 0)) {
+            $fi = $_SESSION['cia'];
+            $wh = " and (cp_filial = $fi ) ";
+        } else {
+            $fi = '';
+            $wh = '';
+        }
+
         $tipo = '1';
         $dt = sonumero($dt);
         $dt = substr($dt, 0, 4) . '-' . substr($dt, 4, 2) . '-' . substr($dt, 6, 2);
@@ -596,15 +598,14 @@ class financeiros extends CI_model {
     }
 
     function caixa_dia($dt) {
-        if ((isset($_SESSION['cia'])) and (strlen($_SESSION['cia']) > 0))
-            {
-                $fi = $_SESSION['cia'];  
-                $wh = " and (cp_filial = $fi ) ";      
-            } else {
-                $fi = '';
-                $wh = '';
-            }            
-        
+        if ((isset($_SESSION['cia'])) and (strlen($_SESSION['cia']) > 0)) {
+            $fi = $_SESSION['cia'];
+            $wh = " and (cp_filial = $fi ) ";
+        } else {
+            $fi = '';
+            $wh = '';
+        }
+
         $cp = '*';
         $sql = "select $cp, 1 as tipo from cx_pagar 
 							where cp_vencimento = '$dt'
@@ -760,12 +761,11 @@ class financeiros extends CI_model {
                     break;
             }
         }
-        
-        /* FILIAIS */  
-        if ((isset($data['filial'])) and (strlen($data['filial']) > 0))
-            {
-                $wh .= 'AND (cp_filial = '.$data['filial'].')';
-            }        
+
+        /* FILIAIS */
+        if ((isset($data['filial'])) and (strlen($data['filial']) > 0)) {
+            $wh .= 'AND (cp_filial = ' . $data['filial'] . ')';
+        }
 
         $sql = "select * from $table 
 							left join clientes ON id_f = cp_fornecedor

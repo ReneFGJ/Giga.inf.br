@@ -336,7 +336,6 @@ class Admin extends CI_controller {
     function user($id, $chk = '') {
         $this -> load -> model('users');
         $this -> users -> le($id);
-        $data['content'] = $this -> users -> my_account($id);
 
         $this -> cab();
         $data['title'] = '';

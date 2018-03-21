@@ -13,7 +13,7 @@ $linkp = '<a href="' . $linkp . '">';
 ?>
 		
 			<span class="small">produto</span><br>
-			<span class="superbig"><?php echo $linkp . $pc_desc_basica . '</a>'; ?></span><br>
+			<span class="superbig"><?php echo $linkp . $pc_nome . '</a>'; ?></span><br>
 
 			<span class="small">marca</span><br>
 			<span class="big"><?php echo $ma_nome; ?></span><br>

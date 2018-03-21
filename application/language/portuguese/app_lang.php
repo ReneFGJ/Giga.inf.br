@@ -61,5 +61,7 @@ $lang['situacao_3'] = 'Devolvido(*)';
 
 $lang['situacao_9'] = 'Cancelado';
 
-
+$lang['cc_tipo_1'] = 'Conta Corrente';
+$lang['cc_tipo_2'] = 'Poupança';
+$lang['cc_tipo_0'] = 'sem conta';
 ?>

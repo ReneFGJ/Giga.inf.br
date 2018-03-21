@@ -160,7 +160,8 @@ class clientes extends CI_Model {
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		$sx = '<table class="table middle" width="100%">';
-		$sx .= '<tr>
+        $sx .= '<tr><th colspan=5">Contatos</th></tr>';		
+        $sx .= '<tr class="small">
 						<th>nome</th>
 						<th>tipo</th>
 						<th>telefone</th>

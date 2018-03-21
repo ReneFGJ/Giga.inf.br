@@ -255,7 +255,7 @@ class produtos extends CI_model {
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $link = 'index.php/main/locacao_item/' . $line['id_pp'] . '/' . checkpost_link($line['id_pp']);
-            $link = '<a href="' . base_url($link) . '" target="_new">';
+            $link = '<a href="' . base_url($link) . '" >';
 
             $sx .= '<tr>';
             $sx .= '<td>';
@@ -1111,6 +1111,62 @@ class produtos extends CI_model {
             return($sx);
         }
 
+    function items_por_pedido_devolvido($pd)
+        {
+            $sql = "select * from produto_agenda
+                        inner join produtos on id_pr = ag_produto
+                        inner join produto_nome ON pr_produto = id_pn
+                        left join produtos_marca ON id_ma = pr_marca
+                        where ag_pedido = ".$pd." 
+                        and ag_situacao = 3
+                        order by ag_devolucao desc, ag_devolucao_hora desc";
+
+                                                
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx = '<table wdith="100%" class="table">';
+            $sx .= '<tr><th>Patrimonio</th>
+                        <th>Barcod</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Reservado em</th>
+                        </tr>';
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+//                    echo '<hr>';
+                    //print_r($line);
+                    $sx .= '<tr>';
+                    $sx .= '<td>';
+                    $sx .= $line['pr_tag'];
+                    $sx .= '</td>';
+
+                    $sx .= '<td>';
+                    $sx .= $line['pr_patrimonio'];
+                    $sx .= '</td>';
+                    
+                    $sx .= '<td>';
+                    //$sx .= $line['pn_descricao'];
+                    $sx .= $line['ma_nome'];
+                    $sx .= '</td>';                    
+
+                    $sx .= '<td>';
+                    $sx .= $line['pr_modelo'];
+                    $sx .= '</td>';
+                    
+                    $sx .= '<td>';
+                    $sx .= stodbr($line['ag_data_reserva']);
+                    $sx .= ' ';
+                    $sx .= $line['ag_hora_reserva'];
+                    $sx .= '</td>';
+
+
+                    $sx .= '</tr>';
+                }
+            $sx .= '</table>';
+            return($sx);
+        }
+
     /****************** LOGISTICA *************/
     function movimenta_para_estoque($id, $tipo = 0) {
         $user = $_SESSION['id'];
@@ -1202,6 +1258,7 @@ class produtos extends CI_model {
                                 <strong>Produto não localizado!</strong> Patrimonio não localizado na base.
                                 <div class="col-md-4 text-right">
                                     <a href="' . base_url('index.php/main/produtos_cadastrar_serial?dd99=' . $serie) . '" target="_new' . date("YmdHis") . '"  class="btn btn-default">Cadastrar</a>
+                                    <a href="#"  class="btn btn-default" onclick="window.history.back();">Voltar</a>                                    
                                 </div>
                             </div>';
             $data['title'] = '';
@@ -1233,8 +1290,9 @@ class produtos extends CI_model {
         $err = '';
         $sit = $ln['ag_situacao'];
         $ida = $ln['id_ag'];
+        $time = date("H:i:s");
         if (($sit == 1) or ($sit == 2)) {
-            $sql = "update produto_agenda set ag_situacao = 3, ag_devolucao = '$dt' 
+            $sql = "update produto_agenda set ag_situacao = 3, ag_devolucao = '$dt' , ag_devolucao_hora = '$time'
                                 where id_ag = " . $ida;
             $rlt = $this -> db -> query($sql);
             $dt = array();

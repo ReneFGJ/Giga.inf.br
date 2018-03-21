@@ -20,6 +20,13 @@ $us_nome = $_SESSION['user'];
 			<li>
 			<a href="<?php echo base_url('index.php/main/clientes'); ?>">Clientes</a>
 			</li>
+            <?php
+            if (perfil("#TR1#TR2")) {
+                echo '  <li>
+                        <a href="'.base_url('index.php/main/transfer').'">OT</a>
+                        </li>' . cr();
+            }
+            ?>			
 			<li class="dropdown">
 			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Propostas & Pedidos <span class="caret"></span></a>
 			<ul class="dropdown-menu">

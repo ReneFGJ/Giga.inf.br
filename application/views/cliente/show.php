@@ -54,8 +54,18 @@
 			echo '<tr><td colspan=5><b><font color="red">Sem contatos registrados</font></td></tr>'.cr();
 		}
 	?>
+<?php
+if (isset($cc))
+    {
+        echo '<tr><td colspan=5>';
+        echo $cc;
+        echo '</td></tr>';
+    }
+?>	
 	</table>
 </div>
+
+
 
 <script>
 	$("#cliente_data").click(function() {
