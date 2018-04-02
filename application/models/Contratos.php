@@ -58,6 +58,68 @@ class contratos extends CI_model
 				//exit;
 				return($sx);
 			}
+        function anexos_table($id,$sit='',$cp='')
+            {
+                $wh = '';
+                if (strlen($sit) > 0)
+                    {
+                        $wh = " AND (ag_situacao = '$sit' )";
+                    }
+                $sql = "select * from produto_agenda
+                        inner join produtos on id_pr = ag_produto
+                        inner join produto_nome ON pr_produto = id_pn
+                        inner join produtos_marca ON pr_marca = id_ma                       
+                    where ag_pedido = $id $wh
+                    order by ag_data_reserva, pr_produto, pr_patrimonio
+                    ";   
+                      
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+                $sx = '<br>';
+
+                $xd1 = '';
+                $xd2 = '';
+                $xds = '';
+                $x = 0;
+                $tot = 0;
+                $pr1 = array();
+                $pr2 = array();
+                $pr3 = array();
+                $pr4 = array();
+                for ($r=0;$r < count($rlt);$r++)
+                    {
+                        $line = $rlt[$r];
+                        $d1 = $line['ag_data_reserva'];
+                        $d2 = $line['ag_data_reserva_ate'];
+                        $ds = $line['pn_descricao'].' - '.$line['pr_modelo'].' - '.$line['ma_nome'];
+                        
+                        if (isset($pr1[$ds]))
+                            {
+                                $pr1[$ds] = $pr1[$ds] + 1;
+                                $pr2[$ds] .= ', '.$cp.UpperCase($line['pr_patrimonio']);
+                            } else {
+                                $pr1[$ds] = 1;
+                                $pr2[$ds] = UpperCase($line['pr_patrimonio']);
+                            }
+                    }
+                $sx = '<h3>Locação: '.stodbr($d1).' até '.stodbr($d2).'</h3>';
+                $sx .= '<table width=100% class="table">';
+                $sx .= '<tr><th width="5%">qt.</th>
+                            <th width="60%">produto</th>
+                            <th width="35%">barcod</th>
+                            </tr>';
+                $it = 0;
+                foreach ($pr1 as $key => $value) {
+                    $sx .= '<tr>';
+                    $sx .= '<td>'.$value.'</td>';
+                    //$sx .= '<td>'.(($it++)+1).'</td>';
+                    $sx .= '<td>'.$key.'</td>';
+                    
+                    $sx .= '<td>'.$pr2[$key].'</td>';
+                }
+                $sx .= '</table>';
+                return($sx);
+            }
         function anexos_simple($id,$sit='',$cp='')
             {
                 $wh = '';

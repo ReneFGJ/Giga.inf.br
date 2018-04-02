@@ -127,7 +127,10 @@ $us_nome = $_SESSION['user'];
 					</li>
                     <li>
                         <a href="<?php echo base_url('index.php/main/locacao/7'); ?>">Produtos no cliente</a>
-                    </li>					
+                    </li>
+                    <li>
+                        <a href="<?php echo base_url('index.php/main/locacao/8'); ?>">Localização do Produto</a>
+                    </li>                    					
 				</ul>
 			</li>
 

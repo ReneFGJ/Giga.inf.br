@@ -58,7 +58,7 @@ class Main extends CI_Controller {
         $this -> load -> view('home', null);
         
         $this -> load -> view('search/search', null);
-
+        
         $data['content'] = $this -> user_drh -> aniversariantes();
         $data['title'] = '';
         if (strlen($data['content']) > 0) {
@@ -453,8 +453,9 @@ class Main extends CI_Controller {
             $tela = $this -> produtos -> produto_registra_serie($serie, $ped, $d1, $d2, $cliente);
             $tela = '<meta http-equiv="refresh" content="0; url='.base_url('index.php/main/locacao_item_novo_serie/'.$id.'/'.$ped.'/'.$cliente).'">';            
         }
+        $its = $this->produtos->items_por_pedido_total($ped);
         $tela .= '<script> $("#dd1").focus(); </script>';
-        $data['content'] = $tela;
+        $data['content'] = '<table border=1 width="100%" align="center"><tr valing="top"><td>'.$tela.'</td><td width="5%" align="center"><h2 style="align: center;">'.$its.'</h2><br><span class="small">itens</small></td></tr></table>';
         $data['title'] = '';
         
         $data['content'] .= $this->produtos->items_por_pedido($ped);
@@ -841,7 +842,12 @@ class Main extends CI_Controller {
                 $data['title'] = 'Contratos em locação';
                 $data['content'] = $this -> $model -> contratos_situacao(7);
                 $this->load->view('content',$data);
-                break;                
+                break;  
+            case '8':
+                $data['title'] = 'Localização de Produto';
+                $data['content'] = $this -> $model -> localiza_produto();
+                $this->load->view('content',$data);
+                break;                              
         
 //        $data['title'] = 'Em faturamento';
 //        $data['content'] = $this -> $model -> contratos_situacao(3);
@@ -1476,12 +1482,12 @@ exit;
         }
     }
 
-    function produtos_etiqueta($tp='') {
+    function produtos_etiqueta($tp='',$lj='') {
         $filename = 'etiqueta.etq';
         header("Content-Type: application/force-download");
         header("Content-Disposition: attachment; filename=" . $filename);
         $this -> load -> model('produtos');
-        $this -> produtos -> etiquetas($tp);
+        $this -> produtos -> etiquetas($tp,$lj);
     }
     
     function produtos_etiquetas() {
@@ -1489,10 +1495,24 @@ exit;
         $this->cab();
         
         $data['title'] = 'Etiquetas para imprimir';
-        $data['content'] = '<a href="'.base_url('index.php/main/produtos_etiqueta/1').'" class="btn btn-primary">Imprimir Etiquetas Normal</a> | ';
-        $data['content'] .= '<a href="'.base_url('index.php/main/produtos_etiqueta/2').'" class="btn btn-primary">Imprimir Etiquetas Mini</a> | ';
-        $data['content'] .= '<a href="'.base_url('index.php/main/produtos_checkin').'" class="btn btn-default">Checkin</a>';                
-        $data['content'] .= $this -> produtos -> etiquetas_para_imprimir();
+        $sql = "select count(*) as total, id_fi, fi_nome_fantasia from produtos 
+                    INNER JOIN _filiais ON pr_filial = id_fi
+                        WHERE pr_etiqueta = 1
+                        group by id_fi, fi_nome_fantasia
+                        order by id_fi, fi_nome_fantasia";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $data['content'] = '';                        
+        for ($r=0;$r < count($rlt);$r++)
+            {
+                $line = $rlt[$r];
+                $idj = $line['id_fi'];
+                $data['content'] .= '<h1>'.$line['fi_nome_fantasia'].'</h1>';                
+                $data['content'] .= '<a href="'.base_url('index.php/main/produtos_etiqueta/1/'.$idj).'" class="btn btn-primary">Imprimir Etiquetas Normal</a> | ';
+                $data['content'] .= '<a href="'.base_url('index.php/main/produtos_etiqueta/2/'.$idj).'" class="btn btn-primary">Imprimir Etiquetas Mini</a> | ';
+                $data['content'] .= '<a href="'.base_url('index.php/main/produtos_checkin').'" class="btn btn-default">Checkin</a>';             
+            }
+        $data['content'] .= '<hr>'.$this -> produtos -> etiquetas_para_imprimir();
         $this->load->view('content',$data);
         
         $this->footer();
@@ -1857,6 +1877,7 @@ exit;
         $data = array_merge($data, $data2, $data3);
         $anexo_2 = $this -> contratos -> anexos($id,1);
         $anexo = $this -> contratos -> anexos_simple($id,1);
+        $anexo_3 = $this -> contratos -> anexos_table($id,1);
         $condicoes = '';
 
         $txt = $this->ics->busca('RECIBO_1');
@@ -1880,8 +1901,9 @@ exit;
         
         
         $contrato = troca($contrato, '$LOCADORA_DADOS', $this -> load -> view('contrato/contrato_locador', $data, true));
-        $contrato = troca($contrato, '$EQUIPAMENTOS', $anexo);
-        $contrato = troca($contrato, '$L_EQUIPAMENTOS', $anexo_2);
+        $contrato = troca($contrato, '$EQUIPAMENTOS', $anexo_3);
+        $contrato = troca($contrato, '$T_EQUIPAMENTOS', $anexo_2);
+        $contrato = troca($contrato, '$L_EQUIPAMENTOS', $anexo);
         $contrato = troca($contrato, '$CONDICOES', $condicoes);
         $contrato = troca($contrato, '$LOCATARIA', $data['f_razao_social']);
         $contrato = troca($contrato, '$LOCADORA', $data['f_razao_social']);

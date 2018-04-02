@@ -92,12 +92,11 @@ class produtos extends CI_model {
 
     function busca($t, $cat) {
         $t = troca($t, ' ', ';');
-        
-        if (strlen(sonumero($t)) ==8) 
-            {
-                $t = substr($t,0,7);
-            }
-        $t = splitx(';', $t . ';');            
+
+        if (strlen(sonumero($t)) == 8) {
+            $t = substr($t, 0, 7);
+        }
+        $t = splitx(';', $t . ';');
         $wh1 = '';
         $wh2 = '';
         $wh3 = '';
@@ -141,7 +140,7 @@ class produtos extends CI_model {
 						ORDER BY pc_nome, pr_serial
 						LIMIT 100
 						";
-						
+
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         $total = $rlt[0]['total'];
@@ -177,24 +176,24 @@ class produtos extends CI_model {
         $ID = 0;
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
-            $link = '<a href="'.base_url('index.php/main/produto/'.$line['id_pr']).'" target="_new'.$line['id_pr'].'">';
-            $tit = 'title="'.($line['pm_obs']).($line['pm_obss']).'" ';
-            $tit .= 'alt="'.($line['pm_obs']).($line['pm_obss']).'" ';
+            $link = '<a href="' . base_url('index.php/main/produto/' . $line['id_pr']) . '" target="_new' . $line['id_pr'] . '">';
+            $tit = 'title="' . ($line['pm_obs']) . ($line['pm_obss']) . '" ';
+            $tit .= 'alt="' . ($line['pm_obs']) . ($line['pm_obss']) . '" ';
             $ID++;
-            $sx .= '<tr class="' . trim($line['ps_class']) . '"  '.$tit.'>' . cr();
+            $sx .= '<tr class="' . trim($line['ps_class']) . '"  ' . $tit . '>' . cr();
             $sx .= '	<td class="small">';
             $sx .= strzero($ID, 3) . '. ';
             $sx .= '	</td>' . cr();
 
             $sx .= '    <td >';
-            $sx .= $link.$line['pr_tag'];
-            $sx .= '<br>'.$line['pr_patrimonio'].'</a>';
+            $sx .= $link . $line['pr_tag'];
+            $sx .= '<br>' . $line['pr_patrimonio'] . '</a>';
             $sx .= '    </td>' . cr();
-                        
+
             $sx .= '	<td >';
             $sx .= $line['pn_descricao'];
             $sx .= '	</td>' . cr();
-            
+
             $sx .= '    <td >';
             $sx .= $line['ma_nome'];
             $sx .= '    </td>' . cr();
@@ -233,31 +232,53 @@ class produtos extends CI_model {
     function contratos_situacao($sit) {
         $order = 'pp_dt_ini_evento, pp_entrega_hora';
         $hora = 'pp_entrega_hora';
-        switch($sit)
-            {
-            case '7':
+        switch($sit) {
+            case '7' :
                 $order = 'pp_dt_fim_evento, pp_dt_fim_evento_hora';
                 $hora = 'pp_dt_fim_evento_hora';
                 break;
-            }
+        }
         $sql = "select * from pedido
 						INNER JOIN clientes ON pp_cliente = id_f 
 						INNER JOIN users ON id_us = pp_vendor
 						INNER JOIN _filiais ON pp_filial = id_fi
+						INNER JOIN prazo_entrega ON pp_prazo_entrega = id_pz
 						WHERE pp_tipo_pedido = 3 and pp_situacao = " . $sit . "
-					ORDER BY $order
+					ORDER BY id_pz, $order
 					";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
-        $sx = '';
+        $sx = '<meta http-equiv="refresh" content="60" />';
+        $sx .= date("d/m/Y H:i:s");
         $sx .= '<table class="table" width="100%">';
-        $sx .= '<tr><th>Contrato</th><th>Cliente</th><th>Início Locação</th><th>Fim Locação</th></tr>';
+        $sx .= '<tr><th>Contrato</th><th>Cliente</th><th>Início Locação</th>
+                    <th>Fim Locação</th>
+                    <th>Tipo de Entrega</th>
+                    </tr>';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $link = 'index.php/main/locacao_item/' . $line['id_pp'] . '/' . checkpost_link($line['id_pp']);
             $link = '<a href="' . base_url($link) . '" >';
-
-            $sx .= '<tr>';
+            if ($sit == '7')
+                {
+                    $dt = sonumero($line['pp_dt_fim_evento']);
+                } else {
+                    $dt = sonumero($line['pp_dt_ini_evento']);        
+                }
+            
+            if ($dt == date("Ymd"))
+                {
+                    $bg = '#FFA0A0';
+                } else {
+                    if ($dt < date("Ymd"))
+                        {
+                            $bg = '#FFFFEE';
+                        } else {
+                            $bg = '#EEFFEE';        
+                        }
+                    
+                }
+            $sx .= '<tr style="background-color: '.$bg.'">';
             $sx .= '<td>';
             $sx .= $link;
             $sx .= strzero($line['id_pp'], 7) . '/' . $line['pp_ano'];
@@ -274,12 +295,17 @@ class produtos extends CI_model {
 
             $sx .= '<td align="center">';
             $sx .= stodbr($line['pp_dt_ini_evento']);
-            $sx .= '<br>'.$line[$hora];
+            $sx .= '<br>' . $line[$hora];
             $sx .= '</td>';
 
             $sx .= '<td align="center">';
             $sx .= stodbr($line['pp_dt_fim_evento']);
             $sx .= '</td>';
+
+            $sx .= '<td align="center" style="background-color: '.$line['pz_color'].';">';
+            $sx .= ($line['pz_nome']);
+            $sx .= '</td>';
+            
             $sx .= '</tr>';
         }
         $sx .= '</table>';
@@ -305,14 +331,14 @@ class produtos extends CI_model {
         array_push($cp, array('$Q id_pas:pas_descricao:' . $sql, 'ag_situacao', 'Status', True, True));
         return ($cp);
     }
-    
+
     function cp_etiqueta() {
         $cp = array();
         $op = '1:Alocado&9:cancelado';
         array_push($cp, array('$H8', 'id_et', '', False, True));
         array_push($cp, array('$S100', 'st_nome', 'Nome da etiqueta', True, True));
         array_push($cp, array('$O ' . $op, 'st_ativo', 'Ativo', True, True));
-        
+
         array_push($cp, array('$A', '', 'Etiqueta #1', False, True));
         array_push($cp, array('$I8', 'st_p1', 'Codigo de Barras #1 - Direita', True, True));
         array_push($cp, array('$I8', 'st_p2', 'Codigo de Barras #1 - Altura', True, True));
@@ -328,7 +354,7 @@ class produtos extends CI_model {
         array_push($cp, array('$I8', 'st_o5', 'Reservado', True, True));
 
         return ($cp);
-    }    
+    }
 
     function cp_item() {
         $cp = array();
@@ -358,7 +384,7 @@ class produtos extends CI_model {
         array_push($cp, array('$S10', 'pr_nf', 'Nota fiscal', False, True));
         array_push($cp, array('$D8', 'pr_nf_data', 'Data NF', False, True));
         array_push($cp, array('$N8', 'pr_vlr_custo', 'Valor de custo', False, True));
-    
+
         return ($cp);
     }
 
@@ -415,7 +441,6 @@ class produtos extends CI_model {
         array_push($cp, array('$D8', 'pr_nf_data', 'Data NF', False, True));
         array_push($cp, array('$N8', 'pr_vlr_custo', 'Valor de custo', False, True));
 
-
         return ($cp);
     }
 
@@ -440,7 +465,7 @@ class produtos extends CI_model {
 
         $sql = "select * from produtos_situacao where ps_ativo = 1 order by id_ps";
         array_push($cp, array('$O 1:Ativo&0:Inativo', 'pm_ativo', 'Situação', True, True));
-        array_push($cp, array('$T80:5', 'pm_obss', 'Obs', False, True));        
+        array_push($cp, array('$T80:5', 'pm_obss', 'Obs', False, True));
 
         array_push($cp, array('$B8', '', 'Gravar', False, True));
         return ($cp);
@@ -565,12 +590,12 @@ class produtos extends CI_model {
 
         return (row($form, $id));
     }
-    
+
     function row_etiquetas($id = '') {
         $form = new form;
 
         $form -> fd = array('id_et', 'st_nome', 'st_p1', 'st_p2', 'st_p3', 'st_p4', 'st_p5', 'st_o1', 'st_o2', 'st_o3', 'st_o4', 'st_o5');
-        $form -> lb = array('id', msg('pc_nome'), 'pos','pos','pos','pos','pos','pos','pos','pos','pos','pos','pos');
+        $form -> lb = array('id', msg('pc_nome'), 'pos', 'pos', 'pos', 'pos', 'pos', 'pos', 'pos', 'pos', 'pos', 'pos', 'pos');
         $form -> mk = array('', 'L', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C');
 
         $form -> tabela = "etiqueta";
@@ -583,7 +608,7 @@ class produtos extends CI_model {
         $form -> row = base_url('index.php/main/produtos_modelo');
 
         return (row($form, $id));
-    }    
+    }
 
     function row_categoria($id = '') {
         $form = new form;
@@ -748,40 +773,48 @@ class produtos extends CI_model {
         return (1);
     }
 
-    function etiquetas($tp='') {
-        $sz = '80'; $sy = '';
-        if ($tp==2) { $sz = 50; }
-        
-        $sql = "select * from etiqueta where id_et = ".round('0'.$tp);
-        $rlt = $this->db->query($sql);
-        $rlt = $rlt->result_array();
-        if (count($rlt) > 0)
+    function etiquetas($tp = '',$lj) {
+        $sz = '80';
+        $sy = '';
+        if ($tp == 2) { $sz = 50;
+        }
+
+        $sql = "select * from etiqueta where id_et = " . round('0' . $tp);
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        if (count($rlt) > 0) {
+            $line = $rlt[0];
+            $p1 = $line['st_p1'];
+            $p2 = $line['st_p2'];
+            $p3 = $line['st_p3'];
+            $p4 = $line['st_p4'];
+            $p5 = $line['st_p5'];
+            $o1 = $line['st_o1'];
+            $o2 = $line['st_o2'];
+            $o3 = $line['st_o3'];
+            $o4 = $line['st_o4'];
+            $o5 = $line['st_o5'];
+        } else {
+            $p1 = 60;
+            $p2 = 30;
+            $p3 = 90;
+            $p4 = 140;
+            $p5 = 0;
+            $o1 = 480;
+            $o2 = 30;
+            $o3 = 510;
+            $o4 = 90;
+            $o5 = 0;
+        }
+        /**************************/
+        $wh = '';
+        if (strlen($lj) > 0)
             {
-                $line = $rlt[0];
-                $p1 = $line['st_p1'];
-                $p2 = $line['st_p2'];
-                $p3 = $line['st_p3'];
-                $p4 = $line['st_p4'];
-                $p5 = $line['st_p5'];
-                $o1 = $line['st_o1'];
-                $o2 = $line['st_o2'];
-                $o3 = $line['st_o3'];
-                $o4 = $line['st_o4'];
-                $o5 = $line['st_o5'];                
-            } else {
-                $p1 = 60;
-                $p2 = 30;
-                $p3 = 90;
-                $p4 = 140;
-                $p5 = 0;
-                $o1 = 480;
-                $o2 = 30;
-                $o3 = 510;
-                $o4 = 90;
-                $o5 = 0;
+                $wh = " AND pr_filial = $lj ";
             }
         $sql = "select * from produtos 
 						WHERE pr_etiqueta = 1
+						$wh
 			";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -799,8 +832,8 @@ class produtos extends CI_model {
             $sx .= 'N' . cr();
             $sx .= 'q816' . cr();
             $sx .= 'Q200,24' . cr();
-            $sx .= 'A'.$p3.','.$p4.',0,1,1,2,N,"' . $mod . '"' . cr();
-            $sx .= 'B'.$p1.','.$p2.',0,E80,3,7,'.$sz.',B,"' . $line['pr_patrimonio'] . '"' . cr();            
+            $sx .= 'A' . $p3 . ',' . $p4 . ',0,1,1,2,N,"' . $mod . '"' . cr();
+            $sx .= 'B' . $p1 . ',' . $p2 . ',0,E80,3,7,' . $sz . ',B,"' . $line['pr_patrimonio'] . '"' . cr();
 
             if (isset($rlt[$r + 1])) {
                 $line = $rlt[$r + 1];
@@ -811,8 +844,8 @@ class produtos extends CI_model {
                     $mod = substr($mod, 0, $i);
                 }
                 $sx .= '' . cr();
-                $sx .= 'A'.$o3.','.$o4.',0,1,1,2,N,"' . $mod . '"' . cr();
-                $sx .= 'B'.$o1.','.$o2.',0,E80,3,7,'.$sz.',B,"' . $line['pr_patrimonio'] . '"' . cr();
+                $sx .= 'A' . $o3 . ',' . $o4 . ',0,1,1,2,N,"' . $mod . '"' . cr();
+                $sx .= 'B' . $o1 . ',' . $o2 . ',0,E80,3,7,' . $sz . ',B,"' . $line['pr_patrimonio'] . '"' . cr();
             }
             $sx .= '' . cr();
             $sx .= 'P1' . cr();
@@ -820,23 +853,38 @@ class produtos extends CI_model {
         echo $sx;
     }
 
-    function etiquetas_para_imprimir() {
+    function etiquetas_para_imprimir($lj='') {
+        $wh = '';
+        if (strlen($lj) > 0)
+            {
+                $wh = " AND (pr_filial = $lj )";
+            }
         $sql = "select * from produtos 
                     INNER JOIN produtos_categoria ON id_pc = pr_categoria
                     INNER JOIN produto_nome ON id_pn = pr_produto
-                        WHERE pr_etiqueta = 1
-                        order by pc_nome, pc_nome, pr_serial
+                    INNER JOIN _filiais ON pr_filial = id_fi
+                        WHERE pr_etiqueta = 1 $wh
+                        order by id_fi, pc_nome, pc_nome, pr_serial
             ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         $sx = '';
         $i = 35;
         $xcat = '';
+        $xfil = '';
         for ($r = 0; $r < count($rlt); $r = $r + 1) {
             $line = $rlt[$r];
             $mod = trim($line['pr_modelo']);
             $cat = $line['pc_nome'];
-            if ($cat != $xcat) {
+            $fil = $line['fi_nome_fantasia'];
+            if ($fil != $xfil) {
+                $xfil = $fil;
+                $sx .= '<div class="row">';
+                $sx .= '<div class="col-md-12"><h3>' . $fil . '</h3></div>';
+                $sx .= '</div>' . cr();
+            }
+
+          if ($cat != $xcat) {
                 $xcat = $cat;
                 $sx .= '<div class="row">';
                 $sx .= '<div class="col-md-12"><h3>' . $cat . '</h3></div>';
@@ -872,38 +920,36 @@ class produtos extends CI_model {
         return ($sx);
     }
 
-    function historico_produto($id)
-        {
-            $sx = '<h3>Histórico do produto</h3>';
-            
-            $sql = "select * from produtos_historico
+    function historico_produto($id) {
+        $sx = '<h3>Histórico do produto</h3>';
+
+        $sql = "select * from produtos_historico
                         left join produtos_historico_tipo on ph_historico = id_ht 
                         where ph_produto = $id ";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $sx .= '<table class="table">';
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $sx .= '<table class="table">';
+        $sx .= '<tr>';
+        $sx .= '<th width="20%">data e hora</th>';
+        $sx .= '<th width="70%">descrição</th>';
+        $sx .= '<th width="10%" align="right">pedido</th>';
+        $sx .= '</tr>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
             $sx .= '<tr>';
-            $sx .= '<th width="20%">data e hora</th>';
-            $sx .= '<th width="70%">descrição</th>';
-            $sx .= '<th width="10%" align="right">pedido</th>';
+            $sx .= '<td>' . stodbr($line['ph_data']) . ' ' . substr($line['ph_data'], 11, 8) . '</td>';
+            $sx .= '<td>' . $line['ht_descricao'] . '</td>';
+            $sx .= '<td align="center">' . strzero($line['ph_pedido'], 7) . '</td>';
             $sx .= '</tr>';
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                    $line = $rlt[$r];
-                    $sx .= '<tr>';
-                    $sx .= '<td>'.stodbr($line['ph_data']).' '.substr($line['ph_data'],11,8).'</td>';
-                    $sx .= '<td>'.$line['ht_descricao'].'</td>';
-                    $sx .= '<td align="center">'.strzero($line['ph_pedido'],7).'</td>';
-                    $sx .= '</tr>';
-                    $sx .= cr();
-                }
-            $sx .= '</table>';
-            return($sx);
+            $sx .= cr();
         }
+        $sx .= '</table>';
+        return ($sx);
+    }
 
     function lista_produtos_categoria($id) {
         $sql = 'select * from ' . $this -> table_produto . ' 
-                    WHERE id_pc = ' . round($id).'
+                    WHERE id_pc = ' . round($id) . '
                     ORDER BY pr_tag, pr_patrimonio';
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -942,14 +988,14 @@ class produtos extends CI_model {
             $link = '<a href="' . $link . '">';
 
             $sx .= '<td>';
-            $sx .= $link.$line['fi_nome_fantasia'].'</a>';
+            $sx .= $link . $line['fi_nome_fantasia'] . '</a>';
             $sx .= '</td>';
 
             $sx .= '</tr>' . cr();
         }
         $sx .= '<tr class="' . $line['ps_class'] . '">';
         $sx .= '<td align="right" colspan=6 >';
-        $sx .= 'Total '.$tot.' iten(s)';
+        $sx .= 'Total ' . $tot . ' iten(s)';
         $sx .= '</td></tr>';
         $sx .= '</table>' . cr();
         return ($sx);
@@ -1059,113 +1105,119 @@ class produtos extends CI_model {
         return ($sx);
     }
 
-    function items_por_pedido($pd)
-        {
-            $sql = "select * from produto_agenda
+    function items_por_pedido_total($pd) {
+        $sql = "select count(*) as total from produto_agenda
                         inner join produtos on id_pr = ag_produto
                         inner join produto_nome ON pr_produto = id_pn
                         left join produtos_marca ON id_ma = pr_marca
-                        where ag_pedido = ".$pd." order by id_ag desc";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $sx = '<table wdith="100%" class="table">';
-            $sx .= '<tr><th>Patrimonio</th>
+                        where ag_pedido = " . $pd . " order by id_ag desc";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $line = $rlt[0];
+        $sx = $line['total'];
+        return ($sx);
+    }
+
+    function items_por_pedido($pd) {
+        $sql = "select * from produto_agenda
+                        inner join produtos on id_pr = ag_produto
+                        inner join produto_nome ON pr_produto = id_pn
+                        left join produtos_marca ON id_ma = pr_marca
+                        where ag_pedido = " . $pd . " order by id_ag desc";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $sx = '<table wdith="100%" class="table">';
+        $sx .= '<tr><th>Patrimonio</th>
                         <th>Barcod</th>
                         <th>Marca</th>
                         <th>Modelo</th>
                         <th>Reservado em</th>
                         </tr>';
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                    $line = $rlt[$r];
-//                    echo '<hr>';
-                    //print_r($line);
-                    $sx .= '<tr>';
-                    $sx .= '<td>';
-                    $sx .= $line['pr_tag'];
-                    $sx .= '</td>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            //                    echo '<hr>';
+            //print_r($line);
+            $sx .= '<tr>';
+            $sx .= '<td>';
+            $sx .= $line['pr_tag'];
+            $sx .= '</td>';
 
-                    $sx .= '<td>';
-                    $sx .= $line['pr_patrimonio'];
-                    $sx .= '</td>';
-                    
-                    $sx .= '<td>';
-                    //$sx .= $line['pn_descricao'];
-                    $sx .= $line['ma_nome'];
-                    $sx .= '</td>';                    
+            $sx .= '<td>';
+            $sx .= $line['pr_patrimonio'];
+            $sx .= '</td>';
 
-                    $sx .= '<td>';
-                    $sx .= $line['pr_modelo'];
-                    $sx .= '</td>';
-                    
-                    $sx .= '<td>';
-                    $sx .= stodbr($line['ag_data_reserva']);
-                    $sx .= ' ';
-                    $sx .= $line['ag_hora_reserva'];
-                    $sx .= '</td>';
+            $sx .= '<td>';
+            //$sx .= $line['pn_descricao'];
+            $sx .= $line['ma_nome'];
+            $sx .= '</td>';
 
+            $sx .= '<td>';
+            $sx .= $line['pr_modelo'];
+            $sx .= '</td>';
 
-                    $sx .= '</tr>';
-                }
-            $sx .= '</table>';
-            return($sx);
+            $sx .= '<td>';
+            $sx .= stodbr($line['ag_data_reserva']);
+            $sx .= ' ';
+            $sx .= $line['ag_hora_reserva'];
+            $sx .= '</td>';
+
+            $sx .= '</tr>';
         }
+        $sx .= '</table>';
+        return ($sx);
+    }
 
-    function items_por_pedido_devolvido($pd)
-        {
-            $sql = "select * from produto_agenda
+    function items_por_pedido_devolvido($pd) {
+        $sql = "select * from produto_agenda
                         inner join produtos on id_pr = ag_produto
                         inner join produto_nome ON pr_produto = id_pn
                         left join produtos_marca ON id_ma = pr_marca
-                        where ag_pedido = ".$pd." 
+                        where ag_pedido = " . $pd . " 
                         and ag_situacao = 3
                         order by ag_devolucao desc, ag_devolucao_hora desc";
 
-                                                
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $sx = '<table wdith="100%" class="table">';
-            $sx .= '<tr><th>Patrimonio</th>
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $sx = '<table wdith="100%" class="table">';
+        $sx .= '<tr><th>Patrimonio</th>
                         <th>Barcod</th>
                         <th>Marca</th>
                         <th>Modelo</th>
                         <th>Reservado em</th>
                         </tr>';
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                    $line = $rlt[$r];
-//                    echo '<hr>';
-                    //print_r($line);
-                    $sx .= '<tr>';
-                    $sx .= '<td>';
-                    $sx .= $line['pr_tag'];
-                    $sx .= '</td>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            //                    echo '<hr>';
+            //print_r($line);
+            $sx .= '<tr>';
+            $sx .= '<td>';
+            $sx .= $line['pr_tag'];
+            $sx .= '</td>';
 
-                    $sx .= '<td>';
-                    $sx .= $line['pr_patrimonio'];
-                    $sx .= '</td>';
-                    
-                    $sx .= '<td>';
-                    //$sx .= $line['pn_descricao'];
-                    $sx .= $line['ma_nome'];
-                    $sx .= '</td>';                    
+            $sx .= '<td>';
+            $sx .= $line['pr_patrimonio'];
+            $sx .= '</td>';
 
-                    $sx .= '<td>';
-                    $sx .= $line['pr_modelo'];
-                    $sx .= '</td>';
-                    
-                    $sx .= '<td>';
-                    $sx .= stodbr($line['ag_data_reserva']);
-                    $sx .= ' ';
-                    $sx .= $line['ag_hora_reserva'];
-                    $sx .= '</td>';
+            $sx .= '<td>';
+            //$sx .= $line['pn_descricao'];
+            $sx .= $line['ma_nome'];
+            $sx .= '</td>';
 
+            $sx .= '<td>';
+            $sx .= $line['pr_modelo'];
+            $sx .= '</td>';
 
-                    $sx .= '</tr>';
-                }
-            $sx .= '</table>';
-            return($sx);
+            $sx .= '<td>';
+            $sx .= stodbr($line['ag_data_reserva']);
+            $sx .= ' ';
+            $sx .= $line['ag_hora_reserva'];
+            $sx .= '</td>';
+
+            $sx .= '</tr>';
         }
+        $sx .= '</table>';
+        return ($sx);
+    }
 
     /****************** LOGISTICA *************/
     function movimenta_para_estoque($id, $tipo = 0) {
@@ -1249,7 +1301,7 @@ class produtos extends CI_model {
     }
 
     function produto_registra_serie($serie, $ped, $d1, $d2, $cliente = 1) {
-        $serie = substr($serie,0,7);
+        $serie = substr($serie, 0, 7);
         $sql = "SELECT * FROM `produtos`where pr_tag = '$serie' or pr_patrimonio = '$serie' ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -1265,8 +1317,8 @@ class produtos extends CI_model {
             $data['content'] = $sx;
             echo $sx;
             $this -> load -> view('content', $data);
-            exit;
-            return('');
+            exit ;
+            return ('');
             $err = '';
             return ($err);
         } else {
@@ -1394,7 +1446,6 @@ class produtos extends CI_model {
             $sx .= $line['pc_nome'];
             $sx .= '</td>';
 
-
             $sx .= '<td align="left">';
             $sx .= $line['ma_nome'];
             $sx .= '</td>';
@@ -1487,12 +1538,12 @@ class produtos extends CI_model {
                 $cora = '</span>';
             }
 
-            $last = $line['pr_patrimonio'].' ('.$line['pr_tag'].')';
+            $last = $line['pr_patrimonio'] . ' (' . $line['pr_tag'] . ')';
 
             /**********************************************/
             $link = '<a href="' . base_url('index.php/main/produto/' . $line['id_pr']) . '" target="_new_' . $line['id_pr'] . '">';
             $linka = '</a>';
-            $sx .= '<div class="col-md-1">' . $link . $cor . $line['pr_patrimonio'].' ('.$line['pr_tag'].')' . $cora . $linka . '</div>';
+            $sx .= '<div class="col-md-1">' . $link . $cor . $line['pr_patrimonio'] . ' (' . $line['pr_tag'] . ')' . $cora . $linka . '</div>';
             $tot++;
             $totg++;
         }
@@ -1507,15 +1558,15 @@ class produtos extends CI_model {
         $sx .= '';
         return ($sx);
     }
-    function itens_status($pd,$st)
-        {
-            $sql = "select * from produto_agenda
+
+    function itens_status($pd, $st) {
+        $sql = "select * from produto_agenda
                         INNER JOIN produtos ON ag_produto = id_pr
-                        where ag_pedido = ".$pd;
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $sx = '<table width="100%" class="table">';
-            $sx .= '<tr>
+                        where ag_pedido = " . $pd;
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $sx = '<table width="100%" class="table">';
+        $sx .= '<tr>
                         <th>#</th>
                         <th>Barcode</th>
                         <th>Serial</th>
@@ -1523,43 +1574,121 @@ class produtos extends CI_model {
                         <th>Entrega</th>
                         <th>Devolução</th>
                     </tr>';
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                   $line = $rlt[$r];
-                   
-                   $sx .= '<tr>';
-                   $sx .= '<td>';
-                   $sx .= $line['pr_patrimonio'];
-                   $sx .= '</td>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
 
-                   $sx .= '<td>';
-                   $sx .= $line['pr_serial'];
-                   $sx .= '</td>';
-                    
+            $sx .= '<tr>';
+            $sx .= '<td>';
+            $sx .= $line['pr_patrimonio'];
+            $sx .= '</td>';
 
-                   $sx .= '<td>';
-                   $sx .= $line['pr_modelo'];
-                   $sx .= '</td>';
-                                        
-                   $sx .= '<td>';
-                   $sx .= stodbr($line['ag_data_reserva']);
-                   $sx .= '</td>';
-                   
-                   $sx .= '<td>';
-                   $sx .= stodbr($line['ag_data_reserva_ate']);
-                   $sx .= '</td>';
-                   
-                   $sx .= '</tr>';
-                }
-            return($sx);
+            $sx .= '<td>';
+            $sx .= $line['pr_serial'];
+            $sx .= '</td>';
+
+            $sx .= '<td>';
+            $sx .= $line['pr_modelo'];
+            $sx .= '</td>';
+
+            $sx .= '<td>';
+            $sx .= stodbr($line['ag_data_reserva']);
+            $sx .= '</td>';
+
+            $sx .= '<td>';
+            $sx .= stodbr($line['ag_data_reserva_ate']);
+            $sx .= '</td>';
+
+            $sx .= '</tr>';
         }
+        return ($sx);
+    }
 
-    function itens_atualiza_status($pd,$st1,$st2)
-        {
-            
-            $sql = "update produto_agenda set ag_situacao = ".$st2." where ag_situacao = ".$st1." and ag_pedido = ".$pd;
-            $rlt = $this->db->query($sql);
-            return(1);
+    function itens_atualiza_status($pd, $st1, $st2) {
+
+        $sql = "update produto_agenda set ag_situacao = " . $st2 . " where ag_situacao = " . $st1 . " and ag_pedido = " . $pd;
+        $rlt = $this -> db -> query($sql);
+        return (1);
+    }
+
+    function localiza_produto() {
+        $q = get("dd1");
+        $sx = '<form method="post" action="'.base_url('index.php/main/locacao/8').'">';
+        $sx .= '<span class="small">Informe o código de barras do produto</span>';
+        $sx .= '<input type="text" name="dd1" class="form-control">';
+        $sx .= '<input type="submit" name="acao" class="btn btn-primary" value="procurar >>>">';
+        $sx .= '</form>';
+        if (strlen($q) == 0) {
+
+        } else {
+                $serie = substr($q, 0, 7);
+                $sql = "select * from produtos
+                        inner join produtos_categoria  ON pr_categoria = id_pc
+                        inner join produtos_marca ON id_ma = pr_marca                
+                        LEFT JOIN produto_agenda ON ag_produto = id_pr 
+                        LEFT JOIN clientes ON ag_cliente = id_f
+                        where pr_patrimonio like '%$serie%' or pr_tag like '%q%'
+                        order by ag_data_reserva_ate desc, pr_patrimonio
+                        limit 100
+                    ";
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+                $sx .= '<table class="table" width="100%">';
+                $sx .= '<tr>
+                            <th width="5%">barcod</th>
+                            <th width="15%">produto</th>
+                            <th width="10%">modelo</th>
+                            <th width="10%">marca</th>
+                            <th width="40%">cliente</th>
+                            <th width="10%">prev.dev.</th>
+                            <th width="10%">situação</th>
+                        </tr>'.cr();
+                for ($r=0;$r < count($rlt);$r++)
+                    {
+                        $line = $rlt[$r];
+                        $st = $line['ag_situacao'];
+                        $sx .= '<tr>';
+                        $sx .= '<td align="center">';
+                        $link = '<a href="'.base_url('index.php/main/locacao/8/?dd1='.$line['pr_patrimonio']).'">';
+                        $sx .= $link.$line['pr_patrimonio'];
+                        $sx .= '<br>';
+                        $sx .= $line['pr_tag'].'</a>';
+                        $sx .= '</td>';                        
+                        $sx .= '<td>';
+                        $sx .= $line['pc_nome'];
+                        $sx .= '</td>';
+                        $sx .= '<td>';
+                        $sx .= $line['pr_modelo'];
+                        $sx .= '</td>';
+                        $sx .= '<td>';
+                        $sx .= $line['ma_nome'];
+                        $sx .= '</td>';
+                        $sx .= '<td>';
+                        if (strlen($line['id_f']) > 0)
+                            {
+                                $link = '<a href="'.base_url('index.php/main/cliente/'.$line['id_f'].'/'.checkpost_link($line['id_f'])).'">';
+                            } else {
+                                $link = '<a href="#">';
+                            }
+                        $sx .= $link.$line['f_razao_social'];
+                        $sx .= ' / ';
+                        $sx .= $line['f_nome_fantasia'];
+                        $sx .= '</a>';
+                        $sx .= '</td>';
+                        $sx .= '<td align="center">';
+                        $link = '<a href="'.base_url('index.php/main/locacao_item/'.$line['ag_pedido'].'/'.checkpost_link($line['ag_pedido'])).'">';
+                        $sx .= $link . stodbr($line['ag_data_reserva_ate']);
+                        $sx .= '<br> Ped. ';
+                        $sx .= strzero($line['ag_pedido'],5). '</a>';
+                        $sx .= '</td>';
+                        $sx .= '<td>';
+                        $sx .= msg('situacao_'.$st);
+                        $sx .= '</td>';                                                
+                        $sx .= '</tr>';
+                    }
+                $sx .= '</table>';
         }
+        return ($sx);
+    }
+
 }
 ?>
