@@ -23,7 +23,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = '';
+$ip = $_SERVER['REMOTE_ADDR'];
+$ip = substr($ip,0,strpos($ip,'.'));
+if ($ip != '10')
+    {
+        $config['base_url'] = 'http://gigacuritiba.dyndns.org:8050/';
+    } else {
+        $config['base_url'] = '';        
+    }
 
 /*
 |--------------------------------------------------------------------------

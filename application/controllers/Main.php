@@ -1566,6 +1566,57 @@ exit;
         $this -> footer();  
         } 
 
+    function produtos_checkout()
+        {
+        /* Load Model */
+        $this -> load -> model('contratos');
+        $model = 'produtos';
+        $this -> load -> model($model);
+        $cod = get("dd1");
+        $acao = get("acao");
+        $data = array();
+        $tipo = 3;
+
+        /* Controller */
+        $this -> cab();
+        $data['dados_produto'] = '';
+        $data['title'] = 'Checkout de produtos (Retorno do cliente)';
+        $ok = 0;
+        $tela = '';
+        if (strlen($acao) > 0) {
+            $cod = substr($cod, 0, 7);
+            $cod = strzero($cod, 7);
+
+            $data2 = $this -> $model -> le_produto_ean($cod);
+            if (count($data2) > 0) {
+                $data['dados_produto'] = $this -> load -> view('produto/view_6', $data2, true);
+                $data['title'] = 'Checkin do produto';
+                $tela = $this -> contratos -> baixa_produto($data2['id_pr'],$tipo);
+                $this -> $model -> movimenta_para_estoque($data2['id_pr'],$tipo);
+                $ok = 1;
+            } else {
+                $data['erro'] = 'Código Inválido<br>' . $cod;
+                $data['dados_produto'] = $this -> load -> view('alert', $data, true);
+            }
+        }
+
+        $data['cod'] = $cod;
+        $data['content'] = $this -> load -> view('produto/leitor_codigo', $data, true);
+        $data['content'] .= ' <a href="'.base_url('index.php/main/produtos_etiquetas').'" class="btn btn-default">Voltar para etiquetas</a>';
+        
+        $data['content'] .= $tela;
+        
+        if ($ok==1)
+            {
+                $tela = $data['content'];                
+                $data['content'] = $tela;
+            }
+                    
+        $this -> load -> view('content', $data);
+
+        $this -> footer();  
+        } 
+
     function produto_view($id = '') {
         /* Load Model */
         $model = 'produtos';

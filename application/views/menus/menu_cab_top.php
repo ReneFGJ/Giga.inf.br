@@ -105,6 +105,9 @@ $us_nome = $_SESSION['user'];
                     <li>
                         <a href="<?php echo base_url('index.php/main/produtos_checkin'); ?>">Produtos Checkin</a>
                     </li>
+                    <li>
+                        <a href="<?php echo base_url('index.php/main/produtos_checkout'); ?>">Produtos Checkout (Retorno cliente)</a>
+                    </li>
 					<li role="separator" class="divider"></li>
 					<li>
 						<a href="<?php echo base_url('index.php/main/produtos_movimentacao/0'); ?>">Consulta produto</a>

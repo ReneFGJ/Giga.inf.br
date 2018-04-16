@@ -2,6 +2,78 @@
 class contratos extends CI_model
 	{
 		var $table = 'contrato_modelo';
+        
+        function baixa_produto($id)
+            {
+                $sx = '';
+                $sql = "select * from produto_agenda 
+                            INNER JOIN produtos ON id_pr = ag_produto
+                            INNER JOIN produtos_categoria ON id_pc = pr_categoria
+                            INNER JOIN clientes ON id_f = ag_cliente
+                            where ag_produto = $id 
+                            and (ag_situacao = 1 or ag_situacao = 2)";
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+                if (count($rlt) == 0)
+                    {
+                        $data['erro'] = 'Produto não localizado ou não fornecido';
+                        $sx .= $this->load->view('alert',$data,true);
+                        return($sx);
+                    }
+                $sx = '<table class="table" width="100%">';
+                $sx .= '<tr>
+                            <th width="7%">Pedido</th>
+                            <th width="7%">BarCode</th>
+                            <th width="10%">Retirada</th>
+                            <th width="7%">Descrição</th>
+                            <th width="10%">Modelo</th>
+                            <th width="50%">Cliente</th>
+                        </tr>';
+                for ($r=0;$r < count($rlt);$r++)
+                    {
+                        $line = $rlt[$r];
+                        $user_id = $_SESSION['id'];
+                        $data = date("Y-m-d");
+                        $hora = date("H:i:s");
+                        $ped = $line['ag_pedido'];
+                        $sql = "update produto_agenda set 
+                                    ag_devolucao = '$data',
+                                    ag_devolucao_hora = '$hora',
+                                    ag_situacao = 3,
+                                    ag_devolucao_log = $user_id
+                                where id_ag = ".$line['id_ag'];
+                                $zrlt = $this->db->query($sql);
+
+                        $sx .= '<tr>';
+                        //print_r($line);
+                        $sx .= '<td>'.$line['ag_pedido'].'</td>';
+                        $sx .= '<td>'.$line['pr_patrimonio'].'</td>';
+                        $sx .= '<td>'.stodbr($line['ag_data_reserva']).'</td>';                        
+                        $sx .= '<td>'.$line['pc_nome'].'</td>';
+                        $sx .= '<td>'.$line['pr_modelo'].'</td>';
+                        $sx .= '<td>'.$line['f_nome_fantasia'].'</td>';
+                        
+                        $sx .= '</tr>';
+                        $pedido = $line['ag_pedido'];
+                    }
+                $sx .= '</table>';
+                    
+                $sql = "select count(*) as total from produto_agenda 
+                            where ag_pedido = $pedido 
+                            and (ag_situacao = 1 or ag_situacao = 2)";
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+                $line = $rlt[0];
+                if ($line['total'] > 0)
+                    {
+                        $sx .= '<div class="col-md-12 big">Restam '.$line['total'].' item(ns)</div>';
+                    } else {
+                        $this->pedidos->pedido_altera_status($pedido,7,900);
+                        $this->produtos->itens_atualiza_status($pedido,2,3);                        
+                    }
+                                    
+                return($sx);
+            }
 		function le($id)
 			{
 				$sql = "select * from ".$this->table." where id_c = 1";

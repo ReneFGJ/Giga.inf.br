@@ -54,7 +54,7 @@ class tranfers extends CI_model {
                     LEFT JOIN clientes on cp_fornecedor = id_f
                     LEFT JOIN cx_pagar_situacao ON cp_situacao = id_cpa
                             where cp_auto = 1 
-                            order by cp_vencimento";
+                            order by cp_vencimento desc";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         $sx = '<table width="100%" class="table">';
