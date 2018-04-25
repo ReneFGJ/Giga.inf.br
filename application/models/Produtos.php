@@ -134,7 +134,7 @@ class produtos extends CI_model {
         $sql = "select count(*) as total from produtos
 						LEFT JOIN produtos_categoria ON id_pc = pr_categoria
 						LEFT JOIN produtos_situacao ON id_ps = pr_ativo
-						LEFT JOIN produtos_MARCA ON id_ma = pr_marca
+						LEFT JOIN produtos_marca ON id_ma = pr_marca
 						LEFT JOIN _filiais ON pr_filial = id_fi
 						WHERE (($wh1) OR ($wh2)) $wh3
 						ORDER BY pc_nome, pr_serial
@@ -149,7 +149,7 @@ class produtos extends CI_model {
 						LEFT JOIN produto_nome ON id_pn = pr_produto
 						LEFT JOIN produtos_categoria ON id_pc = pr_categoria
 						LEFT JOIN produtos_situacao ON id_ps = pr_ativo
-						LEFT JOIN produtos_MARCA ON id_ma = pr_marca
+						LEFT JOIN produtos_marca ON id_ma = pr_marca
 						LEFT JOIN produto_modelo ON id_pm = pr_modelo
 						LEFT JOIN _filiais ON pr_filial = id_fi
 						WHERE (($wh1) OR ($wh2)) $wh3
