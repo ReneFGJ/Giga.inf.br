@@ -772,7 +772,7 @@ class financeiros extends CI_model {
 							where 1=1
 							$wh
 						order by cp_vencimento desc, cp_valor desc 
-						limit 200
+						limit 20000
 						";
 
         /* SALDO */
@@ -927,7 +927,7 @@ class financeiros extends CI_model {
 							where 1=1
 							$wh
 						order by cp_vencimento desc, cp_valor desc 
-						limit 150
+						limit 1500
 						";
 
         $rlt = $this -> db -> query($sql);
