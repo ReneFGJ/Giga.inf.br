@@ -101,6 +101,7 @@ class user_drh extends CI_Model {
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
             $sx = '<div class="col-md-12"><h2>Aniversariantes do mês</h2></div>'.cr();
+			$col = 10;
             for ($r=0;$r < count($rlt);$r++)
                 {
                     $line = $rlt[$r];
@@ -112,13 +113,23 @@ class user_drh extends CI_Model {
                         } else {
                             $img = 'img-no-picture.png';        
                         }
+					if ($col > 5)
+						{
+							if ($col != 10)
+								{
+									$sx .= '</div>';
+								}
+							$sx .= '<div class="row">';
+							$col = 0;
+						}
                     $sx .= '<div class="col-md-2 text-center">';
                     $sx .= '<img src="'.base_url('img/picture/'.$img).'" class="img-responsive" style="border-radius: 15%;">'.cr();
                     $sx .= '<h4>'.$line['us_nome'].'</h4>'.cr();
                     $sx .= substr(stodbr($line['usd_nascimento']),0,5).cr();
                     $sx .= '</div>';
+					$col++;
                 }
-            if (count($rlt) == 0) { $sx = ''; }
+            if (count($rlt) == 0) { $sx = ''; } else { $sx .= '</div>'; }
             return($sx);
         }
 

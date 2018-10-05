@@ -23,6 +23,43 @@ class clientes extends CI_Model {
 			return ( array());
 		}
 	}
+	
+	function export()
+		{
+			/*
+				header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
+				header("Content-type:   application/x-msexcel; charset=utf-8");
+				header("Content-Disposition: attachment; filename=clientes_giga.xls"); 
+				header("Expires: 0");
+				header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+				header("Cache-Control: private",false);			 
+			 */	
+							
+			$sql = "select * from clientes order by f_razao_social";
+			$sql = "select * from clientes_contatos order by cc_cliente_id";
+			$sql = "select * from users";
+			$sql = "select * from user_drh";
+			$rlt = $this->db->query($sql);
+			$rlt = $rlt->result_array();
+			$sx = '<table>';
+			$sx .= '<tr>';
+			foreach ($rlt[0] as $key => $value) {
+				$sx .= '<th>'.$key.'</th>';				
+			}
+			$sx .= '</tr>';
+			for ($r=0;$r < count($rlt);$r++)
+				{
+					$line = $rlt[$r];
+					$sx .= '<tr>';
+					foreach ($rlt[0] as $key => $value) {
+						$sx .= '<td>'.$line[$key].'</td>';
+					}
+					$sx .= '</tr>';
+				}
+			$sx .= '</table>';
+			echo $sx;
+			return($sx);
+		}
 
 	function le_contatos($id) {
 		$sql = "select * from " . $this -> table_contatos . " 

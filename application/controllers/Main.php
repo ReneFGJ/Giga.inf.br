@@ -58,12 +58,25 @@ class Main extends CI_Controller {
         $this -> load -> view('home', null);
         
         $this -> load -> view('search/search', null);
+		if (strlen(get("dd1")) > 0)
+			{
+				redirect(base_url("index.php/main/clientes?dd1=".get("dd1")."&acao=busca&dd5=2&dd2=search"));		
+			}
+		
         
         $data['content'] = $this -> user_drh -> aniversariantes();
         $data['title'] = '';
+		
+		$data['content'] .= '
+			<h1>Informações úteis</h1>
+				<ul>
+				<li><a href="'.base_url('index.php/admin/filiais').'">Dados das filiais da Giga</a></li>
+				</ul>
+				';
         if (strlen($data['content']) > 0) {
             $this -> load -> view('content', $data);
         }
+
         $this -> footer();
     }
 

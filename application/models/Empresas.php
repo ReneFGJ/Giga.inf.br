@@ -42,8 +42,14 @@ class empresas extends CI_model {
 		
 		$form -> tabela = $this -> table;
 		$form -> see = true;
-		$form -> novo = true;
-		$form -> edit = true;
+		if (perfil("#ADM"))
+			{
+				$form -> novo = true;
+				$form -> edit = true;
+			} else {
+				$form -> novo = false;
+				$form -> edit = false;				
+			}
 
 		$form -> row_edit = base_url('index.php/admin/filiais_edit');
 		$form -> row_view = base_url('index.php/admin/filial');

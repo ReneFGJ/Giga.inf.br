@@ -54,62 +54,58 @@ class Financeiro extends CI_Controller {
 
 		$this -> footer();
 	}
-    
-    function credito_liberar($id=0,$chk='')
-        {
-        $this -> load -> model('financeiros');
-        $data['nocab'] = true;
-        $this -> cab($data);
-        
-        $cp = array();
-        array_push($cp,array('$H8','id_f','',false,false));
-        $ops = '1:Em análise';
-        $ops .= '&2:Aprovado';
-        $ops .= '&9:Não aprovado';
-        array_push($cp,array('$O '.$ops,'f_situacao','',True,True));
-        
-        $form = new form;
-        $form->id = $id;
-        $tela = $form->editar($cp,'clientes');
-        $data['content'] = $tela;
-        $data['title'] = '';
-        $this->load->view('content',$data);
-        if ($form->saved > 0)
-            {
-                $this->load->view('wclose');
-            }
-        }
-    
-    function analise() {
-        $this -> load -> model('financeiros');
-        $this -> cab();
-        $tela = $this -> financeiros -> analise_credito();
-        $data['content'] = $tela;
-        $data['title'] = 'Cadastros para análise';
-        $this -> load -> view('content', $data);
 
-        $this -> footer();
-    }    
-
-	function cpagar($dia = '',$fi='') {
+	function credito_liberar($id = 0, $chk = '') {
 		$this -> load -> model('financeiros');
-        $this -> load -> model('filiais');
-        
-        if (strlen($fi) > 0)
-            {
-                if ($fi == 'X')
-                    {
-                        $_SESSION['cia'] = null;
-                    } else {
-                        $_SESSION['cia'] = $fi;        
-                    }
-                
-            }
-        
-        $data['filiais'] = $this->filiais->filiais();
-        $data['path'] = 'financeiro/cpagar';
-        $data['dia'] = $dia;
-        $data['fi'] = $fi;
+		$data['nocab'] = true;
+		$this -> cab($data);
+
+		$cp = array();
+		array_push($cp, array('$H8', 'id_f', '', false, false));
+		$ops = '1:Em análise';
+		$ops .= '&2:Aprovado';
+		$ops .= '&9:Não aprovado';
+		array_push($cp, array('$O ' . $ops, 'f_situacao', '', True, True));
+
+		$form = new form;
+		$form -> id = $id;
+		$tela = $form -> editar($cp, 'clientes');
+		$data['content'] = $tela;
+		$data['title'] = '';
+		$this -> load -> view('content', $data);
+		if ($form -> saved > 0) {
+			$this -> load -> view('wclose');
+		}
+	}
+
+	function analise() {
+		$this -> load -> model('financeiros');
+		$this -> cab();
+		$tela = $this -> financeiros -> analise_credito();
+		$data['content'] = $tela;
+		$data['title'] = 'Cadastros para análise';
+		$this -> load -> view('content', $data);
+
+		$this -> footer();
+	}
+
+	function cpagar($dia = '', $fi = '') {
+		$this -> load -> model('financeiros');
+		$this -> load -> model('filiais');
+
+		if (strlen($fi) > 0) {
+			if ($fi == 'X') {
+				$_SESSION['cia'] = null;
+			} else {
+				$_SESSION['cia'] = $fi;
+			}
+
+		}
+
+		$data['filiais'] = $this -> filiais -> filiais();
+		$data['path'] = 'financeiro/cpagar';
+		$data['dia'] = $dia;
+		$data['fi'] = $fi;
 
 		/* Importar */
 		//$this->load->model('imports');
@@ -121,13 +117,13 @@ class Financeiro extends CI_Controller {
 		$this -> cab();
 		$data['date'] = $dia;
 		$data['calendario'] = $this -> financeiros -> calendario($dia, 1);
-        
+
 		$data['saldo'] = $this -> financeiros -> saldo_dia($dia, 1);
 		$this -> load -> view('financeiro/navbar_cx', $data);
-        
-        $tela = $this -> load->view('financeiro/cias.php',$data,true);
+
+		$tela = $this -> load -> view('financeiro/cias.php', $data, true);
 		$tela .= $this -> financeiros -> contas_pagar($dia);
-        
+
 		$data['content'] = $tela;
 		$data['title'] = '';
 		$this -> load -> view('content', $data);
@@ -135,27 +131,25 @@ class Financeiro extends CI_Controller {
 		$this -> footer();
 	}
 
-	function creceber($dia = '',$fi='') {
+	function creceber($dia = '', $fi = '') {
 		$this -> load -> model('financeiros');
-        $this -> load -> model('filiais');
-        
-        if (strlen($fi) > 0)
-            {
-                if ($fi == 'X')
-                    {
-                        $_SESSION['cia'] = null;
-                    } else {
-                        $_SESSION['cia'] = $fi;        
-                    }
-                
-            }
-        
-        $data['filiais'] = $this->filiais->filiais();
-        $data['path'] = 'financeiro/creceber';
-        $data['dia'] = $dia;
-        $data['fi'] = $fi;
-                
-		$this->financeiros->deleta_excluidos();
+		$this -> load -> model('filiais');
+
+		if (strlen($fi) > 0) {
+			if ($fi == 'X') {
+				$_SESSION['cia'] = null;
+			} else {
+				$_SESSION['cia'] = $fi;
+			}
+
+		}
+
+		$data['filiais'] = $this -> filiais -> filiais();
+		$data['path'] = 'financeiro/creceber';
+		$data['dia'] = $dia;
+		$data['fi'] = $fi;
+
+		$this -> financeiros -> deleta_excluidos();
 
 		/* Importar */
 		$this -> load -> model('imports');
@@ -169,10 +163,10 @@ class Financeiro extends CI_Controller {
 		$data['calendario'] = $this -> financeiros -> calendario($dia, 2);
 		$data['saldo'] = $this -> financeiros -> saldo_dia($dia, 2);
 		$this -> load -> view('financeiro/navbar_cr_cx', $data);
-        
-        $tela = $this -> load->view('financeiro/cias.php',$data,true);
-        $tela .= $this -> financeiros -> contas_receber($dia);
-		
+
+		$tela = $this -> load -> view('financeiro/cias.php', $data, true);
+		$tela .= $this -> financeiros -> contas_receber($dia);
+
 		$data['content'] = $tela;
 		$data['title'] = '';
 		$this -> load -> view('content', $data);
@@ -181,46 +175,54 @@ class Financeiro extends CI_Controller {
 	}
 
 	function creceber_quitar($id = 0, $chk = '') {
-		$this -> load -> model('financeiros');
-		$data = array();
-		$data['nocab'] = true;
-		$this -> cab($data);
-		$cp = $this -> financeiros -> cp_creceber_quitar();
-		$form = new form;
-		$form -> id = $id;
-		$data['content'] = $form -> editar($cp, $this -> financeiros -> table_receber);
-		$data['title'] = '';
-		$this -> load -> view('content', $data);
+		if (perfil("#FQR")) {
+			$this -> load -> model('financeiros');
+			$data = array();
+			$data['nocab'] = true;
+			$this -> cab($data);
+			$cp = $this -> financeiros -> cp_creceber_quitar();
+			$form = new form;
+			$form -> id = $id;
+			$data['content'] = $form -> editar($cp, $this -> financeiros -> table_receber);
+			$data['title'] = '';
+			$this -> load -> view('content', $data);
 
-		if ($form -> saved > 0) {
-			echo '
+			if ($form -> saved > 0) {
+				echo '
 					<script> 
 						window.opener.location.reload();
 						close();
 					</script>';
-			return ('');
+				return ('');
+			}
+		} else {
+			echo 'Perfil não liberado #FQR"';
 		}
 	}
 
 	function cpagar_quitar($id = 0, $chk = '') {
-		$this -> load -> model('financeiros');
-		$data = array();
-		$data['nocab'] = true;
-		$this -> cab($data);
-		$cp = $this -> financeiros -> cp_cpagar_quitar();
-		$form = new form;
-		$form -> id = $id;
-		$data['content'] = $form -> editar($cp, $this -> financeiros -> table_pagar);
-		$data['title'] = '';
-		$this -> load -> view('content', $data);
+		if (perfil("#FQR")) {
+			$this -> load -> model('financeiros');
+			$data = array();
+			$data['nocab'] = true;
+			$this -> cab($data);
+			$cp = $this -> financeiros -> cp_cpagar_quitar();
+			$form = new form;
+			$form -> id = $id;
+			$data['content'] = $form -> editar($cp, $this -> financeiros -> table_pagar);
+			$data['title'] = '';
+			$this -> load -> view('content', $data);
 
-		if ($form -> saved > 0) {
-			echo '
+			if ($form -> saved > 0) {
+				echo '
 					<script> 
 						window.opener.location.reload();
 						close();
 					</script>';
-			return ('');
+				return ('');
+			}
+		} else {
+			echo 'Perfil não liberado #FQR"';
 		}
 	}
 
@@ -228,25 +230,24 @@ class Financeiro extends CI_Controller {
 		$this -> load -> model('financeiros');
 		$tabela = $this -> financeiros -> table_pagar;
 		$parcelas = round(get("dd6"));
-		
+
 		$data = array();
 		$data['nocab'] = true;
 		$this -> cab($data);
 		$cp = $this -> financeiros -> cp_cpagar_editar($id);
 		$form = new form;
 		$form -> id = $id;
-		
+
 		$vlr = get("dd12");
-		$vlr = troca($vlr,'.','');
-		$vlr = troca($vlr,',','.');
+		$vlr = troca($vlr, '.', '');
+		$vlr = troca($vlr, ',', '.');
 		$_POST['dd13'] = $vlr;
 
-		$data['content'] = $form -> editar($cp, $tabela);		
-		
+		$data['content'] = $form -> editar($cp, $tabela);
 
 		$data['title'] = '';
 		$this -> load -> view('content', $data);
-		
+
 		if ($form -> saved > 0) {
 			echo '
 					<script> 
@@ -261,7 +262,7 @@ class Financeiro extends CI_Controller {
 		$this -> load -> model('financeiros');
 		$tabela = $this -> financeiros -> table_pagar;
 		$parcelas = round(get("dd6"));
-		
+
 		$data = array();
 		$data['nocab'] = true;
 		$this -> cab($data);
@@ -269,39 +270,35 @@ class Financeiro extends CI_Controller {
 		$form = new form;
 		$form -> id = $id;
 		$vlr = get("dd12");
-		$vlr = troca($vlr,'.','');
-		$vlr = troca($vlr,',','.');
+		$vlr = troca($vlr, '.', '');
+		$vlr = troca($vlr, ',', '.');
 		$_POST['dd13'] = $vlr;
 
-		if ($id==0)
-			{
-				$data['content'] = $form -> editar($cp, '');
-			} else {
-				$data['content'] = $form -> editar($cp, $tabela);		
-			}
-		
+		if ($id == 0) {
+			$data['content'] = $form -> editar($cp, '');
+		} else {
+			$data['content'] = $form -> editar($cp, $tabela);
+		}
 
 		$data['title'] = '';
 		$this -> load -> view('content', $data);
-		
+
 		if ($form -> saved > 0) {
 			$perio = get("dd7");
 			$venc = brtos(get("dd2"));
 			$cp[6][3] = False;
-			
-			if ($parcelas > 1)
-				{
-					$_POST['dd6'] = strzero(1, 2) . '/' . strzero($parcelas, 2);	
-				} else {
-					$_POST['dd6'] = 'ÚNICA';					
-				}
+
+			if ($parcelas > 1) {
+				$_POST['dd6'] = strzero(1, 2) . '/' . strzero($parcelas, 2);
+			} else {
+				$_POST['dd6'] = 'ÚNICA';
+			}
 			$form -> editar($cp, $tabela);
-			
-			if ($form->saved <> 1)
-				{
-					echo 'OPS';
-					exit;
-				}				
+
+			if ($form -> saved <> 1) {
+				echo 'OPS';
+				exit ;
+			}
 
 			for ($r = 2; $r <= $parcelas; $r++) {
 				$_POST['dd6'] = strzero($r, 2) . '/' . strzero($parcelas, 2);
@@ -352,24 +349,24 @@ class Financeiro extends CI_Controller {
 		$this -> load -> model('financeiros');
 		$tabela = $this -> financeiros -> table_receber;
 		$parcelas = round(get("dd6"));
-		
+
 		$data = array();
 		$data['nocab'] = true;
 		$this -> cab($data);
 		$cp = $this -> financeiros -> cp_creceber_editar($id);
 		$form = new form;
 		$form -> id = $id;
-		
+
 		$vlr = get("dd12");
-		$vlr = troca($vlr,'.','');
-		$vlr = troca($vlr,',','.');
+		$vlr = troca($vlr, '.', '');
+		$vlr = troca($vlr, ',', '.');
 		$_POST['dd13'] = $vlr;
 
-		$data['content'] = $form -> editar($cp, $tabela);		
+		$data['content'] = $form -> editar($cp, $tabela);
 
 		$data['title'] = '';
 		$this -> load -> view('content', $data);
-		
+
 		if ($form -> saved > 0) {
 			echo '
 					<script> 
@@ -384,7 +381,7 @@ class Financeiro extends CI_Controller {
 		$this -> load -> model('financeiros');
 		$tabela = $this -> financeiros -> table_receber;
 		$parcelas = round(get("dd6"));
-		
+
 		$data = array();
 		$data['nocab'] = true;
 		$this -> cab($data);
@@ -392,34 +389,31 @@ class Financeiro extends CI_Controller {
 		$form = new form;
 		$form -> id = $id;
 		$vlr = get("dd12");
-		$vlr = troca($vlr,'.','');
-		$vlr = troca($vlr,',','.');
+		$vlr = troca($vlr, '.', '');
+		$vlr = troca($vlr, ',', '.');
 		$_POST['dd13'] = $vlr;
 
 		$data['content'] = $form -> editar($cp, '');
 
-
 		$data['title'] = '';
 		$this -> load -> view('content', $data);
-		
+
 		if ($form -> saved > 0) {
 			$perio = get("dd7");
 			$venc = brtos(get("dd2"));
 			$cp[6][3] = False;
-			
-			if ($parcelas > 1)
-				{
-					$_POST['dd6'] = strzero(1, 2) . '/' . strzero($parcelas, 2);	
-				} else {
-					$_POST['dd6'] = 'ÚNICA';					
-				}
+
+			if ($parcelas > 1) {
+				$_POST['dd6'] = strzero(1, 2) . '/' . strzero($parcelas, 2);
+			} else {
+				$_POST['dd6'] = 'ÚNICA';
+			}
 			$form -> editar($cp, $tabela);
-			
-			if ($form->saved <> 1)
-				{
-					echo 'OPS';
-					exit;
-				}				
+
+			if ($form -> saved <> 1) {
+				echo 'OPS';
+				exit ;
+			}
 
 			for ($r = 2; $r <= $parcelas; $r++) {
 				$_POST['dd6'] = strzero($r, 2) . '/' . strzero($parcelas, 2);
@@ -512,7 +506,7 @@ class Financeiro extends CI_Controller {
 		$sx .= '<select name="dd1" id="dd1" class="form-control">' . cr();
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
-			$sx .= '<option value="' . $line['id_fi'] . '">' . $line['fi_razao_social'] . ' (' . number_format($line['fi_aliquota'], 2, ',', '.') . '%) - Próxima fatura: '.strzero($line['fi_nr_recibo'],7).'</option>' . cr();
+			$sx .= '<option value="' . $line['id_fi'] . '">' . $line['fi_razao_social'] . ' (' . number_format($line['fi_aliquota'], 2, ',', '.') . '%) - Próxima fatura: ' . strzero($line['fi_nr_recibo'], 7) . '</option>' . cr();
 		}
 		$sx .= '</select>' . cr();
 		$sx .= '<br>';
@@ -725,71 +719,70 @@ class Financeiro extends CI_Controller {
 
 	function relatorio() {
 		$this -> load -> model('financeiros');
+		if (perfil("#FNR")) {
+			$this -> cab();
+			$data['title'] = '';
+			$menu = array();
+			$data['title_menu'] = 'Relatórios';
+			array_push($menu, array('Contas a Receber', '__Clientes em aberto', 'ITE', '/financeiro/creceber_abertos'));
+			array_push($menu, array('Contas a Receber', '__Resumo do contas a receber', 'ITE', '/financeiro/resumos_creceber'));
 
-		$this -> cab();
-		$data['title'] = '';
-		$menu = array();
-		$data['title_menu'] = 'Relatórios';
-		array_push($menu, array('Contas a Receber', '__Clientes em aberto', 'ITE', '/financeiro/creceber_abertos'));
-		array_push($menu, array('Contas a Receber', '__Resumo do contas a receber', 'ITE', '/financeiro/resumos_creceber'));
-		
-		array_push($menu, array('Contas a Receber', '__Enviar e-mail de Aviso de Vencimento', 'ITE', '/financeiro/creceber_aviso'));
+			array_push($menu, array('Contas a Receber', '__Enviar e-mail de Aviso de Vencimento', 'ITE', '/financeiro/creceber_aviso'));
 
-		array_push($menu, array('Contas a Pagar', '__Contas em aberto', 'ITE', '/financeiro/cpagar_abertos'));
-		array_push($menu, array('Contas a Pagar', '__Resumo do contas a pagar', 'ITE', '/financeiro/resumos_cpagar'));
+			array_push($menu, array('Contas a Pagar', '__Contas em aberto', 'ITE', '/financeiro/cpagar_abertos'));
+			array_push($menu, array('Contas a Pagar', '__Resumo do contas a pagar', 'ITE', '/financeiro/resumos_cpagar'));
 
-		array_push($menu, array('Relação', '__Recebido / Despesas', 'ITE', '/financeiro/relatorio_cpcr'));
-		array_push($menu, array('Contabil', '__Razão', 'ITE', '/financeiro/contabil_razao'));
+			array_push($menu, array('Relação', '__Recebido / Despesas', 'ITE', '/financeiro/relatorio_cpcr'));
+			array_push($menu, array('Contabil', '__Razão', 'ITE', '/financeiro/contabil_razao'));
 
-		$data['menu'] = $menu;
-		$data['content'] = $this -> load -> view('header/main_menu', $data, true);
+			$data['menu'] = $menu;
+			$data['content'] = $this -> load -> view('header/main_menu', $data, true);
 
-		$this -> load -> view('content', $data);
+			$this -> load -> view('content', $data);
 
-		$this -> footer();
+			$this -> footer();
+		} else {
+			redirect(base_url("index.php"));
+		}
 	}
 
-	function creceber_aviso()
-		{
+	function creceber_aviso() {
 		$this -> load -> model('ics');
 		$this -> load -> model('clientes');
 		$this -> load -> model('financeiros');
 
 		$this -> cab();
-				
-		
+
 		$cp = array();
-		array_push($cp,array('$H8','','',False,True));
-		array_push($cp,array('$A3','','Vencimento',False,True));
-		array_push($cp,array('$D8','','de',True,True));
-		array_push($cp,array('$D8','','até',False,True));
-		array_push($cp,array('$O 1:Confirmar envio&2:Enviar teste para meu e-mail','','Enviar',True,True));
-		
-		if (strlen(get("acao")) == 0)
-			{
-				$dt1 = stod(date("Ymd"))+1*24*60*60;
-				$dt2 = stod(date("Ymd"))+1*24*60*60;
-				$_POST['dd2'] = date("d/m/Y",$dt1);
-				$_POST['dd3'] = date("d/m/Y",$dt2);
-			}
-		
+		array_push($cp, array('$H8', '', '', False, True));
+		array_push($cp, array('$A3', '', 'Vencimento', False, True));
+		array_push($cp, array('$D8', '', 'de', True, True));
+		array_push($cp, array('$D8', '', 'até', False, True));
+		array_push($cp, array('$O 1:Confirmar envio&2:Enviar teste para meu e-mail', '', 'Enviar', True, True));
+
+		if (strlen(get("acao")) == 0) {
+			$dt1 = stod(date("Ymd")) + 1 * 24 * 60 * 60;
+			$dt2 = stod(date("Ymd")) + 1 * 24 * 60 * 60;
+			$_POST['dd2'] = date("d/m/Y", $dt1);
+			$_POST['dd3'] = date("d/m/Y", $dt2);
+		}
+
 		$form = new form;
-		$form->id = 0;
-		$tela = $form->editar($cp,'');
-			
+		$form -> id = 0;
+		$tela = $form -> editar($cp, '');
+
 		$data['de'] = get("dd2");
 		$data['ate'] = get("dd3");
-        $data['test'] = get("dd4");
-		$tela .= $this -> financeiros -> financeiro_abertos(2,$data);
-	
-		$tela .= $this->financeiros->creceber_enviar_email($data,$form->saved, $data['test']);
-		
+		$data['test'] = get("dd4");
+		$tela .= $this -> financeiros -> financeiro_abertos(2, $data);
+
+		$tela .= $this -> financeiros -> creceber_enviar_email($data, $form -> saved, $data['test']);
+
 		$data['title'] = 'Aviso de Vencimento - e-mail';
 		$data['content'] = $tela;
-		$this -> load -> view('content', $data);	
-				
-			
-		}
+		$this -> load -> view('content', $data);
+
+	}
 
 	function creceber_contabil_edit($id = '', $chk = '') {
 		$this -> load -> model('financeiros');
@@ -814,57 +807,57 @@ class Financeiro extends CI_Controller {
 		}
 	}
 
-    function creceber_abertos() {
-        $this -> load -> model('financeiros');
+	function creceber_abertos() {
+		$this -> load -> model('financeiros');
 
-        $this -> cab();
-        $data['title'] = msg('contas_receber_relatorio');
-        $form = new form;
-        $cp = array();
-        array_push($cp, array('$H8', '', '', false, true));
-        array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
-        array_push($cp, array('$D8', '', 'Vencimento final', False, true));
-        array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', False, true));
-        
-        $sql = "select * from _filiais where fi_ativo = 1";
-        array_push($cp, array('$Q id_fi:fi_nome_fantasia:'.$sql, '', 'Empresa', False, true));
-        $data['content'] = $form -> editar($cp, '');
-        $this -> load -> view('content', $data);
+		$this -> cab();
+		$data['title'] = msg('contas_receber_relatorio');
+		$form = new form;
+		$cp = array();
+		array_push($cp, array('$H8', '', '', false, true));
+		array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
+		array_push($cp, array('$D8', '', 'Vencimento final', False, true));
+		array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', False, true));
 
-        if ($form -> saved > 0) {
-            $dt['filial'] = get("dd4");
-            $sx = $this -> financeiros -> financeiro_abertos(2,$dt);
-            $data['content'] = $sx;
-            $this -> load -> view('content', $data);
-        }
-        $this -> footer();
-    }
+		$sql = "select * from _filiais where fi_ativo = 1";
+		array_push($cp, array('$Q id_fi:fi_nome_fantasia:' . $sql, '', 'Empresa', False, true));
+		$data['content'] = $form -> editar($cp, '');
+		$this -> load -> view('content', $data);
 
-    function cpagar_abertos() {
-        $this -> load -> model('financeiros');
+		if ($form -> saved > 0) {
+			$dt['filial'] = get("dd4");
+			$sx = $this -> financeiros -> financeiro_abertos(2, $dt);
+			$data['content'] = $sx;
+			$this -> load -> view('content', $data);
+		}
+		$this -> footer();
+	}
 
-        $this -> cab();
-        $data['title'] = msg('contas_pagar_relatorio');
-        $form = new form;
-        $cp = array();
-        array_push($cp, array('$H8', '', '', false, true));
-        array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
-        array_push($cp, array('$D8', '', 'Vencimento final', True, true));
-        array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', True, true));
-                $sql = "select * from _filiais where fi_ativo = 1";
-        array_push($cp, array('$Q id_fi:fi_nome_fantasia:'.$sql, '', 'Empresa', False, true));
-        
-        $data['content'] = $form -> editar($cp, '');
-        $this -> load -> view('content', $data);
+	function cpagar_abertos() {
+		$this -> load -> model('financeiros');
 
-        if ($form -> saved > 0) {
-            $dt['filial'] = get("dd4");
-            $sx = $this -> financeiros -> financeiro_abertos(1,$dt);
-            $data['content'] = $sx;
-            $this -> load -> view('content', $data);
-        }
-        $this -> footer();
-    }
+		$this -> cab();
+		$data['title'] = msg('contas_pagar_relatorio');
+		$form = new form;
+		$cp = array();
+		array_push($cp, array('$H8', '', '', false, true));
+		array_push($cp, array('$D8', '', 'Vencimento inicial', False, true));
+		array_push($cp, array('$D8', '', 'Vencimento final', True, true));
+		array_push($cp, array('$O A:Abertos&P:pagos&T:Todos', '', 'Situação', True, true));
+		$sql = "select * from _filiais where fi_ativo = 1";
+		array_push($cp, array('$Q id_fi:fi_nome_fantasia:' . $sql, '', 'Empresa', False, true));
+
+		$data['content'] = $form -> editar($cp, '');
+		$this -> load -> view('content', $data);
+
+		if ($form -> saved > 0) {
+			$dt['filial'] = get("dd4");
+			$sx = $this -> financeiros -> financeiro_abertos(1, $dt);
+			$data['content'] = $sx;
+			$this -> load -> view('content', $data);
+		}
+		$this -> footer();
+	}
 
 	function resumos_cpagar() {
 
@@ -967,13 +960,12 @@ class Financeiro extends CI_Controller {
 		$this -> load -> view('content', $data);
 		$this -> footer();
 	}
-    
-    function faturar()
-        {
-            $this->load->model('pedidos');
-            $this->cab();
-            
-        }
+
+	function faturar() {
+		$this -> load -> model('pedidos');
+		$this -> cab();
+
+	}
 
 }
 ?>

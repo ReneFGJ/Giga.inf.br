@@ -42,6 +42,22 @@ class Admin extends CI_controller {
             $this -> users -> create_admin_user();
         }
     }
+	
+	function export($tipo='') {
+		
+		switch($tipo)
+			{
+			case 'clientes':	
+				$this->load->model('clientes');
+				$this->clientes->export();				
+				break;
+			case 'funcionarios':
+				break;
+			default:
+				$this -> cab();
+			}		
+		$this -> footer();
+	}	
 
     /********************************************************************** perfil *********************/
     function perfil($id = '', $chk = '') {
