@@ -46,6 +46,21 @@ class Export extends CI_Controller {
 			}		
 		$this -> footer();
 	}
+    
+    function contas($tipo='',$off='')
+        {
+            $this->load->model('exports');
+            switch ($tipo)
+                {
+                case 'cpagar':
+                    echo $this->exports->cpagar($off);
+                    break;        
+                case 'creceber':
+                    echo $this->exports->creceber($off);
+                    break;        
+                }
+            
+        }
 	
 }
 ?>
